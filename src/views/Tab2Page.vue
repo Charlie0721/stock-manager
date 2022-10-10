@@ -22,12 +22,7 @@
           <ion-title size="large">Tab 2</ion-title>
         </ion-toolbar>
       </ion-header>
-      <ion-button @click="scanner()">Escanear Código barras</ion-button>
-      <ion-card-title>
-            <h4 class="letter-color">
-              {{ barcode }}
-            </h4>
-          </ion-card-title>
+
       <ion-card v-for="product in allProducts" :key="product.idproducto">
         <ion-card-header>
           <ion-card-title>
@@ -74,7 +69,6 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { BarcodeScanner } from "@ionic-native/barcode-scanner";
 import {
   IonPage,
   IonHeader,
@@ -87,7 +81,6 @@ import {
   IonCardTitle,
   IonCardHeader,
   IonCardContent,
-  //IonInput,
   IonButton,
   IonSearchbar,
 } from "@ionic/vue";
@@ -118,7 +111,6 @@ export default defineComponent({
       searchProduct: "" as string,
       allProductstoSearch: [] as any,
       productsToFilter: [] as any,
-      barcode: '' as any
     };
   },
   mounted() {
@@ -154,19 +146,7 @@ export default defineComponent({
         console.log(error);
       }
     },
-    scanner() {
-      const barcode = BarcodeScanner;
-      barcode
-        .scan()
-        .then((barcodeData) => {
-          this.barcode= barcodeData.text
-          console.log("BarcodeData",this.barcode);
-        
-        })
-        .catch((error) => {
-          console.log("Error", error);
-        });
-    },
+
     async searchOneProduct(event: any) {
       try {
         this.searchProduct = event.detail.value;
@@ -186,6 +166,7 @@ export default defineComponent({
         console.log(error);
       }
     },
+
     editProduct(id: number) {
       this.$router.push("/edit-product/" + id);
     },
