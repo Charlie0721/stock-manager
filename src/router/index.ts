@@ -56,7 +56,13 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/viewOrderByNumber.vue'),
     
   },
-  
+  { 
+    
+    path: '/data-collector',
+    name: 'dataCollector',
+    component: () => import('@/views/dataCollector.vue'),
+    
+  },
  
 ]
 

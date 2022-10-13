@@ -2,8 +2,13 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        
-        <ion-title><img class="edit-image" src="../images/images_app/logo_header.png" /> Consultar Inventarios </ion-title>
+        <ion-title
+          ><img class="edit-image" src="../images/images_app/logo_header.png" />
+          Consultar Inventarios
+          <ion-button class="btn-data-collector" @click="goToCollector()">
+            Recolector
+          </ion-button>
+        </ion-title>
       </ion-toolbar>
       <ion-searchbar
         animated
@@ -55,7 +60,9 @@ import {
   IonCardContent,
   IonCardSubtitle,
   IonSearchbar,
+  IonButton,
 } from "@ionic/vue";
+import router from "@/router";
 export default defineComponent({
   name: "Tab1Page",
   components: {
@@ -71,6 +78,7 @@ export default defineComponent({
     IonCardContent,
     IonCardSubtitle,
     IonSearchbar,
+    IonButton,
   },
 
   data() {
@@ -110,6 +118,9 @@ export default defineComponent({
         console.log(error);
       }
     },
+    goToCollector() {
+      this.$router.push("/data-collector");
+    },
   },
 });
 </script>
@@ -122,5 +133,16 @@ export default defineComponent({
 .edit-image {
   width: 5%;
   max-height: 5%;
+}
+.edit-image {
+  width: 5%;
+  max-height: 5%;
+}
+.btn-data-collector {
+  border-radius: 30px;
+}
+
+ion-button {
+  background-color: var(--ion-color-mycolor);
 }
 </style>
