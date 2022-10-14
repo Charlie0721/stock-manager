@@ -60,7 +60,7 @@
         class="btn-edit-product"
         expand="full"
         @click="createFile()"
-        ><ion-icon :icon="i.saveSharp"></ion-icon> Capturar</ion-button
+        ><ion-icon :icon="i.document"></ion-icon> Generar Archivo txt</ion-button
       >
     </ion-content>
   </ion-page>
@@ -158,9 +158,8 @@ export default defineComponent({
           collector.barcode + collector.coma + collector.amount + "\n"
         );
       });
-      
-      console.log(barcode)
-      const blob = new Blob([barcode], {
+
+      const blob = new Blob([barcode.join("")], {
         type: "text/plain;charset=utf-8",
       });
       FileSaver.saveAs(blob, "inventario.txt");
