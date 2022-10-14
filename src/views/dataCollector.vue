@@ -59,7 +59,7 @@
         color="mycolor"
         class="btn-edit-product"
         expand="full"
-        @click="showListing()"
+        @click="createFile()"
         ><ion-icon :icon="i.saveSharp"></ion-icon> Capturar</ion-button
       >
     </ion-content>
@@ -80,17 +80,15 @@ import {
   IonCardSubtitle,
   IonCard,
   IonCardTitle,
-  //   IonCardHeader,
   IonButton,
-  //   IonSearchbar,
   IonItem,
   IonLabel,
   IonInput,
-  // IonTextarea,
   IonIcon,
   IonList,
 } from "@ionic/vue";
 import { ISearchByBarcodeToCollector } from "../interfaces/barcode.interface";
+import FileSaver, { saveAs } from "file-saver";
 export default defineComponent({
   name: "Tab2Page",
   components: {
@@ -103,12 +101,10 @@ export default defineComponent({
     IonCard,
     IonCardTitle,
     IonList,
-
     IonButton,
     IonItem,
     IonLabel,
     IonInput,
-    // IonTextarea,
     IonIcon,
   },
   data() {
@@ -147,17 +143,28 @@ export default defineComponent({
         finalDataParsed.forEach((collector: any) => {
           this.dataCollector.push(collector);
         });
-        console.log(this.dataCollector);
       } catch (error) {
         console.log(error);
       }
     },
 
-    // showListing() {
-    //   this.dataInTextArea;
+    createFile() {
+      const dataParsed = JSON.stringify(this.dataCollector);
+      let barcode: any = [];
 
-    //   console.log(this.dataInTextArea);
-    // },
+      const finalDataParsed = JSON.parse(dataParsed);
+      finalDataParsed.forEach((collector: any) => {
+        barcode.push(
+          collector.barcode + collector.coma + collector.amount + "\n"
+        );
+      });
+      
+      console.log(barcode)
+      const blob = new Blob([barcode], {
+        type: "text/plain;charset=utf-8",
+      });
+      FileSaver.saveAs(blob, "inventario.txt");
+    },
   },
 });
 </script>
