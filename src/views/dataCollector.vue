@@ -24,10 +24,17 @@
             <ion-label position="floating">Codigo de Barras</ion-label>
             <ion-input
               type="text"
-              :value="barcodeScan.barcode"
+              :value="barcode"
               @input="barcodeScan.barcode = $event.target.value"
             ></ion-input>
           </ion-item>
+          <ion-button
+            color="mycolor"
+            expand="full"
+            class="btn-edit-product"
+            @click="scanner()"
+            >Escanear Código barras</ion-button
+          >
           <ion-button
             color="mycolor"
             class="btn-edit-product"
@@ -74,6 +81,7 @@
 import { defineComponent } from "vue";
 import * as allIcons from "ionicons/icons";
 import { BarcodeCollectorSearch } from "../services/dataRecolector";
+import { BarcodeScanner } from "@ionic-native/barcode-scanner";
 import {
   IonPage,
   IonHeader,
@@ -127,10 +135,21 @@ export default defineComponent({
     returnProducts() {
       this.$router.push("/tabs/tab1");
     },
+    scanner() {
+      const barcode = BarcodeScanner;
+      barcode
+        .scan()
+        .then((barcodeData) => {
+          this.barcode = barcodeData.text;
+        })
+        .catch((error) => {
+          console.log("Error", error);
+        });
+    },
     async searchProduct() {
       try {
         let scanB = this.barcodeScan.barcode;
-        if (scanB === "" || scanB ==='' || scanB === undefined) {
+        if (scanB === "" || scanB === "" || scanB === undefined) {
           const alert = await alertController.create({
             cssClass: "my-custom-class",
             header: "ATENCIÓN !!!",
