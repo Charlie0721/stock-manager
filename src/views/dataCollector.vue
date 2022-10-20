@@ -60,7 +60,11 @@
         class="btn-edit-product"
         expand="full"
         @click="createFile()"
-        ><ion-icon :icon="i.document"></ion-icon> Generar Archivo txt</ion-button
+        ><ion-icon :icon="i.document"></ion-icon> Generar Archivo
+        txt</ion-button
+      >
+      <ion-button color="danger" expand="full" @click="returnProducts()"
+        ><ion-icon :icon="i.arrowBackSharp"></ion-icon>Volver</ion-button
       >
     </ion-content>
   </ion-page>
@@ -76,7 +80,7 @@ import {
   IonToolbar,
   IonTitle,
   IonContent,
-  //   alertController,
+  alertController,
   IonCardSubtitle,
   IonCard,
   IonCardTitle,
@@ -120,49 +124,69 @@ export default defineComponent({
   },
 
   methods: {
+    returnProducts() {
+      this.$router.push("/tabs/tab1");
+    },
     async searchProduct() {
       try {
-        const response = await BarcodeCollectorSearch.searchProductBarcode(
-          this.barcodeScan
-        );
-        this.descriptions = response.data;
-        this.barcode = response.data[0].barcode;
-        this.barcodeScan.barcode = "";
+        let scanB = this.barcodeScan.barcode;
+        if (scanB === "" || scanB ==='' || scanB === undefined) {
+          const alert = await alertController.create({
+            cssClass: "my-custom-class",
+            header: "ATENCIÓN !!!",
+            subHeader: `NO PASA VALIDACIÓN `,
+            message: `DEBE INGRESAR CODIGO DE BARRAS !!`,
+            buttons: ["ACEPTAR"],
+          });
+          await alert.present();
+          return false;
+        } else {
+          const response = await BarcodeCollectorSearch.searchProductBarcode(
+            this.barcodeScan
+          );
+          this.descriptions = response.data;
+          this.barcode = response.data[0].barcode;
+          this.barcodeScan.barcode = "";
 
-        const finalData = [
-          {
-            barcode: this.barcode,
-            coma: this.coma,
-            amount: this.amount,
-          },
-        ];
+          const finalData = [
+            {
+              barcode: this.barcode,
+              coma: this.coma,
+              amount: this.amount,
+            },
+          ];
 
-        const finalDataCollector = JSON.stringify(finalData);
-        const finalDataParsed = JSON.parse(finalDataCollector);
+          const finalDataCollector = JSON.stringify(finalData);
+          const finalDataParsed = JSON.parse(finalDataCollector);
 
-        finalDataParsed.forEach((collector: any) => {
-          this.dataCollector.push(collector);
-        });
+          finalDataParsed.forEach((collector: any) => {
+            this.dataCollector.push(collector);
+          });
+        }
       } catch (error) {
         console.log(error);
       }
     },
 
     createFile() {
-      const dataParsed = JSON.stringify(this.dataCollector);
-      let barcode: any = [];
+      try {
+        const dataParsed = JSON.stringify(this.dataCollector);
+        let barcode: any = [];
 
-      const finalDataParsed = JSON.parse(dataParsed);
-      finalDataParsed.forEach((collector: any) => {
-        barcode.push(
-          collector.barcode + collector.coma + collector.amount + "\n"
-        );
-      });
+        const finalDataParsed = JSON.parse(dataParsed);
+        finalDataParsed.forEach((collector: any) => {
+          barcode.push(
+            collector.barcode + collector.coma + collector.amount + "\n"
+          );
+        });
 
-      const blob = new Blob([barcode.join("")], {
-        type: "text/plain;charset=utf-8",
-      });
-      FileSaver.saveAs(blob, "inventario.txt");
+        const blob = new Blob([barcode.join("")], {
+          type: "text/plain;charset=utf-8",
+        });
+        FileSaver.saveAs(blob, "inventario.txt");
+      } catch (error) {
+        console.log(error);
+      }
     },
   },
 });

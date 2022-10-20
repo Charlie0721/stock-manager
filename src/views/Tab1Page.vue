@@ -5,7 +5,7 @@
         <ion-title
           ><img class="edit-image" src="../images/images_app/logo_header.png" />
           Consultar Inventarios
-          <ion-button class="btn-data-collector" @click="goToCollector()">
+          <ion-button  color="mycolor" class="btn-edit-product" @click="goToCollector()">
             Recolector
           </ion-button>
         </ion-title>
@@ -62,7 +62,6 @@ import {
   IonSearchbar,
   IonButton,
 } from "@ionic/vue";
-import router from "@/router";
 export default defineComponent({
   name: "Tab1Page",
   components: {
@@ -126,23 +125,20 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.letter-color {
-  color: #82230d;
-  text-shadow: 1px 1px #fff;
-}
+
 .edit-image {
   width: 5%;
   max-height: 5%;
 }
-.edit-image {
-  width: 5%;
-  max-height: 5%;
-}
-.btn-data-collector {
-  border-radius: 30px;
+.btn-edit-product {
+  border-radius: 10px;
 }
 
 ion-button {
   background-color: var(--ion-color-mycolor);
+}
+.letter-color {
+  color: #82230d;
+  text-shadow: 1px 1px #fff;
 }
 </style>
