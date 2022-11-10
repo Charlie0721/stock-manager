@@ -159,8 +159,8 @@ export default defineComponent({
           document.body.style.opacity = "1";
           console.log(result.content); // log the raw scanned content
         }
-        let barcode = result.content;
-        this.barcode = barcode;
+        this.barcodeScan.barcode = result.content;
+        this.barcode =  this.barcodeScan.barcode;
       } catch (error) {
         const alert = await alertController.create({
           cssClass: "my-custom-class",
@@ -221,9 +221,7 @@ export default defineComponent({
           return false;
         }
 
-        // user has not denied permission
-        // but the user also has not yet granted the permission
-        // so request it
+       
         const statusRequest = await BarcodeScanner.checkPermission({
           force: true,
         });
@@ -254,8 +252,8 @@ export default defineComponent({
 
     async searchProduct() {
       try {
-        let scanB = this.barcodeScan.barcode;
-        if (scanB === "" || scanB === "" || scanB === undefined) {
+        this.barcode  = this.barcodeScan.barcode;
+        if (this.barcode === "" || this.barcode === "" || this.barcode === undefined) {
           const alert = await alertController.create({
             cssClass: "my-custom-class",
             header: "ATENCIÓN !!!",
@@ -270,8 +268,7 @@ export default defineComponent({
             this.barcodeScan
           );
           this.descriptions = response.data;
-          this.barcode = response.data[0].barcode;
-          this.barcodeScan.barcode = "";
+          
           const finalData = [
             {
               barcode: this.barcode,
@@ -284,6 +281,7 @@ export default defineComponent({
           finalDataParsed.forEach((collector: any) => {
             this.dataCollector.push(collector);
           });
+          this.barcode=""
         }
       } catch (error) {
         console.log(error);
