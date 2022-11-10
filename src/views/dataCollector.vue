@@ -8,7 +8,7 @@
         </ion-title>
       </ion-toolbar>
     </ion-header>
-    <ion-content>
+    <ion-content className=".hideBg">
       <ion-card>
         <ion-card-title>
           <h4
@@ -32,8 +32,14 @@
             color="mycolor"
             expand="full"
             class="btn-edit-product"
-            @click="scanner()"
+            @click="startScan()"
             >Escanear Código barras</ion-button
+          >
+          <ion-button
+            color="mycolor"
+            class="btn-edit-product"
+            @click="stopScan()"
+            >Stop scan</ion-button
           >
           <ion-button
             color="mycolor"
@@ -43,6 +49,9 @@
           >
             Busca Producto</ion-button
           >
+          <h4 class="letter-color">
+            {{ barcode }}
+          </h4>
           <ion-item>
             <ion-label position="floating">Cantidad</ion-label>
             <ion-input
@@ -66,7 +75,7 @@
         color="mycolor"
         class="btn-edit-product"
         expand="full"
-        @click="createFile()"
+        @click="writeSecretFile()"
         ><ion-icon :icon="i.document"></ion-icon> Generar Archivo
         txt</ion-button
       >
@@ -81,7 +90,7 @@
 import { defineComponent } from "vue";
 import * as allIcons from "ionicons/icons";
 import { BarcodeCollectorSearch } from "../services/dataRecolector";
-import { BarcodeScanner } from "@ionic-native/barcode-scanner";
+import { BarcodeScanner } from "@capacitor-community/barcode-scanner";
 import {
   IonPage,
   IonHeader,
@@ -100,7 +109,7 @@ import {
   IonList,
 } from "@ionic/vue";
 import { ISearchByBarcodeToCollector } from "../interfaces/barcode.interface";
-import FileSaver, { saveAs } from "file-saver";
+import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
 export default defineComponent({
   name: "Tab2Page",
   components: {
@@ -130,22 +139,119 @@ export default defineComponent({
       coma: "," as string,
     };
   },
-
   methods: {
     returnProducts() {
       this.$router.push("/tabs/tab1");
     },
-    scanner() {
-      const barcode = BarcodeScanner;
-      barcode
-        .scan()
-        .then((barcodeData) => {
-          this.barcode = barcodeData.text;
-        })
-        .catch((error) => {
-          console.log("Error", error);
+    async startScan() {
+      try {
+        this.didUserGrantPermission();
+        document.body.style.opacity = "0.2";
+        document.body.style.background = "transparent";
+
+        BarcodeScanner.hideBackground(); // make background of WebView transparent
+
+        const result = await BarcodeScanner.startScan(); // start scanning and wait for a result
+
+        // if the result has content
+        if (result.hasContent) {
+          document.body.style.background = "";
+          document.body.style.opacity = "1";
+          console.log(result.content); // log the raw scanned content
+        }
+        let barcode = result.content;
+        this.barcode = barcode;
+      } catch (error) {
+        const alert = await alertController.create({
+          cssClass: "my-custom-class",
+          header: "Error !!! ",
+          message: `error: ${error.message}`,
+          buttons: ["ACEPTAR"],
         });
+        await alert.present();
+        return false;
+      }
     },
+    stopScan() {
+      BarcodeScanner.showBackground();
+      BarcodeScanner.stopScan();
+    },
+
+    deactivated() {
+      this.stopScan();
+    },
+
+    beforeDestroy() {
+      this.stopScan();
+    },
+    async didUserGrantPermission() {
+      try {
+        const status = await BarcodeScanner.checkPermission({ force: false });
+
+        if (status.granted) {
+          // user granted permission
+          return true;
+        }
+
+        if (status.denied) {
+          // user denied permission
+          return false;
+        }
+
+        if (status.asked) {
+          // system requested the user for permission during this call
+          // only possible when force set to true
+        }
+
+        if (status.neverAsked) {
+          // user has not been requested this permission before
+          // it is advised to show the user some sort of prompt
+          // this way you will not waste your only chance to ask for the permission
+          const c = confirm(
+            "We need your permission to use your camera to be able to scan barcodes"
+          );
+          if (!c) {
+            return false;
+          }
+        }
+
+        if (status.restricted || status.unknown) {
+          // ios only
+          // probably means the permission has been denied
+          return false;
+        }
+
+        // user has not denied permission
+        // but the user also has not yet granted the permission
+        // so request it
+        const statusRequest = await BarcodeScanner.checkPermission({
+          force: true,
+        });
+
+        if (statusRequest.asked) {
+          // system requested the user for permission during this call
+          // only possible when force set to true
+        }
+
+        if (statusRequest.granted) {
+          // the user did grant the permission now
+          return true;
+        }
+
+        // user did not grant the permission, so he must have declined the request
+        return false;
+      } catch (error) {
+        const alert = await alertController.create({
+          cssClass: "my-custom-class",
+          header: "Error !!! " + error,
+          message: `error: ${error.message}`,
+          buttons: ["ACEPTAR"],
+        });
+        await alert.present();
+        return false;
+      }
+    },
+
     async searchProduct() {
       try {
         let scanB = this.barcodeScan.barcode;
@@ -166,7 +272,6 @@ export default defineComponent({
           this.descriptions = response.data;
           this.barcode = response.data[0].barcode;
           this.barcodeScan.barcode = "";
-
           const finalData = [
             {
               barcode: this.barcode,
@@ -174,10 +279,8 @@ export default defineComponent({
               amount: this.amount,
             },
           ];
-
           const finalDataCollector = JSON.stringify(finalData);
           const finalDataParsed = JSON.parse(finalDataCollector);
-
           finalDataParsed.forEach((collector: any) => {
             this.dataCollector.push(collector);
           });
@@ -187,22 +290,22 @@ export default defineComponent({
       }
     },
 
-    createFile() {
+    async writeSecretFile() {
       try {
         const dataParsed = JSON.stringify(this.dataCollector);
         let barcode: any = [];
-
         const finalDataParsed = JSON.parse(dataParsed);
         finalDataParsed.forEach((collector: any) => {
           barcode.push(
             collector.barcode + collector.coma + collector.amount + "\n"
           );
         });
-
-        const blob = new Blob([barcode.join("")], {
-          type: "text/plain;charset=utf-8",
+        await Filesystem.writeFile({
+          path: "secrets/inventory.txt",
+          data: barcode.join(""),
+          directory: Directory.Documents,
+          encoding: Encoding.UTF8,
         });
-        FileSaver.saveAs(blob, "inventario.txt");
       } catch (error) {
         console.log(error);
       }
@@ -219,12 +322,14 @@ export default defineComponent({
 .btn-edit-product {
   border-radius: 30px;
 }
-
 ion-button {
   background-color: var(--ion-color-mycolor);
 }
 .letter-color {
   color: #82230d;
   text-shadow: 1px 1px #fff;
+}
+.hideBg::part(background) {
+  display: none;
 }
 </style>
