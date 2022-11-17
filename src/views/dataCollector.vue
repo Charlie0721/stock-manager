@@ -35,12 +35,7 @@
             @click="startScan()"
             >Escanear Código barras</ion-button
           >
-          <ion-button
-            color="mycolor"
-            class="btn-edit-product"
-            @click="stopScan()"
-            >Stop scan</ion-button
-          >
+
           <ion-button
             color="mycolor"
             class="btn-edit-product"
@@ -75,13 +70,20 @@
         color="mycolor"
         class="btn-edit-product"
         expand="full"
-        @click="writeSecretFile()"
+        @click="writeFile()"
         ><ion-icon :icon="i.document"></ion-icon> Generar Archivo
         txt</ion-button
       >
       <ion-button color="danger" expand="full" @click="returnProducts()"
         ><ion-icon :icon="i.arrowBackSharp"></ion-icon>Volver</ion-button
       >
+      <ion-button
+        expand="full"
+        color="mycolor"
+        class="btn-edit-product"
+        @click="newOrder()"
+        ><ion-icon :icon="i.refreshCircleSharp"></ion-icon> Iniciar
+      </ion-button>
     </ion-content>
   </ion-page>
 </template>
@@ -109,7 +111,6 @@ import {
   IonList,
 } from "@ionic/vue";
 import { ISearchByBarcodeToCollector } from "../interfaces/barcode.interface";
-import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
 export default defineComponent({
   name: "Tab2Page",
   components: {
@@ -160,7 +161,7 @@ export default defineComponent({
           console.log(result.content); // log the raw scanned content
         }
         this.barcodeScan.barcode = result.content;
-        this.barcode =  this.barcodeScan.barcode;
+        this.barcode = this.barcodeScan.barcode;
       } catch (error) {
         const alert = await alertController.create({
           cssClass: "my-custom-class",
@@ -175,6 +176,9 @@ export default defineComponent({
     stopScan() {
       BarcodeScanner.showBackground();
       BarcodeScanner.stopScan();
+    },
+    newOrder() {
+      location.reload();
     },
 
     deactivated() {
@@ -221,7 +225,6 @@ export default defineComponent({
           return false;
         }
 
-       
         const statusRequest = await BarcodeScanner.checkPermission({
           force: true,
         });
@@ -252,8 +255,12 @@ export default defineComponent({
 
     async searchProduct() {
       try {
-        this.barcode  = this.barcodeScan.barcode;
-        if (this.barcode === "" || this.barcode === "" || this.barcode === undefined) {
+        this.barcode = this.barcodeScan.barcode;
+        if (
+          this.barcode === "" ||
+          this.barcode === "" ||
+          this.barcode === undefined
+        ) {
           const alert = await alertController.create({
             cssClass: "my-custom-class",
             header: "ATENCIÓN !!!",
@@ -268,7 +275,7 @@ export default defineComponent({
             this.barcodeScan
           );
           this.descriptions = response.data;
-          
+
           const finalData = [
             {
               barcode: this.barcode,
@@ -281,29 +288,39 @@ export default defineComponent({
           finalDataParsed.forEach((collector: any) => {
             this.dataCollector.push(collector);
           });
-          this.barcode=""
+          this.barcode = "";
         }
       } catch (error) {
         console.log(error);
       }
     },
 
-    async writeSecretFile() {
+    async writeFile() {
       try {
-        const dataParsed = JSON.stringify(this.dataCollector);
-        let barcode: any = [];
-        const finalDataParsed = JSON.parse(dataParsed);
-        finalDataParsed.forEach((collector: any) => {
-          barcode.push(
-            collector.barcode + collector.coma + collector.amount + "\n"
-          );
-        });
-        await Filesystem.writeFile({
-          path: "secrets/inventory.txt",
-          data: barcode.join(""),
-          directory: Directory.Documents,
-          encoding: Encoding.UTF8,
-        });
+        let data = this.dataCollector;
+        if (data.length > 0) {
+          const createFile = await BarcodeCollectorSearch.generateTxtFile(data);
+          console.log(createFile);
+          const alert = await alertController.create({
+            cssClass: "my-custom-class",
+            header: "CONFIRMACIÓN !!!",
+            subHeader: `SE DESCARGO ARCHIVO EN SERVIDOR POS `,
+            message: `ARCHIVO GENERADO PARA SUBIR A CONEXION POS`,
+            buttons: ["ACEPTAR"],
+          });
+          await alert.present();
+          return false;
+        } else {
+          const alert = await alertController.create({
+            cssClass: "my-custom-class",
+            header: "ATENCION !!!",
+            subHeader: `NO PASA VALIDACIÓN `,
+            message: `DEBE CARGAR DATOS PARA SUBIR A CONEXION POS`,
+            buttons: ["ACEPTAR"],
+          });
+          await alert.present();
+          return false;
+        }
       } catch (error) {
         console.log(error);
       }

@@ -444,7 +444,7 @@ export default defineComponent({
     fabToggled(e: any) {
       e.stopPropagation();
     },
-    async newOrder() {
+    newOrder() {
       location.reload();
     },
     async createClient() {
