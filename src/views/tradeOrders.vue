@@ -47,13 +47,13 @@
           </ion-card>
         </ion-fab-list>
       </ion-fab>
-      <ion-button
+      <!-- <ion-button
         color="mycolor"
         class="btn-edit-product"
         expand="full"
         @click="getNumbers(idalmacen)"
         >Numero de pedido</ion-button
-      >
+      > -->
       <ion-button
         id="open-modal1"
         expand="block"
@@ -432,6 +432,9 @@ export default defineComponent({
       shoppingCart: {} as any,
       finalCant: 0 as number,
       TotalProduct: 0 as number,
+      idsoftware: 0 as number,
+      detalle:"" as string,
+      plazo: 0 as number,
     };
   },
   mounted() {
@@ -608,17 +611,7 @@ export default defineComponent({
           await alert.present();
           return false;
         }
-        if (this.finalNumber === 0) {
-          const alert = await alertController.create({
-            cssClass: "my-custom-class",
-            header: "ATENCION !!!",
-            subHeader: `NO PASA VALIDACION `,
-            message: `DEBE DAR CLICK EN EL BOTON "NUMERO DE PEDIDO"`,
-            buttons: ["ACEPTAR"],
-          });
-          await alert.present();
-          return false;
-        }
+    
         if (this.addTotals === 0 || this.addTotals < 0) {
           const alert = await alertController.create({
             cssClass: "my-custom-class",
@@ -630,6 +623,7 @@ export default defineComponent({
           await alert.present();
           return false;
         } else {
+          await this.getNumbers()
           this.saveTradeOrder.numero = this.finalNumber;
           this.saveTradeOrder.fecha = this.date;
           this.saveTradeOrder.subtotal = this.addTotals;
@@ -641,8 +635,10 @@ export default defineComponent({
           this.saveTradeOrder.detpedidos = this.productArray;
           this.saveTradeOrder.idtercero = this.idtercero;
           this.saveTradeOrder.idvendedor = this.idvendedor;
+          this.saveTradeOrder.idsoftware=2;
+          this.saveTradeOrder.detalle= "Pedido desde app movil";
+          this.saveTradeOrder.plazo= this.plazo;
         }
-
         const saveOrder = await tradeOrders.saveOrder(this.saveTradeOrder);
         console.log(saveOrder);
         const alert = await alertController.create({

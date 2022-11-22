@@ -92,7 +92,10 @@
 import { defineComponent } from "vue";
 import * as allIcons from "ionicons/icons";
 import { BarcodeCollectorSearch } from "../services/dataRecolector";
-import { BarcodeScanner } from "@capacitor-community/barcode-scanner";
+import {
+  BarcodeScanner,
+  SupportedFormat,
+} from "@capacitor-community/barcode-scanner";
 import {
   IonPage,
   IonHeader,
@@ -152,7 +155,14 @@ export default defineComponent({
 
         BarcodeScanner.hideBackground(); // make background of WebView transparent
 
-        const result = await BarcodeScanner.startScan(); // start scanning and wait for a result
+        const result = await BarcodeScanner.startScan({
+          targetedFormats: [
+            SupportedFormat.QR_CODE,
+            SupportedFormat.CODE_128,
+            SupportedFormat.EAN_13,
+            SupportedFormat.EAN_8,
+          ],
+        }); // start scanning and wait for a result
 
         // if the result has content
         if (result.hasContent) {

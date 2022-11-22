@@ -11,6 +11,9 @@ export interface ItradeOrderHeader {
     valretenciones: number;
     idalmacen: number;
     estado: number;
+    detalle?: string,
+    idsoftware: number;
+    plazo: number;
     detpedidos: ItradeOrderDetail[]; 
 }
 
