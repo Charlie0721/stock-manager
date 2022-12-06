@@ -5,11 +5,11 @@
         <ion-title>
           <img class="edit-image1" src="../images/images_app/logo_header.png" />
           Pedido Comercial
-          <img
+          <!-- <img
             class="edit-image"
             src="../images/images_app/shopping_cart.png"
             @click="viewOrder(idalmacen, finalNumber)"
-          />
+          /> -->
         </ion-title>
       </ion-toolbar>
     </ion-header>
@@ -42,18 +42,19 @@
                   </ion-select-option>
                 </ion-select>
               </ion-item>
-              <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="getIdalmacen()"> Aceptar</ion-button>
+              <ion-button
+                color="mycolor"
+                class="btn-edit-product"
+                expand="full"
+                @click="getIdalmacen()"
+              >
+                Aceptar</ion-button
+              >
             </ion-card-content>
           </ion-card>
         </ion-fab-list>
       </ion-fab>
-      <!-- <ion-button
-        color="mycolor"
-        class="btn-edit-product"
-        expand="full"
-        @click="getNumbers(idalmacen)"
-        >Numero de pedido</ion-button
-      > -->
+
       <ion-button
         id="open-modal1"
         expand="block"
@@ -334,7 +335,10 @@
 import { defineComponent } from "vue";
 import * as allIcons from "ionicons/icons";
 import { tradeOrders } from "@/services/tradeOrder";
-import { ItradeOrderHeader } from "@/interfaces/traderOrder.interface";
+import {
+  ItradeOrderDetail,
+  ItradeOrderHeader,
+} from "@/interfaces/traderOrder.interface";
 import { IcreateClient } from "@/interfaces/createClient.interface";
 import {
   IonPage,
@@ -409,6 +413,7 @@ export default defineComponent({
       employees: [] as any,
       searchEmployees: "" as string,
       date: "" as string,
+      currentTime: "" as string,
       products: [] as any,
       searchProduct: "" as string,
       productArray: [] as any,
@@ -419,7 +424,7 @@ export default defineComponent({
       customerName: "" as string,
       customerNit: "" as string,
       despachado: 0 as number,
-      idTradeOrder: 0 as number,
+      idTradeOrder: "" as string,
       descuentoProd: 0 as number,
       finalAmount: 0 as number,
       finalSalePrice: 0 as number,
@@ -433,7 +438,7 @@ export default defineComponent({
       finalCant: 0 as number,
       TotalProduct: 0 as number,
       idsoftware: 0 as number,
-      detalle:"" as string,
+      detalle: "" as string,
       plazo: 0 as number,
     };
   },
@@ -441,7 +446,6 @@ export default defineComponent({
     this.getWarehouses();
     this.getEmployee();
     this.getDate();
-    this.getId();
   },
   methods: {
     fabToggled(e: any) {
@@ -539,19 +543,17 @@ export default defineComponent({
       }
     },
 
-     addAmount(idproducto: number) {
+    addAmount(idproducto: number) {
       const producto = this.productArray.filter((r) => {
         return r.idproducto === idproducto;
       })[0];
       if (producto) {
-        
         producto.cantidad++;
         this.finalAmount = producto.cantidad;
         this.addTotals = this.productArray.reduce(
-          (total,  { cantidad, valorprod }) => total + cantidad * valorprod,
+          (total, { cantidad, valorprod }) => total + cantidad * valorprod,
           0
         );
-        
       }
     },
 
@@ -569,14 +571,15 @@ export default defineComponent({
       }
     },
 
-    async getId() {
-      try {
-        const idTrade = await tradeOrders.getIdTradeOrder();
-        this.idTradeOrder = idTrade.data.length + 1;
-      } catch (error) {
-        console.log(error);
-      }
-    },
+    //     async getId() {
+    //       try {
+    //         const idTrade = await tradeOrders.getIdTradeOrder();
+    //         this.idTradeOrder = idTrade.data.length + 1;
+    //         console.log(this.idTradeOrder);
+    //       } catch (error) {
+    //         console.log(error);
+    //       }
+    //  },
     async saveCompleteTradeOrder() {
       try {
         if (this.idalmacen === 0 || this.SelectIdalmacen == 0) {
@@ -611,7 +614,7 @@ export default defineComponent({
           await alert.present();
           return false;
         }
-    
+
         if (this.addTotals === 0 || this.addTotals < 0) {
           const alert = await alertController.create({
             cssClass: "my-custom-class",
@@ -623,7 +626,7 @@ export default defineComponent({
           await alert.present();
           return false;
         } else {
-          await this.getNumbers()
+          await this.getNumbers();
           this.saveTradeOrder.numero = this.finalNumber;
           this.saveTradeOrder.fecha = this.date;
           this.saveTradeOrder.subtotal = this.addTotals;
@@ -632,23 +635,34 @@ export default defineComponent({
           this.saveTradeOrder.valretenciones = 0;
           this.saveTradeOrder.idalmacen = this.idalmacen;
           this.saveTradeOrder.estado = 3;
-          this.saveTradeOrder.detpedidos = this.productArray;
           this.saveTradeOrder.idtercero = this.idtercero;
           this.saveTradeOrder.idvendedor = this.idvendedor;
-          this.saveTradeOrder.idsoftware=2;
-          this.saveTradeOrder.detalle= "Pedido desde app movil";
-          this.saveTradeOrder.plazo= this.plazo;
+          this.saveTradeOrder.idsoftware = 2;
+          this.saveTradeOrder.detalle = "Pedido desde app movil";
+          this.saveTradeOrder.fechacrea = this.date;
+          this.saveTradeOrder.hora=this.currentTime
+          this.saveTradeOrder.plazo = this.plazo;
+          console.log(this.currentTime)
+          const idTrade = await tradeOrders.getIdTradeOrder();
+          this.idTradeOrder = idTrade.data.length + 1;
+          console.log(this.idTradeOrder);
+          const finalProduct = this.productArray;
+          finalProduct.forEach((product) => {
+            const newProducts = finalProduct.find(
+              (item) => item.idproducto === product.idproducto
+            );
+            newProducts.idpedido = this.idTradeOrder;
+            console.log(newProducts);
+          });
+
+          this.saveTradeOrder.detpedidos = finalProduct;
+
+          console.trace(this.saveTradeOrder);
+          const saveOrder1 = await tradeOrders.saveOrder(this.saveTradeOrder);
+          console.log(saveOrder1);
         }
-        const saveOrder = await tradeOrders.saveOrder(this.saveTradeOrder);
-        console.log(saveOrder);
-        const alert = await alertController.create({
-          cssClass: "my-custom-class",
-          header: "CONFIRMACION !!!",
-          subHeader: `PEDIDO ${this.finalNumber} GUARDADO SATISFACTORIAMENTE `,
-          message: `FACTURAR EN CONEXION POS CON EL NUMERO ${this.finalNumber}`,
-          buttons: ["ACEPTAR"],
-        });
-        await alert.present();
+        //  console.log(`${this.idTradeOrder}`);
+        this.viewOrder(this.idalmacen, this.finalNumber);
       } catch (error) {
         console.log(error);
       }
@@ -668,7 +682,7 @@ export default defineComponent({
       }
     },
 
-    selectProduct(
+    async selectProduct(
       idproducto: number,
       descripcion: string,
       precioventa: number,
@@ -678,7 +692,6 @@ export default defineComponent({
       try {
         const product = [
           {
-            idpedido: this.idTradeOrder,
             idproducto: idproducto,
             descripcion: descripcion,
             valorprod: precioventa,
@@ -745,6 +758,9 @@ export default defineComponent({
       let date = new Date();
       let year = date.getFullYear();
       let month = date.getMonth() + 1;
+      let hour = date.getHours();
+      let minutes = date.getMinutes();
+      let seconds = date.getSeconds();
       let updatedMonth = month.toString();
       if (updatedMonth.length == 1) {
         updatedMonth = `0${updatedMonth}`;
@@ -754,6 +770,7 @@ export default defineComponent({
         day = `0${day}`;
       }
       this.date = `${year}${updatedMonth}${day}`;
+      this.currentTime=`${hour}:${minutes}:${seconds}`;
     },
     selectEmployee(id: number, nit: string, nombres: string) {
       this.idvendedor = id;

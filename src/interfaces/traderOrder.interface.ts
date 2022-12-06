@@ -12,6 +12,8 @@ export interface ItradeOrderHeader {
     idalmacen: number;
     estado: number;
     detalle?: string,
+    fechacrea:string;
+    hora:string;
     idsoftware: number;
     plazo: number;
     detpedidos: ItradeOrderDetail[]; 
@@ -19,7 +21,7 @@ export interface ItradeOrderHeader {
 
 export interface ItradeOrderDetail {
 
-    idpedido: number;
+    idpedido: string;
     idproducto: number;
     cantidad: number;
     valorprod: number;

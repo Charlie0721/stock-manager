@@ -11,9 +11,9 @@
     <ion-content :fullscreen="true">
       <ion-card>
         <ion-card-header>
-          <ion-card-subtitle class="letter-color"
-            >Pedido número {{ numb }}</ion-card-subtitle
-          >
+          <ion-card-subtitle class="letter-color"></ion-card-subtitle>
+          <h2 class="letter-color">Pedido número {{ numb }}</h2>
+
           <ion-card-title class="letter-color"
             >CLIENTE: {{ name }} {{ lastName }}</ion-card-title
           >
@@ -62,9 +62,13 @@
     <ion-footer collapse="fade">
       <ion-toolbar>
         <ion-title>
-          <ion-button expand="full" color="mycolor" @click="returnOrder()"
+          <!-- <ion-router-link color="secondary" href="/trade-orders">Volver</ion-router-link> -->
+          <!-- <ion-button expand="full" color="mycolor" @click="returnOrder()"
             ><ion-icon :icon="i.arrowBackSharp"></ion-icon>Volver
-          </ion-button></ion-title
+          </ion-button> -->
+          <!-- <ion-button router-link="/trade-orders" router-direction="back" >Volver</ion-button> -->
+          <a class="letter-color" href="/trade-orders">Volver</a>
+          </ion-title
         >
       </ion-toolbar>
     </ion-footer>
@@ -94,9 +98,11 @@ import {
   IonLabel,
   IonText,
   IonFooter,
+ 
 } from "@ionic/vue";
 import { tradeOrders } from "../services/tradeOrder";
 import vueQr from "vue-qr/src/packages/vue-qr.vue";
+//import { useIonRouter } from '@ionic/vue';
 export default defineComponent({
   name: "viewOrder",
 
@@ -111,14 +117,15 @@ export default defineComponent({
     IonCardHeader,
     IonCardSubtitle,
     IonCardTitle,
-    IonIcon,
+   // IonIcon,
     IonItem,
-    IonButton,
+   // IonButton,
     IonContent,
     IonList,
     IonLabel,
     IonText,
     IonFooter,
+   
   },
   data() {
     return {
@@ -136,9 +143,12 @@ export default defineComponent({
     this.getOrderByNumber();
   },
   methods: {
-    returnOrder() {
-      this.$router.push("/trade-orders");
-    },
+    // returnOrder() {
+    //   //this.$router.push("/trade-orders");
+    //   const ionRouter = useIonRouter();
+    //   ionRouter.navigate('/trade-orders', 'forward', 'replace')
+    // },
+
     async getOrderByNumber() {
       try {
         this.idalm = this.$route.params.idalmacen.toString();
@@ -160,7 +170,6 @@ export default defineComponent({
 });
 </script>
 <style scoped>
-
 ion-button {
   background-color: var(--ion-color-mycolor);
 }
