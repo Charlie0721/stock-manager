@@ -5,56 +5,17 @@
         <ion-title>
           <img class="edit-image1" src="../images/images_app/logo_header.png" />
           Pedido Comercial
-          <!-- <img
-            class="edit-image"
-            src="../images/images_app/shopping_cart.png"
-            @click="viewOrder(idalmacen, finalNumber)"
-          /> -->
+
+          <ion-button
+            color="mycolor"
+            class="btn-edit-product"
+            @click="newOrder()"
+            ><ion-icon :icon="i.refreshCircleSharp"></ion-icon> Nuevo Pedido
+          </ion-button>
         </ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
-      <ion-fab
-        id="remote_controller"
-        vertical="start"
-        horizontal="start"
-        slot="fixed"
-      >
-        <ion-fab-button color="danger">
-          <ion-icon :icon="i.add"></ion-icon>
-        </ion-fab-button>
-        <ion-fab-list side="bottom" @click="fabToggled($event)">
-          <ion-card>
-            <ion-card-header>Seleccionar Almacén</ion-card-header>
-            <ion-card-content>
-              <ion-item>
-                <ion-label>Almacen</ion-label>
-                <ion-select
-                  :value="SelectIdalmacen"
-                  @ionChange="SelectIdalmacen = $event.target.value"
-                >
-                  <ion-select-option
-                    :value="warehouse.idalmacen"
-                    v-for="warehouse in allWarehouses"
-                    :key="warehouse.idalmacen"
-                  >
-                    {{ warehouse.nomalmacen }}
-                  </ion-select-option>
-                </ion-select>
-              </ion-item>
-              <ion-button
-                color="mycolor"
-                class="btn-edit-product"
-                expand="full"
-                @click="getIdalmacen()"
-              >
-                Aceptar</ion-button
-              >
-            </ion-card-content>
-          </ion-card>
-        </ion-fab-list>
-      </ion-fab>
-
       <ion-button
         id="open-modal1"
         expand="block"
@@ -261,7 +222,7 @@
           expand="block"
           color="mycolor"
           class="btn-edit-product"
-          @click="getProducts(idalmacen)"
+          @click="getProducts()"
         >
           <ion-icon :icon="i.searchCircleSharp"></ion-icon>Seleccionar
           Productos</ion-button
@@ -320,13 +281,6 @@
             </ion-list>
           </ion-content>
         </ion-modal>
-        <ion-button
-          expand="full"
-          color="mycolor"
-          class="btn-edit-product"
-          @click="newOrder()"
-          ><ion-icon :icon="i.refreshCircleSharp"></ion-icon> Nuevo Pedido
-        </ion-button>
       </ion-content>
     </ion-content>
   </ion-page>
@@ -347,16 +301,11 @@ import {
   IonTitle,
   IonContent,
   IonCardSubtitle,
-  IonFab,
-  IonFabButton,
-  IonFabList,
   IonIcon,
   IonCard,
   IonCardContent,
   IonCardHeader,
   IonLabel,
-  IonSelectOption,
-  IonSelect,
   IonItem,
   IonButton,
   alertController,
@@ -379,17 +328,12 @@ export default defineComponent({
     IonTitle,
     IonContent,
     IonPage,
-    IonFab,
-    IonFabButton,
     IonCardSubtitle,
-    IonFabList,
     IonIcon,
     IonCard,
     IonCardContent,
     IonCardHeader,
     IonLabel,
-    IonSelectOption,
-    IonSelect,
     IonItem,
     IonButton,
     IonList,
@@ -406,7 +350,7 @@ export default defineComponent({
       i: allIcons,
       SelectIdalmacen: 0 as number,
       allWarehouses: [] as any,
-      idalmacen: 0 as number,
+      idalmacen: "" as string,
       finalNumber: 0 as number,
       customers: [] as any,
       searhCustomer: "" as string,
@@ -443,7 +387,6 @@ export default defineComponent({
     };
   },
   mounted() {
-    this.getWarehouses();
     this.getEmployee();
     this.getDate();
   },
@@ -571,27 +514,8 @@ export default defineComponent({
       }
     },
 
-    //     async getId() {
-    //       try {
-    //         const idTrade = await tradeOrders.getIdTradeOrder();
-    //         this.idTradeOrder = idTrade.data.length + 1;
-    //         console.log(this.idTradeOrder);
-    //       } catch (error) {
-    //         console.log(error);
-    //       }
-    //  },
     async saveCompleteTradeOrder() {
       try {
-        if (this.idalmacen === 0 || this.SelectIdalmacen == 0) {
-          const alert = await alertController.create({
-            cssClass: "my-custom-class",
-            header: "ATENCION !!!",
-            subHeader: `NO PASA VALIDACION `,
-            message: `DEBE SELECCIONAR ALMACEN`,
-            buttons: ["ACEPTAR"],
-          });
-          await alert.present();
-        }
         if (this.idvendedor === 0) {
           const alert = await alertController.create({
             cssClass: "my-custom-class",
@@ -640,28 +564,23 @@ export default defineComponent({
           this.saveTradeOrder.idsoftware = 2;
           this.saveTradeOrder.detalle = "Pedido desde app movil";
           this.saveTradeOrder.fechacrea = this.date;
-          this.saveTradeOrder.hora=this.currentTime
+          this.saveTradeOrder.hora = this.currentTime;
           this.saveTradeOrder.plazo = this.plazo;
-          console.log(this.currentTime)
           const idTrade = await tradeOrders.getIdTradeOrder();
           this.idTradeOrder = idTrade.data.length + 1;
-          console.log(this.idTradeOrder);
           const finalProduct = this.productArray;
           finalProduct.forEach((product) => {
             const newProducts = finalProduct.find(
               (item) => item.idproducto === product.idproducto
             );
             newProducts.idpedido = this.idTradeOrder;
-            console.log(newProducts);
           });
 
           this.saveTradeOrder.detpedidos = finalProduct;
 
-          console.trace(this.saveTradeOrder);
           const saveOrder1 = await tradeOrders.saveOrder(this.saveTradeOrder);
           console.log(saveOrder1);
         }
-        //  console.log(`${this.idTradeOrder}`);
         this.viewOrder(this.idalmacen, this.finalNumber);
       } catch (error) {
         console.log(error);
@@ -733,10 +652,12 @@ export default defineComponent({
         console.log(error);
       }
     },
-    async getProducts(id: number) {
+    async getProducts() {
       try {
-        id = this.idalmacen;
-        if (id === 0) {
+        let idAlm = localStorage.getItem("idAlmacen");
+
+        this.idalmacen = JSON.parse(idAlm);
+        if (idAlm === "") {
           const alert = await alertController.create({
             cssClass: "my-custom-class",
             header: "INFORMACION !!!",
@@ -746,7 +667,7 @@ export default defineComponent({
           });
           await alert.present();
         } else {
-          const getProduct = await tradeOrders.getProducts(id);
+          const getProduct = await tradeOrders.getProducts(this.idalmacen);
 
           this.products = getProduct.data;
         }
@@ -770,7 +691,7 @@ export default defineComponent({
         day = `0${day}`;
       }
       this.date = `${year}${updatedMonth}${day}`;
-      this.currentTime=`${hour}:${minutes}:${seconds}`;
+      this.currentTime = `${hour}:${minutes}:${seconds}`;
     },
     selectEmployee(id: number, nit: string, nombres: string) {
       this.idvendedor = id;
@@ -834,17 +755,7 @@ export default defineComponent({
         console.log(error);
       }
     },
-    async getWarehouses() {
-      try {
-        const warehouses = await tradeOrders.getWarehouse();
-        this.allWarehouses = warehouses.data;
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    getIdalmacen() {
-      this.idalmacen = this.SelectIdalmacen;
-    },
+
     async getNumbers(id: number) {
       try {
         id = this.idalmacen;

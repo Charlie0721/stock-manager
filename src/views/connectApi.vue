@@ -195,7 +195,7 @@ export default defineComponent({
         if (typeof conn == "string") {
           connection = JSON.parse(conn);
         }
-        this.$router.push("/tabs/tab1");
+        this.$router.push("/warehouse-for-orders");
       } else {
         this.$router.push("/");
              const alert = await alertController.create({

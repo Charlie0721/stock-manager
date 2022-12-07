@@ -12,6 +12,12 @@ const routes: Array<RouteRecordRaw> = [
 
   },
   {
+    path: '/warehouse-for-orders',
+    name: 'warehouse',
+    component: () => import('@/views/warehouseForOrders.vue'),
+
+  },
+  {
     path: '/tabs/',
     component: TabsPage,
     children: [
