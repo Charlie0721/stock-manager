@@ -27,7 +27,14 @@
               :value="barcode"
               @input="barcodeScan.barcode = $event.target.value"
             ></ion-input>
+            <ion-label position="floating">Cantidad</ion-label>
+            <ion-input
+              type="text"
+              :value="amount"
+              @input="amount = $event.target.value"
+            ></ion-input>
           </ion-item>
+          
           <ion-button
             color="mycolor"
             expand="full"
@@ -266,6 +273,7 @@ export default defineComponent({
     async searchProduct() {
       try {
         this.barcode = this.barcodeScan.barcode;
+        let amount=this.amount;
         if (
           this.barcode === "" ||
           this.barcode === "" ||
@@ -290,7 +298,7 @@ export default defineComponent({
             {
               barcode: this.barcode,
               coma: this.coma,
-              amount: this.amount,
+              amount: amount,
             },
           ];
           const finalDataCollector = JSON.stringify(finalData);
@@ -299,6 +307,7 @@ export default defineComponent({
             this.dataCollector.push(collector);
           });
           this.barcode = "";
+          this.amount=1;
         }
       } catch (error) {
         console.log(error);
