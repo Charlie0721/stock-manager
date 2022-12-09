@@ -29,7 +29,7 @@
             ></ion-input>
             <ion-label position="floating">Cantidad</ion-label>
             <ion-input
-              type="text"
+              type="number"
               :value="amount"
               @input="amount = $event.target.value"
             ></ion-input>
