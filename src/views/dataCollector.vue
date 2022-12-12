@@ -34,7 +34,7 @@
               @input="amount = $event.target.value"
             ></ion-input>
           </ion-item>
-          
+
           <ion-button
             color="mycolor"
             expand="full"
@@ -151,6 +151,10 @@ export default defineComponent({
     };
   },
   methods: {
+    newOrder() {
+      location.reload();
+    },
+
     returnProducts() {
       this.$router.push("/tabs/tab1");
     },
@@ -193,9 +197,6 @@ export default defineComponent({
     stopScan() {
       BarcodeScanner.showBackground();
       BarcodeScanner.stopScan();
-    },
-    newOrder() {
-      location.reload();
     },
 
     deactivated() {
@@ -273,7 +274,7 @@ export default defineComponent({
     async searchProduct() {
       try {
         this.barcode = this.barcodeScan.barcode;
-        let amount=this.amount;
+        let amount = this.amount;
         if (
           this.barcode === "" ||
           this.barcode === "" ||
@@ -307,7 +308,7 @@ export default defineComponent({
             this.dataCollector.push(collector);
           });
           this.barcode = "";
-          this.amount=1;
+          this.amount = 1;
         }
       } catch (error) {
         console.log(error);
