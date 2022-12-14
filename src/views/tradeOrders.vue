@@ -252,6 +252,7 @@
               @input="searchByBarcode = $event.target.value"
               placeholder="Código de barras"
               @ionChange="searchBarcode($event)"
+              autofocus="true"
             ></ion-input>
             <ion-button
               color="mycolor"
@@ -287,7 +288,7 @@
                         product.codiva
                       )
                     "
-                    >Comprar<ion-icon
+                    >Agregar<ion-icon
                       :icon="i.checkmarkCircleOutline"
                     ></ion-icon>
                   </ion-button>
@@ -400,7 +401,7 @@ export default defineComponent({
       idsoftware: 0 as number,
       detalle: "" as string,
       plazo: 0 as number,
-      searchByBarcode: "" as string,
+      searchByBarcode: "" as string
     };
   },
   mounted() {
@@ -755,6 +756,7 @@ export default defineComponent({
         finalProductParsed.forEach((product: any) => {
           this.productArray.push(product);
         });
+        this.searchByBarcode = "";
       } catch (error) {
         console.log(error);
       }
@@ -783,8 +785,9 @@ export default defineComponent({
     async searchBarcode(e: any) {
       try {
         this.searchByBarcode = e.detail.value;
+        this.searchByBarcode = this.searchByBarcode.toUpperCase();
         if (this.searchByBarcode === "") {
-          return  await this.getProducts(this.idalmacen);
+          return await this.getProducts(this.idalmacen);
         }
         if (this.searchByBarcode && this.searchByBarcode.trim() != "") {
           this.products = this.products.filter((product: any) => {

@@ -201,6 +201,22 @@
               placeholder="Buscar Producto"
               @ionChange="searchOneProduct($event)"
             ></ion-searchbar>
+            <ion-input
+              type="text"
+              :value="searchByBarcode"
+              @input="searchByBarcode = $event.target.value"
+              placeholder="Código de barras"
+              @ionChange="searchBarcode($event)"
+              autofocus="true"
+            ></ion-input>
+            <ion-button
+              color="mycolor"
+              expand="full"
+              class="btn-edit-product"
+              @click="startScan()"
+            >
+              Buscar Código barras</ion-button
+            >
             <ion-list v-for="product in products" :key="product.idproduct">
               <ion-item>
                 <ion-label
@@ -243,8 +259,7 @@
           color="mycolor"
           class="btn-edit-product"
           @click="newOrder()"
-          ><ion-icon :icon="i.refreshCircleSharp"></ion-icon> Nuevo
-          Movimiento
+          ><ion-icon :icon="i.refreshCircleSharp"></ion-icon> Nuevo Movimiento
         </ion-button>
       </ion-content>
     </ion-content>
@@ -256,6 +271,10 @@ import { defineComponent } from "vue";
 import * as allIcons from "ionicons/icons";
 import { InventoryMovements } from "@/services/movementInventory";
 import { IIngMovInvEntrada } from "@/interfaces/inventoryMovements.interface";
+import {
+  BarcodeScanner,
+  SupportedFormat,
+} from "@capacitor-community/barcode-scanner";
 import {
   IonPage,
   IonHeader,
@@ -335,7 +354,8 @@ export default defineComponent({
       cost: 0 as number,
       detail: "" as string,
       idMovement: 0 as number,
-      salida:0 as number,
+      salida: 0 as number,
+      searchByBarcode: "" as string,
     };
   },
   mounted() {
@@ -346,6 +366,143 @@ export default defineComponent({
     fabToggled(e: any) {
       e.stopPropagation();
     },
+
+  async searchBarcode(e: any) {
+      try {
+        this.searchByBarcode = e.detail.value;
+        this.searchByBarcode = this.searchByBarcode.toUpperCase();
+        if (this.searchByBarcode === "") {
+          return await this.getProducts(this.idalmacen);
+        }
+        if (this.searchByBarcode && this.searchByBarcode.trim() != "") {
+          this.products = this.products.filter((product: any) => {
+            return product.barcode.indexOf(this.searchByBarcode) > -1;
+          });
+        }
+      } catch (error) {
+        const alert = await alertController.create({
+          cssClass: "my-custom-class",
+          header: "ERROR !!!",
+          subHeader: `${error.message} `,
+          message: `Error: ${error.message}`,
+          buttons: ["ACEPTAR"],
+        });
+        await alert.present();
+      }
+    },
+
+   async startScan() {
+      try {
+        this.didUserGrantPermission();
+        document.body.style.opacity = "0.2";
+        document.body.style.background = "transparent";
+
+        BarcodeScanner.hideBackground(); // make background of WebView transparent
+
+        const result = await BarcodeScanner.startScan({
+          targetedFormats: [
+            SupportedFormat.QR_CODE,
+            SupportedFormat.CODE_128,
+            SupportedFormat.EAN_13,
+            SupportedFormat.EAN_8,
+          ],
+        }); // start scanning and wait for a result
+
+        // if the result has content
+        if (result.hasContent) {
+          document.body.style.background = "";
+          document.body.style.opacity = "1";
+          console.log(result.content); // log the raw scanned content
+        }
+        this.searchByBarcode = result.content;
+      } catch (error) {
+        const alert = await alertController.create({
+          cssClass: "my-custom-class",
+          header: "Error !!! ",
+          message: `error: ${error.message}`,
+          buttons: ["ACEPTAR"],
+        });
+        await alert.present();
+        return false;
+      }
+    },
+    stopScan() {
+      BarcodeScanner.showBackground();
+      BarcodeScanner.stopScan();
+    },
+
+    deactivated() {
+      this.stopScan();
+    },
+
+    beforeDestroy() {
+      this.stopScan();
+    },
+    async didUserGrantPermission() {
+      try {
+        const status = await BarcodeScanner.checkPermission({ force: false });
+
+        if (status.granted) {
+          // user granted permission
+          return true;
+        }
+
+        if (status.denied) {
+          // user denied permission
+          return false;
+        }
+
+        if (status.asked) {
+          // system requested the user for permission during this call
+          // only possible when force set to true
+        }
+
+        if (status.neverAsked) {
+          // user has not been requested this permission before
+          // it is advised to show the user some sort of prompt
+          // this way you will not waste your only chance to ask for the permission
+          const c = confirm(
+            "We need your permission to use your camera to be able to scan barcodes"
+          );
+          if (!c) {
+            return false;
+          }
+        }
+
+        if (status.restricted || status.unknown) {
+          // ios only
+          // probably means the permission has been denied
+          return false;
+        }
+
+        const statusRequest = await BarcodeScanner.checkPermission({
+          force: true,
+        });
+
+        if (statusRequest.asked) {
+          // system requested the user for permission during this call
+          // only possible when force set to true
+        }
+
+        if (statusRequest.granted) {
+          // the user did grant the permission now
+          return true;
+        }
+
+        // user did not grant the permission, so he must have declined the request
+        return false;
+      } catch (error) {
+        const alert = await alertController.create({
+          cssClass: "my-custom-class",
+          header: "Error !!! " + error,
+          message: `error: ${error.message}`,
+          buttons: ["ACEPTAR"],
+        });
+        await alert.present();
+        return false;
+      }
+    },
+
     newOrder() {
       location.reload();
     },
@@ -406,7 +563,6 @@ export default defineComponent({
       cantidadAct: number
     ) {
       try {
-       
         const product = [
           {
             idajuste: this.idMovement,
@@ -415,8 +571,8 @@ export default defineComponent({
             costo: costo,
             entrada: this.finalAmount,
             cantidadAct: cantidadAct,
-            salida:0,
-            idalmacen:this.idalmacen,
+            salida: 0,
+            idalmacen: this.idalmacen,
           },
         ];
         const productFinal = JSON.stringify(product);
@@ -425,6 +581,7 @@ export default defineComponent({
         finalProductParsed.forEach((product: any) => {
           this.productArray.push(product);
         });
+        this.searchByBarcode= "";
       } catch (error) {
         console.log(error);
       }
@@ -575,16 +732,15 @@ export default defineComponent({
         await alert.present();
         return false;
       } else {
-        
         this.saveInventoryMovements.idalmacen = this.idalmacen;
-        this.saveInventoryMovements.idusuario= 1;
-        this.saveInventoryMovements.idconceptajuste= 1;
+        this.saveInventoryMovements.idusuario = 1;
+        this.saveInventoryMovements.idconceptajuste = 1;
         this.saveInventoryMovements.numero = this.finalNumber;
         this.saveInventoryMovements.fecha = this.fecha.replace(/-/gi, "");
         this.saveInventoryMovements.detalle = this.detail;
         this.saveInventoryMovements.ajustesinv = this.productArray;
         this.saveInventoryMovements.idtercero = this.idtercero;
-        this.saveInventoryMovements.estado=0;
+        this.saveInventoryMovements.estado = 0;
         const saveInventoryMovementsToPos =
           await InventoryMovements.movementInventorySave(
             this.saveInventoryMovements
