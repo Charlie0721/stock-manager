@@ -207,7 +207,7 @@
               @input="searchByBarcode = $event.target.value"
               placeholder="Código de barras"
               @ionChange="searchBarcode($event)"
-              autofocus="true"
+              :clear-input="true"
             ></ion-input>
             <ion-button
               color="mycolor"
@@ -367,7 +367,7 @@ export default defineComponent({
       e.stopPropagation();
     },
 
-  async searchBarcode(e: any) {
+    async searchBarcode(e: any) {
       try {
         this.searchByBarcode = e.detail.value;
         this.searchByBarcode = this.searchByBarcode.toUpperCase();
@@ -391,7 +391,7 @@ export default defineComponent({
       }
     },
 
-   async startScan() {
+    async startScan() {
       try {
         this.didUserGrantPermission();
         document.body.style.opacity = "0.2";
@@ -581,7 +581,7 @@ export default defineComponent({
         finalProductParsed.forEach((product: any) => {
           this.productArray.push(product);
         });
-        this.searchByBarcode= "";
+        this.searchByBarcode = "";
       } catch (error) {
         console.log(error);
       }

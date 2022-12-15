@@ -94,8 +94,12 @@
         >
         </ion-searchbar>
         <ion-content>
-          <ion-list>
-            <ion-label>
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>Seleccionar Cliente</ion-card-title>
+              <ion-card-subtitle>Click sobre el cliente</ion-card-subtitle>
+            </ion-card-header>
+            <ion-card-content>
               <ion-list
                 background-hover="92949c"
                 v-for="customer in customers"
@@ -108,12 +112,13 @@
                   )
                 "
               >
-                <ion-item :button="true" :detail="false">
-                  NIT: {{ customer.nit }}. {{ customer.nombres }}
-                </ion-item></ion-list
-              ></ion-label
-            >
-          </ion-list>
+                <ion-item>
+                  <ion-label> NIT: {{ customer.nit }}</ion-label>
+                </ion-item>
+                <ion-item> {{ customer.nombres }} </ion-item>
+              </ion-list>
+            </ion-card-content>
+          </ion-card>
         </ion-content>
       </ion-popover>
       <ion-button
@@ -252,7 +257,7 @@
               @input="searchByBarcode = $event.target.value"
               placeholder="Código de barras"
               @ionChange="searchBarcode($event)"
-              autofocus="true"
+              :clear-input="true"
             ></ion-input>
             <ion-button
               color="mycolor"
@@ -401,7 +406,7 @@ export default defineComponent({
       idsoftware: 0 as number,
       detalle: "" as string,
       plazo: 0 as number,
-      searchByBarcode: "" as string
+      searchByBarcode: "" as string,
     };
   },
   mounted() {
