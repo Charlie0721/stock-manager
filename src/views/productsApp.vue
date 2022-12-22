@@ -28,6 +28,34 @@
         <ion-icon :icon="i.refreshCircleSharp"> </ion-icon>
         Cargar</ion-button
       >
+      <br />
+      <br />
+      <ion-progress-bar
+        type="indeterminate"
+        color="danger"
+        v-if="changeProducts === true"
+      ></ion-progress-bar>
+      <br />
+      <h2 class="letter-color" v-if="changeProducts === true">
+        Cargando Productos
+      </h2>
+      <ion-progress-bar
+        type="indeterminate"
+        color="danger"
+        v-if="changeProducts === true"
+      ></ion-progress-bar>
+      <br />
+      <ion-progress-bar
+        type="indeterminate"
+        color="danger"
+        v-if="changeProducts === true"
+      ></ion-progress-bar>
+      <br />
+      <ion-progress-bar
+        type="indeterminate"
+        color="danger"
+        v-if="changeProducts === true"
+      ></ion-progress-bar>
 
       <ion-fab-list side="top" @click="fabToggled($event)">
         <ion-card>
@@ -57,6 +85,7 @@ import {
   IonItem,
   IonIcon,
   IonFabList,
+  IonProgressBar,
 } from "@ionic/vue";
 import axios from "axios";
 
@@ -74,7 +103,7 @@ export default defineComponent({
     IonLabel,
     IonButton,
     IonItem,
-
+    IonProgressBar,
     IonIcon,
 
     IonFabList,
@@ -83,6 +112,7 @@ export default defineComponent({
     return {
       i: allIcons,
       Allproducts: [] as any,
+      changeProducts: false as boolean,
     };
   },
 
@@ -96,7 +126,7 @@ export default defineComponent({
         this.Allproducts = getProduct.data;
 
         localStorage.setItem("allProducts", JSON.stringify(this.Allproducts));
-
+        this.changeProducts = true;
         this.sendProductsToApp();
         this.$router.push("/tabs/tab2");
       } catch (error) {
@@ -131,5 +161,9 @@ ion-button {
 .edit-image1 {
   width: 5%;
   max-height: 5%;
+}
+.letter-color {
+  color: #82230d;
+  text-shadow: 1px 1px #fff;
 }
 </style>
