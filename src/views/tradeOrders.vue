@@ -279,7 +279,7 @@
                   {{
                     new Intl.NumberFormat("de-DE").format(product.precioventa)
                   }}
-                  | Cantidad: {{ product.cantidad }}
+                 
                   <ion-button
                     color="mycolor"
                     class="btn-edit-product"
@@ -813,22 +813,9 @@ export default defineComponent({
     async getProducts() {
       try {
         let idAlm = localStorage.getItem("idAlmacen");
-
         this.idalmacen = JSON.parse(idAlm);
-        if (idAlm === "") {
-          const alert = await alertController.create({
-            cssClass: "my-custom-class",
-            header: "INFORMACION !!!",
-            subHeader: `PARA CONTINUAR `,
-            message: `DEBE SELECCIONAR ALMACEN`,
-            buttons: ["ACEPTAR"],
-          });
-          await alert.present();
-        } else {
-          const getProduct = await tradeOrders.getProducts(this.idalmacen);
-
-          this.products = getProduct.data;
-        }
+        let products = localStorage.getItem("allProducts");
+        this.products = JSON.parse(products);
       } catch (error) {
         console.log(error);
       }

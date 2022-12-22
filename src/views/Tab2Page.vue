@@ -6,6 +6,12 @@
           ><img class="edit-image" src="../images/images_app/logo_header.png" />
           Listado de Productos</ion-title
         >
+        <ion-button
+          color="mycolor"
+          class="btn-edit-product"
+          @click="updatePageWithProducts()"
+          ><ion-icon :icon="i.refreshCircleSharp"></ion-icon>
+        </ion-button>
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
@@ -99,8 +105,9 @@ import {
   IonButton,
   IonSearchbar,
   IonInput,
+  IonIcon,
 } from "@ionic/vue";
-import { getAllProductsFromAplication } from "@/services/searchPricesService";
+import { Products } from "@/services/Products";
 import * as allIcons from "ionicons/icons";
 import vueQr from "vue-qr/src/packages/vue-qr.vue";
 import {
@@ -124,6 +131,7 @@ export default defineComponent({
     IonCardContent,
     IonButton,
     IonInput,
+    IonIcon,
   },
   data() {
     return {
@@ -138,13 +146,25 @@ export default defineComponent({
   mounted() {
     this.getAllProducts();
   },
+
   methods: {
+    async updatePageWithProducts() {
+      const getProduct = await Products.getAllProductsFromAplication();
+      this.Allproducts = getProduct.data;
+
+      localStorage.setItem("allProducts", JSON.stringify(this.Allproducts));
+    
+    await this.reloadPage();
+    },
+    reloadPage() {
+      location.reload();
+    },
+
     async getAllProducts() {
       try {
-        const resProducts = await getAllProductsFromAplication();
-        this.allProducts = resProducts.data;
-
-        if (resProducts.data.length > 0) {
+        let products = localStorage.getItem("allProducts");
+        this.allProducts = JSON.parse(products);
+        if (products.length > 0) {
           const alert = await alertController.create({
             cssClass: "my-custom-class",
             header: "CONFIRMACIÓN !!!!",
@@ -173,7 +193,7 @@ export default defineComponent({
         this.searchByBarcode = e.detail.value;
         this.searchByBarcode = this.searchByBarcode.toUpperCase();
         if (this.searchByBarcode === "") {
-          return await this.getAllProducts();
+          return this.getAllProducts();
         }
         if (this.searchByBarcode && this.searchByBarcode.trim() != "") {
           this.allProducts = this.allProducts.filter((product: any) => {

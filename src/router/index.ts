@@ -18,6 +18,12 @@ const routes: Array<RouteRecordRaw> = [
 
   },
   {
+    path: '/products-for-app',
+    name: 'productsForApp',
+    component: () => import('@/views/productsApp.vue'),
+
+  },
+  {
     path: '/tabs/',
     component: TabsPage,
     children: [

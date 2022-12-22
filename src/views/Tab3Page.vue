@@ -334,7 +334,6 @@ export default defineComponent({
   data() {
     return {
       i: allIcons,
-
       saveInventoryMovements: {} as IIngMovInvEntrada,
       SelectIdalmacen: 0 as number,
       allWarehouses: [] as any,

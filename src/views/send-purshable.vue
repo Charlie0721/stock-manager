@@ -415,7 +415,7 @@ export default defineComponent({
         this.searchByBarcode = e.detail.value;
         this.searchByBarcode = this.searchByBarcode.toUpperCase();
         if (this.searchByBarcode === "") {
-          return await this.getProducts(this.idalmacen);
+          return await this.getProducts();
         }
         if (this.searchByBarcode && this.searchByBarcode.trim() != "") {
           this.products = this.products.filter((product: any) => {
@@ -551,9 +551,8 @@ export default defineComponent({
     },
     async getProducts() {
       try {
-        const getProduct = await Purchases.getProductsByApp();
-
-        this.products = getProduct.data;
+        let products = localStorage.getItem("allProducts");
+        this.products = JSON.parse(products);
       } catch (error) {
         console.log(error);
       }
@@ -568,7 +567,7 @@ export default defineComponent({
         this.searchProduct = e.detail.value;
         this.searchProduct = this.searchProduct.toUpperCase();
         if (this.searchProduct === "") {
-          return await this.getProducts(this.idalmacen);
+          return await this.getProducts();
         }
         if (this.searchProduct && this.searchProduct.trim() != "") {
           this.products = this.products.filter((product: any) => {

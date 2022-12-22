@@ -132,19 +132,19 @@ export default defineComponent({
     getIdalmacen() {
       this.idalmacen = this.SelectIdalmacen;
       localStorage.setItem("idAlmacen", JSON.stringify(this.idalmacen));
-      this.$router.push("/tabs/tab1");
+      this.$router.push("/products-for-app");
     },
     fabToggled(e: any) {
       e.stopPropagation();
     },
     async sendIdToOrders() {
       if (localStorage.getItem("idAlmacen")) {
-        const id = localStorage.getItem("connection");
+        const id = localStorage.getItem("idAlmacen");
         let idAlm;
         if (typeof id == "string") {
           idAlm = JSON.parse(id);
         }
-        this.$router.push("/tabs/tab1");
+        this.$router.push("/products-for-app");
       } else {
         this.$router.push("/warehouse-for-orders");
         const alert = await alertController.create({
