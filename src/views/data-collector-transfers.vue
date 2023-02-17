@@ -4,11 +4,23 @@
       <ion-toolbar>
         <ion-title
           ><img class="edit-image" src="../images/images_app/logo_header.png" />
-          Recolector de Inventarios
+          Recolector de Traslados
         </ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content className=".hideBg">
+      <ion-card>
+        <ion-card-title>
+          <h4>Almacenes</h4>
+        </ion-card-title>
+        <ion-list v-for="warehouse in warehouses" :key="warehouse.idalmacen">
+          <ion-item>
+            <ion-label
+              >{{ warehouse.idalmacen }}{{ warehouse.nomalmacen }}</ion-label
+            >
+          </ion-item>
+        </ion-list>
+      </ion-card>
       <ion-card>
         <ion-card-title>
           <h4
@@ -21,7 +33,19 @@
         </ion-card-title>
         <ion-card-subtitle>
           <ion-item>
-            <ion-label position="floating">Codigo de Barras</ion-label>
+            <ion-label position="floating">Id almacen origen</ion-label>
+            <ion-input
+              type="number"
+              :value="warehouseId1"
+              @input="warehouseId1 = $event.target.value"
+            ></ion-input>
+            <ion-label position="floating">Id almacen destino</ion-label>
+            <ion-input
+              type="number"
+              :value="warehouseId2"
+              @input="warehouseId2 = $event.target.value"
+            ></ion-input>
+            <ion-label position="floating">Codigo de barras</ion-label>
             <ion-input
               type="text"
               :value="barcode"
@@ -65,10 +89,15 @@
           </ion-item>
         </ion-card-subtitle>
       </ion-card>
-      <ion-list v-for="collector in dataCollector" :key="collector.collector">
+      <ion-list
+        v-for="collector in dataCollectorTransfers"
+        :key="collector.collector"
+      >
         <ion-item>
           <ion-label
-            >{{ collector.barcode }}{{ collector.coma
+            >{{ collector.warehouse1 }}{{ collector.coma
+            }}{{ collector.warehouse2 }}{{ collector.coma1 }}
+            {{ collector.barcode }}{{ collector.coma2
             }}{{ collector.amount }}</ion-label
           >
         </ion-item>
@@ -91,74 +120,79 @@
         @click="newOrder()"
         ><ion-icon :icon="i.refreshCircleSharp"></ion-icon> Iniciar
       </ion-button>
-      <ion-button
-        expand="full"
-        color="mycolor"
-        class="btn-edit-product"
-        @click="goToCollectorTransfer()"
-      >
-        Recolector de traslados
-      </ion-button>
     </ion-content>
   </ion-page>
 </template>
 
+
 <script lang="ts">
 import { defineComponent } from "vue";
 import * as allIcons from "ionicons/icons";
-import { BarcodeCollectorSearch } from "../services/dataRecolector";
-import {
-  BarcodeScanner,
-  SupportedFormat,
-} from "@capacitor-community/barcode-scanner";
+
 import {
   IonPage,
   IonHeader,
   IonToolbar,
   IonTitle,
   IonContent,
-  alertController,
-  IonCardSubtitle,
   IonCard,
   IonCardTitle,
-  IonButton,
+  IonList,
   IonItem,
   IonLabel,
+  alertController,
   IonInput,
+  IonButton,
+  IonCardSubtitle,
   IonIcon,
-  IonList,
 } from "@ionic/vue";
-import { ISearchByBarcodeToCollector } from "../interfaces/barcode.interface";
+import { ISearchByBarcodeToCollector } from "@/interfaces/barcode.interface";
+import { BarcodeCollectorSearch } from "../services/dataRecolector";
+import {
+  BarcodeScanner,
+  SupportedFormat,
+} from "@capacitor-community/barcode-scanner";
 export default defineComponent({
-  name: "Tab2Page",
   components: {
+    IonPage,
     IonHeader,
     IonToolbar,
     IonTitle,
     IonContent,
-    IonPage,
-    IonCardSubtitle,
     IonCard,
     IonCardTitle,
     IonList,
-    IonButton,
     IonItem,
-    IonLabel,
     IonInput,
+    IonLabel,
+    IonButton,
+    IonCardSubtitle,
     IonIcon,
   },
   data() {
     return {
       i: allIcons,
+      warehouses: [] as any,
       barcodeScan: {} as ISearchByBarcodeToCollector,
       amount: 1 as number,
-      descriptions: [] as any,
-      dataCollector: [] as any,
       barcode: "" as string,
       coma: "," as string,
+      coma1: "," as string,
+      coma2: "," as string,
+      warehouseId1: 0 as number,
+      warehouseId2: 0 as number,
+      dataCollectorTransfers: [] as any,
+      descriptions: [] as any,
     };
   },
+  mounted() {
+    this.getWarehouses();
+  },
   methods: {
+    async getWarehouses() {
+      const response = await BarcodeCollectorSearch.getWarehouses();
+      this.warehouses = response.data;
+    },
     newOrder() {
       location.reload();
     },
@@ -308,15 +342,19 @@ export default defineComponent({
 
           const finalData = [
             {
-              barcode: this.barcode,
+              warehouse1: this.warehouseId1,
               coma: this.coma,
+              warehouse2: this.warehouseId2,
+              coma1: this.coma1,
+              barcode: this.barcode,
+              coma2: this.coma2,
               amount: amount,
             },
           ];
           const finalDataCollector = JSON.stringify(finalData);
           const finalDataParsed = JSON.parse(finalDataCollector);
           finalDataParsed.forEach((collector: any) => {
-            this.dataCollector.push(collector);
+            this.dataCollectorTransfers.push(collector);
           });
           this.barcode = "";
           this.amount = 1;
@@ -328,9 +366,10 @@ export default defineComponent({
 
     async writeFile() {
       try {
-        let data = this.dataCollector;
+        let data = this.dataCollectorTransfers;
+        console.log(data);
         if (data.length > 0) {
-          const createFile = await BarcodeCollectorSearch.generateTxtFile(data);
+          const createFile = await BarcodeCollectorSearch.generateTxtFileTransfers(data);
           console.log(createFile);
           const alert = await alertController.create({
             cssClass: "my-custom-class",

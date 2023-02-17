@@ -84,7 +84,7 @@ http://ionicframework.com/docs/theming/ */
   --ion-color-mycolor-tint: #8f3925;
 }
 
-@media (prefers-color-scheme: light) {
+@media (prefers-color-scheme: dark) {
   /*
    * Dark Colors
    * -------------------------------------------

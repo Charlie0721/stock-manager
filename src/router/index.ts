@@ -75,7 +75,13 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/dataCollector.vue'),
     
   },
- 
+  { 
+    
+    path: '/data-collector/transfers',
+    name: 'dataCollector-transfers',
+    component: () => import('@/views/data-collector-transfers.vue'),
+    
+  },
 ]
 
 const router = createRouter({

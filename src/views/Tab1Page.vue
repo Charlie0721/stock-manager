@@ -29,7 +29,7 @@
         @input="searchByBarcode = $event.target.value"
         placeholder="Código de barras"
         @ionChange="searchBarcode($event)"
-        :clear-input="true"
+        :clear-input="true" 
       ></ion-input>
       <ion-button
         color="mycolor"
