@@ -1,7 +1,7 @@
 import axios from "./axios"
 import { ItradeOrderHeader } from '../interfaces/traderOrder.interface'
 import { IcreateClient } from '../interfaces/createClient.interface';
-export class tradeOrders {
+export class TradeOrders {
 
     static getWarehouse = async () => await axios.get('/trade-order/warehouse')
     static getNumber = async (id: number) => await axios.get('/trade-order/number/' + id)

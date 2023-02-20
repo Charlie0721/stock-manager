@@ -120,7 +120,7 @@ export default defineComponent({
     async getProductsQuantities() {
       try {
         const responseProducts = await productsQuantities();
-        this.products = responseProducts.data[0];
+        this.products = responseProducts.data;
       } catch (error) {
         console.error(error);
       }

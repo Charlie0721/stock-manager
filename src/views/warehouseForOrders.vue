@@ -62,7 +62,7 @@
   <script lang="ts">
 import { defineComponent } from "vue";
 import * as allIcons from "ionicons/icons";
-import { tradeOrders } from "@/services/tradeOrder";
+import { TradeOrders } from "@/services/tradeOrder";
 import {
   IonPage,
   IonHeader,
@@ -123,7 +123,7 @@ export default defineComponent({
   methods: {
     async getWarehouses() {
       try {
-        const warehouses = await tradeOrders.getWarehouse();
+        const warehouses = await TradeOrders.getWarehouse();
         this.allWarehouses = warehouses.data;
       } catch (error) {
         console.log(error);
@@ -132,7 +132,7 @@ export default defineComponent({
     getIdalmacen() {
       this.idalmacen = this.SelectIdalmacen;
       localStorage.setItem("idAlmacen", JSON.stringify(this.idalmacen));
-      this.$router.push("/products-for-app");
+      this.$router.push("/tabs/tab1");
     },
     fabToggled(e: any) {
       e.stopPropagation();

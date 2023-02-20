@@ -6,12 +6,6 @@
           ><img class="edit-image" src="../images/images_app/logo_header.png" />
           Listado de Productos</ion-title
         >
-        <ion-button
-          color="mycolor"
-          class="btn-edit-product"
-          @click="updatePageWithProducts()"
-          ><ion-icon :icon="i.refreshCircleSharp"></ion-icon>
-        </ion-button>
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
@@ -105,7 +99,6 @@ import {
   IonButton,
   IonSearchbar,
   IonInput,
-  IonIcon,
 } from "@ionic/vue";
 import { Products } from "@/services/Products";
 import * as allIcons from "ionicons/icons";
@@ -131,14 +124,12 @@ export default defineComponent({
     IonCardContent,
     IonButton,
     IonInput,
-    IonIcon,
   },
   data() {
     return {
       i: allIcons,
       allProducts: [] as any,
       searchProduct: "" as string,
-      allProductstoSearch: [] as any,
       productsToFilter: [] as any,
       searchByBarcode: "" as string,
     };
@@ -148,23 +139,17 @@ export default defineComponent({
   },
 
   methods: {
-    async updatePageWithProducts() {
-      const getProduct = await Products.getAllProductsFromAplication();
-      this.Allproducts = getProduct.data;
-
-      localStorage.setItem("allProducts", JSON.stringify(this.Allproducts));
-    
-    await this.reloadPage();
-    },
     reloadPage() {
       location.reload();
     },
 
     async getAllProducts() {
       try {
-        let products = localStorage.getItem("allProducts");
-        this.allProducts = JSON.parse(products);
-        if (products.length > 0) {
+        // let products = localStorage.getItem("allProducts");
+        // this.allProducts = JSON.parse(products);
+        const products = await Products.getAllProductsFromAplication();
+        this.allProducts = products.data;
+        if (products) {
           const alert = await alertController.create({
             cssClass: "my-custom-class",
             header: "CONFIRMACIÓN !!!!",

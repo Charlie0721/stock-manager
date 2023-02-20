@@ -551,8 +551,11 @@ export default defineComponent({
     },
     async getProducts() {
       try {
-        let products = localStorage.getItem("allProducts");
-        this.products = JSON.parse(products);
+
+        const responseProducts= await Purchases.getProductsByApp()
+        this.products=responseProducts.data
+        // let products = localStorage.getItem("allProducts");
+        // this.products = JSON.parse(products);
       } catch (error) {
         console.log(error);
       }

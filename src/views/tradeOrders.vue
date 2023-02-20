@@ -309,7 +309,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import * as allIcons from "ionicons/icons";
-import { tradeOrders } from "@/services/tradeOrder";
+import { TradeOrders } from "@/services/tradeOrder";
 import {
   BarcodeScanner,
   SupportedFormat,
@@ -592,7 +592,7 @@ export default defineComponent({
           await alert.present();
           return false;
         } else {
-          const newClient = await tradeOrders.saveClientToOrder(
+          const newClient = await TradeOrders.saveClientToOrder(
             this.saveClient
           );
           this.saveClient.nit = "";
@@ -700,7 +700,7 @@ export default defineComponent({
           this.saveTradeOrder.fechacrea = this.date;
           this.saveTradeOrder.hora = this.currentTime;
           this.saveTradeOrder.plazo = this.plazo;
-          const idTrade = await tradeOrders.getIdTradeOrder();
+          const idTrade = await TradeOrders.getIdTradeOrder();
           this.idTradeOrder = idTrade.data.length + 1;
           const finalProduct = this.productArray;
           finalProduct.forEach((product) => {
@@ -712,7 +712,7 @@ export default defineComponent({
 
           this.saveTradeOrder.detpedidos = finalProduct;
 
-          const saveOrder1 = await tradeOrders.saveOrder(this.saveTradeOrder);
+          const saveOrder1 = await TradeOrders.saveOrder(this.saveTradeOrder);
           console.log(saveOrder1);
         }
         this.viewOrder(this.idalmacen, this.finalNumber);
@@ -812,10 +812,11 @@ export default defineComponent({
     },
     async getProducts() {
       try {
+
         let idAlm = localStorage.getItem("idAlmacen");
         this.idalmacen = JSON.parse(idAlm);
-        let products = localStorage.getItem("allProducts");
-        this.products = JSON.parse(products);
+        const response=await TradeOrders.getProducts(this.idalmacen)
+        this.products = response.data
       } catch (error) {
         console.log(error);
       }
@@ -865,7 +866,7 @@ export default defineComponent({
     },
 
     async getEmployee() {
-      const employees = await tradeOrders.getEmployee();
+      const employees = await TradeOrders.getEmployee();
       this.employees = employees.data.employee;
     },
     selectCustomer(id: number, nit: string, nombres: string) {
@@ -894,7 +895,7 @@ export default defineComponent({
     },
     async getCustomers() {
       try {
-        const customers = await tradeOrders.getCustomers();
+        const customers = await TradeOrders.getCustomers();
         this.customers = customers.data.customer;
       } catch (error) {
         console.log(error);
@@ -914,7 +915,7 @@ export default defineComponent({
           });
           await alert.present();
         } else {
-          const consecutiveNumber = await tradeOrders.getNumber(id);
+          const consecutiveNumber = await TradeOrders.getNumber(id);
           this.finalNumber = consecutiveNumber.data.length + 1;
           const alert = await alertController.create({
             cssClass: "my-custom-class",

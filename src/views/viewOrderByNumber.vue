@@ -100,7 +100,7 @@ import {
   IonFooter,
  
 } from "@ionic/vue";
-import { tradeOrders } from "../services/tradeOrder";
+import { TradeOrders } from "../services/tradeOrder";
 import vueQr from "vue-qr/src/packages/vue-qr.vue";
 //import { useIonRouter } from '@ionic/vue';
 export default defineComponent({
@@ -153,7 +153,7 @@ export default defineComponent({
       try {
         this.idalm = this.$route.params.idalmacen.toString();
         this.numb = this.$route.params.number.toString();
-        const responseOrder = await tradeOrders.getOrderByNumberAndWarehouse(
+        const responseOrder = await TradeOrders.getOrderByNumberAndWarehouse(
           this.numb,
           this.idalm
         );
