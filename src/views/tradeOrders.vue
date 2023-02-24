@@ -250,13 +250,14 @@
               @click="$refs.modal.$el.setCurrentBreakpoint(0.75)"
               placeholder="Buscar Producto"
               @ionChange="searchOneProduct($event)"
+              @keypress.enter="searchItem()"
             ></ion-searchbar>
             <ion-input
               type="text"
               :value="searchByBarcode"
               @input="searchByBarcode = $event.target.value"
               placeholder="Código de barras"
-              @ionChange="searchBarcode($event)"
+               @keypress.enter="searchByBarcodeItem()"
               :clear-input="true"
             ></ion-input>
             <ion-button
@@ -267,6 +268,13 @@
             >
               Buscar Código barras</ion-button
             >
+              <ion-button color="mycolor" @click="prevPage()" v-if="page > 1"
+              >Anterior</ion-button
+            >
+            <ion-button color="mycolor" @click="nextPage()"
+              >Siguiente</ion-button
+            >
+            <span> página {{ page }} </span>
             <ion-list v-for="product in products" :key="product.idproduct">
               <ion-item>
                 <ion-label
@@ -407,6 +415,13 @@ export default defineComponent({
       detalle: "" as string,
       plazo: 0 as number,
       searchByBarcode: "" as string,
+      limit: 10 as number,
+      page: 1 as number,
+      offset: 0 as number,
+      codigo: "" as string,
+      descripcion: "" as string,
+      barcode: "" as string,
+      totalPages: 0 as number,
     };
   },
   mounted() {
@@ -766,57 +781,44 @@ export default defineComponent({
         console.log(error);
       }
     },
-    async searchOneProduct(e: any) {
+     async searchOneProduct(e: any) {
       try {
         this.searchProduct = e.detail.value;
-        this.searchProduct = this.searchProduct.toUpperCase();
+        this.descripcion = this.searchProduct.toUpperCase();
         if (this.searchProduct === "") {
           return await this.getProducts(this.idalmacen);
-        }
-        if (this.searchProduct && this.searchProduct.trim() != "") {
-          this.products = this.products.filter((product: any) => {
-            return (
-              product.descripcion.toUpperCase().indexOf(this.searchProduct) >
-                -1 ||
-              product.barcode.indexOf(this.searchProduct) > -1 ||
-              product.codigo.indexOf(this.searchProduct) > -1
-            );
-          });
         }
       } catch (error) {
         console.log(error);
       }
-    },
-    async searchBarcode(e: any) {
-      try {
-        this.searchByBarcode = e.detail.value;
-        this.searchByBarcode = this.searchByBarcode.toUpperCase();
-        if (this.searchByBarcode === "") {
-          return await this.getProducts(this.idalmacen);
-        }
-        if (this.searchByBarcode && this.searchByBarcode.trim() != "") {
-          this.products = this.products.filter((product: any) => {
-            return product.barcode.indexOf(this.searchByBarcode) > -1;
-          });
-        }
-      } catch (error) {
-        const alert = await alertController.create({
-          cssClass: "my-custom-class",
-          header: "ERROR !!!",
-          subHeader: `${error.message} `,
-          message: `Error: ${error.message}`,
-          buttons: ["ACEPTAR"],
-        });
-        await alert.present();
+    },   
+    prevPage() {
+      if (this.page > 1) {
+        this.page--;
+        this.getProducts();
       }
+    },
+    nextPage() {
+      this.page++;
+      this.getProducts();
+    },
+    searchItem() {
+      this.getProducts(this.descripcion);
+    },
+    searchByBarcodeItem() {
+      this.barcode = this.searchByBarcode;
+      this.getProducts(this.barcode);
     },
     async getProducts() {
       try {
 
         let idAlm = localStorage.getItem("idAlmacen");
         this.idalmacen = JSON.parse(idAlm);
-        const response=await TradeOrders.getProducts(this.idalmacen)
-        this.products = response.data
+        const response=await TradeOrders.getProducts(this.idalmacen,   this.limit,
+            this.page,
+            this.descripcion,
+            this.barcode)
+        this.products = response.data.products
       } catch (error) {
         console.log(error);
       }

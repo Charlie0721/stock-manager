@@ -7,7 +7,7 @@ export class Purchases {
     /**Metodo para obtener los almacenes activos */
     static getWarehouses = async () => await axios.get('/purchases/get-warehouses')
     /**Metodo para obtener los productos activos */
-    static getProductsByApp = async () => await axios.get('/purchases/get-products')
+    static getProductsByApp = async (limit:number, page:number, descripcion:string, barcode:string) => await axios.get(`/purchases/get-products?limit=${limit}&page=${page}&descripcion=${descripcion}&barcode=${barcode}`)
     /**obtener datos de iva en compras */
     static getTaxes = async () => await axios.get('/purchases/get-taxes')
     /**Guardar la compra */

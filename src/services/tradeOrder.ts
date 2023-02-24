@@ -7,7 +7,7 @@ export class TradeOrders {
     static getNumber = async (id: number) => await axios.get('/trade-order/number/' + id)
     static getCustomers = async () => await axios.get('/trade-order/customer')
     static getEmployee = async () => await axios.get('/trade-order/employee')
-    static getProducts = async (id: number) => await axios.get('/trade-order/product/' + id)
+    static getProducts = async (id: number,limit:number, page:number, descripcion:string, barcode:string) => await axios.get(`/trade-order/product/${id}?limit=${limit}&page=${page}&descripcion=${descripcion}&barcode=${barcode}` )
     static getIdTradeOrder = async () => await axios.get('/trade-order/get-id')
     static saveOrder = async (data: ItradeOrderHeader) =>{
         this.getIdTradeOrder()
