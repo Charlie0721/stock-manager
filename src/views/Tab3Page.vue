@@ -203,7 +203,7 @@
               @keypress.enter="searchItem()"
             ></ion-searchbar>
             <ion-input
-              type="text"
+              type="search"
               :value="searchByBarcode"
               @input="searchByBarcode = $event.target.value"
               placeholder="Código de barras"
@@ -506,12 +506,15 @@ export default defineComponent({
       this.page++;
       this.getProducts();
     },
-    searchItem() {
-      this.getProducts(this.descripcion);
-    },
-    searchByBarcodeItem() {
+    async searchByBarcodeItem() {
       this.barcode = this.searchByBarcode;
       this.getProducts(this.barcode);
+      if (this.barcode === "") {
+        return this.getProducts();
+      }
+    },
+    searchItem() {
+      this.getProducts(this.descripcion);
     },
 
     async getProducts(id: number) {

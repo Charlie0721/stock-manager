@@ -210,29 +210,7 @@ export default defineComponent({
       this.page++;
       this.getAllProducts();
     },
-    async searchBarcode(e: any) {
-      try {
-        this.searchByBarcode = e.detail.value;
-        this.searchByBarcode = this.searchByBarcode.toUpperCase();
-        if (this.searchByBarcode === "") {
-          return this.getAllProducts();
-        }
-        if (this.searchByBarcode && this.searchByBarcode.trim() != "") {
-          this.allProducts = this.allProducts.filter((product: any) => {
-            return product.barcode.indexOf(this.searchByBarcode) > -1;
-          });
-        }
-      } catch (error) {
-        const alert = await alertController.create({
-          cssClass: "my-custom-class",
-          header: "ERROR !!!",
-          subHeader: `${error.message} `,
-          message: `Error: ${error.message}`,
-          buttons: ["ACEPTAR"],
-        });
-        await alert.present();
-      }
-    },
+
 
     async startScan() {
       try {
