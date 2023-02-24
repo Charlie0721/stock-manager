@@ -14,6 +14,7 @@
         debounce="500"
         placeholder="Buscar Producto"
         @ionChange="searchOneProduct($event)"
+        @keypress.enter="searchItem()"
       >
       </ion-searchbar>
 
@@ -27,8 +28,8 @@
         :value="searchByBarcode"
         @input="searchByBarcode = $event.target.value"
         placeholder="Código de barras"
-        @ionChange="searchBarcode($event)"
         :clear-input="true"
+        @keypress.enter="searchByBarcodeItem()"
       ></ion-input>
       <ion-button
         color="mycolor"
@@ -38,6 +39,33 @@
       >
         Buscar Código barras</ion-button
       >
+      <ion-button color="mycolor" @click="prevPage()" v-if="page > 1"
+        >Anterior</ion-button
+      >
+      <ion-button color="mycolor" @click="nextPage()">Siguiente</ion-button>
+      <span> página {{ page }} </span>
+      <ion-card>
+        <ion-list>
+          <ion-item>
+            <ion-select
+              placeholder="Items por página"
+              :value="10"
+              @ionChange="this.limit = $event.target.value"
+            >
+              <ion-select-option value="10">10</ion-select-option>
+              <ion-select-option value="15">15</ion-select-option>
+              <ion-select-option value="30">30</ion-select-option>
+            </ion-select>
+            <ion-button
+              color="mycolor"
+              class="btn-edit-product"
+              @click="getAllProducts()"
+            >
+              Aceptar</ion-button
+            >
+          </ion-item>
+        </ion-list>
+      </ion-card>
       <ion-card v-for="product in allProducts" :key="product.idproducto">
         <ion-card-header>
           <ion-card-title>
@@ -47,7 +75,6 @@
           </ion-card-title>
           <ion-card-subtitle
             >Código Barras: {{ product.barcode }}
-            <vue-qr :text="product.barcode" :size="100"></vue-qr>
           </ion-card-subtitle>
           <ion-card-subtitle
             >Código Interno: {{ product.codigo }}</ion-card-subtitle
@@ -99,10 +126,13 @@ import {
   IonButton,
   IonSearchbar,
   IonInput,
+  IonSelectOption,
+  IonSelect,
+  IonList,
+  IonItem,
 } from "@ionic/vue";
 import { Products } from "@/services/Products";
 import * as allIcons from "ionicons/icons";
-import vueQr from "vue-qr/src/packages/vue-qr.vue";
 import {
   BarcodeScanner,
   SupportedFormat,
@@ -110,7 +140,6 @@ import {
 export default defineComponent({
   name: "Tab2Page",
   components: {
-    vueQr,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -124,6 +153,10 @@ export default defineComponent({
     IonCardContent,
     IonButton,
     IonInput,
+    IonSelectOption,
+    IonSelect,
+    IonList,
+    IonItem,
   },
   data() {
     return {
@@ -132,6 +165,13 @@ export default defineComponent({
       searchProduct: "" as string,
       productsToFilter: [] as any,
       searchByBarcode: "" as string,
+      limit: 10 as number,
+      page: 1 as number,
+      offset: 0 as number,
+      codigo: "" as string,
+      descripcion: "" as string,
+      barcode: "" as string,
+      totalPages: 0 as number,
     };
   },
   mounted() {
@@ -145,33 +185,30 @@ export default defineComponent({
 
     async getAllProducts() {
       try {
-        // let products = localStorage.getItem("allProducts");
-        // this.allProducts = JSON.parse(products);
-        const products = await Products.getAllProductsFromAplication();
-        this.allProducts = products.data;
-        if (products) {
-          const alert = await alertController.create({
-            cssClass: "my-custom-class",
-            header: "CONFIRMACIÓN !!!!",
-            subHeader: `Se encontraron: ${this.allProducts.length} Productos`,
-            message: "Información encontrada satisfactoriamente",
-            buttons: ["OK"],
-          });
-          await alert.present();
-        } else {
-          const alert = await alertController.create({
-            cssClass: "my-custom-class",
-            header: "ATENCIÓN !!!",
-            subHeader: "No hay datos encontrados",
-            message: "No se encontro información para mostrar",
-            buttons: ["OK"],
-          });
-          await alert.present();
-        }
+        const products = await Products.getAllProductsFromAplication(
+          this.limit,
+          this.page,
+          this.descripcion,
+          this.barcode
+        );
+        this.totalPages = products.data.totalPages;
+
+        this.allProducts = products.data.products;
+
         this.searchOneProduct(event);
       } catch (error) {
         console.log(error);
       }
+    },
+    prevPage() {
+      if (this.page > 1) {
+        this.page--;
+        this.getAllProducts();
+      }
+    },
+    nextPage() {
+      this.page++;
+      this.getAllProducts();
     },
     async searchBarcode(e: any) {
       try {
@@ -309,24 +346,27 @@ export default defineComponent({
       }
     },
 
-    async searchOneProduct(event: any) {
+    searchOneProduct(event: any) {
       try {
         this.searchProduct = event.detail.value;
-        this.searchProduct = this.searchProduct.toUpperCase();
+        this.descripcion = this.searchProduct.toUpperCase();
         if (this.searchProduct === "") {
           return this.getAllProducts();
-        }
-        if (this.searchProduct && this.searchProduct.trim() != "") {
-          this.allProducts = this.allProducts.filter((product: any) => {
-            return (
-              product.descripcion.toUpperCase().indexOf(this.searchProduct) >
-                -1 || product.barcode.indexOf(this.searchProduct) > -1
-            );
-          });
         }
       } catch (error) {
         console.log(error);
       }
+    },
+    searchByBarcodeItem() {
+      this.barcode = this.searchByBarcode;
+      this.getAllProducts(this.barcode);
+      if (this.barcode === "") {
+        return this.getAllProducts();
+      }
+    },
+
+    searchItem() {
+      this.getAllProducts(this.descripcion, this.barcode);
     },
 
     editProduct(id: number) {

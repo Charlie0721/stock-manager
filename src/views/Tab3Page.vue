@@ -355,6 +355,13 @@ export default defineComponent({
       idMovement: 0 as number,
       salida: 0 as number,
       searchByBarcode: "" as string,
+      limit: 10 as number,
+      page: 1 as number,
+      offset: 0 as number,
+      codigo: "" as string,
+      descripcion: "" as string,
+      barcode: "" as string,
+      totalPages: 0 as number,
     };
   },
   mounted() {
@@ -508,6 +515,7 @@ export default defineComponent({
     async getProducts(id: number) {
       try {
         id = this.idalmacen;
+
         if (id === 0) {
           const alert = await alertController.create({
             cssClass: "my-custom-class",
@@ -518,9 +526,15 @@ export default defineComponent({
           });
           await alert.present();
         } else {
-          const getProduct = await InventoryMovements.getStockItem(id);
+          const getProduct = await InventoryMovements.getStockItem(
+            id,
+            this.limit,
+            this.page,
+            this.descripcion,
+            this.barcode
+          );
 
-          this.products = getProduct.data;
+          this.products = getProduct.data.stock;
         }
       } catch (error) {
         console.log(error);

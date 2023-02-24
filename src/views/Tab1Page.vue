@@ -19,6 +19,7 @@
         debounce="500"
         placeholder="Buscar Producto"
         @ionChange="searchOneProduct($event)"
+        @keypress.enter="searchItem()"
       >
       </ion-searchbar>
     </ion-header>
@@ -28,8 +29,8 @@
         :value="searchByBarcode"
         @input="searchByBarcode = $event.target.value"
         placeholder="Código de barras"
-        @ionChange="searchBarcode($event)"
-        :clear-input="true" 
+        :clear-input="true"
+        @keypress.enter="searchByBarcodeItem()"
       ></ion-input>
       <ion-button
         color="mycolor"
@@ -39,6 +40,11 @@
       >
         Buscar Código barras</ion-button
       >
+      <ion-button color="mycolor" @click="prevPage()" v-if="page > 1"
+        >Anterior</ion-button
+      >
+      <ion-button color="mycolor" @click="nextPage()">Siguiente</ion-button>
+      <span> página {{ page }} </span>
       <ion-card v-for="product in products" :key="product.product">
         <ion-card-header>
           <ion-card-title>
@@ -111,6 +117,13 @@ export default defineComponent({
       products: [] as any,
       searchProduct: "" as string,
       searchByBarcode: "" as string,
+      limit: 10 as number,
+      page: 1 as number,
+      offset: 0 as number,
+      codigo: "" as string,
+      descripcion: "" as string,
+      barcode: "" as string,
+      totalPages: 0 as number,
     };
   },
   mounted() {
@@ -119,34 +132,27 @@ export default defineComponent({
   methods: {
     async getProductsQuantities() {
       try {
-        const responseProducts = await productsQuantities();
-        this.products = responseProducts.data;
+        const responseProducts = await productsQuantities(
+          this.limit,
+          this.page,
+          this.descripcion,
+          this.barcode
+        );
+        this.products = responseProducts.data.inventory;
+        this.totalPages = responseProducts.data.totalPages;
       } catch (error) {
         console.error(error);
       }
     },
-    async searchBarcode(e: any) {
-      try {
-        this.searchByBarcode = e.detail.value;
-        this.searchByBarcode = this.searchByBarcode.toUpperCase();
-        if (this.searchByBarcode === "") {
-          return await this.getProductsQuantities();
-        }
-        if (this.searchByBarcode && this.searchByBarcode.trim() != "") {
-          this.products = this.products.filter((product: any) => {
-            return product.barcode.indexOf(this.searchByBarcode) > -1;
-          });
-        }
-      } catch (error) {
-        const alert = await alertController.create({
-          cssClass: "my-custom-class",
-          header: "ERROR !!!",
-          subHeader: `${error.message} `,
-          message: `Error: ${error.message}`,
-          buttons: ["ACEPTAR"],
-        });
-        await alert.present();
+    prevPage() {
+      if (this.page > 1) {
+        this.page--;
+        this.getProductsQuantities();
       }
+    },
+    nextPage() {
+      this.page++;
+      this.getProductsQuantities();
     },
 
     async startScan() {
@@ -261,24 +267,24 @@ export default defineComponent({
       }
     },
 
-    async searchOneProduct(event: any) {
+    searchOneProduct(event: any) {
       try {
         this.searchProduct = event.detail.value;
-        this.searchProduct = this.searchProduct.toUpperCase();
+        this.descripcion = this.searchProduct.toUpperCase();
         if (this.searchProduct === "") {
           return this.getProductsQuantities();
-        }
-        if (this.searchProduct && this.searchProduct.trim() != "") {
-          this.products = this.products.filter((product: any) => {
-            return (
-              product.descripcion.toUpperCase().indexOf(this.searchProduct) >
-                -1 || product.barcode.indexOf(this.searchProduct) > -1
-            );
-          });
         }
       } catch (error) {
         console.log(error);
       }
+    },
+    async searchByBarcodeItem() {
+      this.barcode = this.searchByBarcode;
+      this.getProductsQuantities(this.barcode);
+    
+    },
+    searchItem() {
+      this.getProductsQuantities(this.descripcion);
     },
     goToCollector() {
       this.$router.push("/data-collector");

@@ -5,7 +5,7 @@ import axios from "./axios"
 
 //**Funcion para obtener los productos con sus respectivas cantidades */
 
-export const productsQuantities= async ()=>await axios.get('/products/get-quantities')
+export const productsQuantities= async (limit:number, page:number, descripcion:string, barcode:string)=>await axios.get(`/products/get-quantities?limit=${limit}&page=${page}&descripcion=${descripcion}&barcode=${barcode}`)
 
 /**Busca el listado de productos editados en compras*/
 export const searchPriceByDate=async (data: any) =>await axios.post('/search-prices',data); 
