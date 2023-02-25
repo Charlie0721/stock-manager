@@ -508,10 +508,11 @@ export default defineComponent({
     },
     async searchByBarcodeItem() {
       this.barcode = this.searchByBarcode;
-      this.getProducts(this.barcode);
-      if (this.barcode === "") {
-        return this.getProducts();
-      }
+     await this.getProducts(this.barcode);
+      setTimeout(async() => {
+      this.barcode = "";
+      await  this.getProducts();
+      }, 5000);
     },
     searchItem() {
       this.getProducts(this.descripcion);

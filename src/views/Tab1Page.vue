@@ -280,8 +280,11 @@ export default defineComponent({
     },
     async searchByBarcodeItem() {
       this.barcode = this.searchByBarcode;
-      this.getProductsQuantities(this.barcode);
-    
+     await this.getProductsQuantities(this.barcode);
+      setTimeout(async() => {
+      this.barcode = "";
+      await  this.getProductsQuantities();
+      }, 5000);
     },
     searchItem() {
       this.getProductsQuantities(this.descripcion);

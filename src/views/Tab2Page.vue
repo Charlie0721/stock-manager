@@ -335,12 +335,13 @@ export default defineComponent({
         console.log(error);
       }
     },
-    searchByBarcodeItem() {
+    async searchByBarcodeItem() {
       this.barcode = this.searchByBarcode;
-      this.getAllProducts(this.barcode);
-      if (this.barcode === "") {
-        return this.getAllProducts();
-      }
+     await this.getAllProducts(this.barcode);
+      setTimeout(async() => {
+      this.barcode = "";
+      await  this.getAllProducts();
+      }, 5000);
     },
 
     searchItem() {

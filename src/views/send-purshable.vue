@@ -250,7 +250,6 @@
               :value="searchByBarcode"
               @input="searchByBarcode = $event.target.value"
               placeholder="Código de barras"
-              @ionChange="searchBarcode($event)"
               :clear-input="true"
               @keypress.enter="searchByBarcodeItem()"
             ></ion-input>
@@ -426,10 +425,14 @@ export default defineComponent({
     fabToggled(e: any) {
       e.stopPropagation();
     },
-  
+
     async searchByBarcodeItem() {
       this.barcode = this.searchByBarcode;
-      this.getProducts(this.barcode);
+      await this.getProducts(this.barcode);
+      setTimeout(async () => {
+        this.barcode = "";
+        await this.getProducts();
+      }, 5000);
     },
     searchItem() {
       this.getProducts(this.descripcion);
