@@ -144,7 +144,7 @@ export default defineComponent({
         if (typeof id == "string") {
           idAlm = JSON.parse(id);
         }
-        this.$router.push("/products-for-app");
+        this.$router.push("/tabs/tab1");
       } else {
         this.$router.push("/warehouse-for-orders");
         const alert = await alertController.create({
