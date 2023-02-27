@@ -83,7 +83,6 @@ import {
   IonFab,
   IonFabList,
 } from "@ionic/vue";
-import axios from "axios";
 
 export default defineComponent({
   name: "Tab1Page",
@@ -140,9 +139,11 @@ export default defineComponent({
     async sendIdToOrders() {
       if (localStorage.getItem("idAlmacen")) {
         const id = localStorage.getItem("idAlmacen");
-        let idAlm;
         if (typeof id == "string") {
-          idAlm = JSON.parse(id);
+          let idAlm = JSON.parse(id);
+          console.table({
+            id: idAlm
+          })
         }
         this.$router.push("/tabs/tab1");
       } else {

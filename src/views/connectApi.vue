@@ -191,11 +191,12 @@ export default defineComponent({
       if (localStorage.getItem("connection")) {
         const conn = localStorage.getItem("connection");
       
-        let connection;
+     
         if (typeof conn == "string") {
-          connection = JSON.parse(conn);
+          let connection = JSON.parse(conn);
+          console.log(connection);
         }
-        this.$router.push("/warehouse-for-orders");
+        this.$router.push("/control-suscription");
       } else {
         this.$router.push("/");
              const alert = await alertController.create({

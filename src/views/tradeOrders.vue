@@ -340,7 +340,6 @@ import {
   IonButton,
   alertController,
   IonList,
-  IonListHeader,
   IonSearchbar,
   IonPopover,
   IonModal,
@@ -610,6 +609,7 @@ export default defineComponent({
           const newClient = await TradeOrders.saveClientToOrder(
             this.saveClient
           );
+          console.log(newClient)
           this.saveClient.nit = "";
           this.saveClient.nombres = "";
           this.saveClient.telefono = "";

@@ -77,6 +77,14 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/data-collector-transfers.vue'),
 
   },
+
+  {
+
+    path: '/control-suscription',
+    name: 'control-suscription',
+    component: () => import('@/views/controlSuscription.vue'),
+
+  },
 ]
 
 const router = createRouter({

@@ -68,8 +68,7 @@
           </ion-button> -->
           <!-- <ion-button router-link="/trade-orders" router-direction="back" >Volver</ion-button> -->
           <a class="letter-color" href="/trade-orders">Volver</a>
-          </ion-title
-        >
+        </ion-title>
       </ion-toolbar>
     </ion-footer>
   </ion-page>
@@ -90,15 +89,12 @@ import {
   IonCardHeader,
   IonCardSubtitle,
   IonCardTitle,
-  IonIcon,
   IonItem,
-  IonButton,
   IonContent,
   IonList,
   IonLabel,
   IonText,
   IonFooter,
- 
 } from "@ionic/vue";
 import { TradeOrders } from "../services/tradeOrder";
 import vueQr from "vue-qr/src/packages/vue-qr.vue";
@@ -117,15 +113,12 @@ export default defineComponent({
     IonCardHeader,
     IonCardSubtitle,
     IonCardTitle,
-   // IonIcon,
     IonItem,
-   // IonButton,
     IonContent,
     IonList,
     IonLabel,
     IonText,
     IonFooter,
-   
   },
   data() {
     return {
