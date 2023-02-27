@@ -5,3 +5,10 @@ export interface ISearchByBarcodeToCollector {
    
 
 }
+
+export interface IAddBarcodes {
+
+    barcode: string;
+    
+
+}

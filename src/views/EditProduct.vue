@@ -9,6 +9,20 @@
       <ion-header collapse="condense"> </ion-header>
       <ion-card>
         <ion-item>
+          <ion-label position="floating"
+            >Agregar varios codigos de barras</ion-label
+          >
+          <ion-input
+            type="text"
+            :value="barcode.barcode"
+            @input="barcode.barcode = $event.target.value"
+          >
+          </ion-input>
+          <ion-button color="dark" @click="addBarcodes(idProducto)"
+            ><ion-icon :icon="i.save"></ion-icon>Agregar</ion-button
+          >
+        </ion-item>
+        <ion-item>
           <ion-label position="floating">Codigo de barras</ion-label>
           <ion-input
             type="text"
@@ -71,9 +85,14 @@
 </template>
 
 <script lang="ts">
-import { updateProduct, getProductById } from "@/services/searchPricesService";
+import {
+  updateProduct,
+  getProductById,
+  addBarcodes,
+} from "@/services/searchPricesService";
 import { IEditProduct } from "@/interfaces/editproduct.interface";
 import { defineComponent } from "vue";
+import { IAddBarcodes } from "../interfaces/barcode.interface";
 import {
   IonPage,
   IonHeader,
@@ -118,6 +137,7 @@ export default defineComponent({
       i: allIcons,
       productEd: {} as IEditProduct,
       idProducto: "" as string,
+      barcode: {} as IAddBarcodes,
     };
   },
   methods: {
@@ -136,6 +156,24 @@ export default defineComponent({
           buttons: ["OK"],
         });
         await alert.present();
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async addBarcodes(id: string) {
+      try {
+        id = this.$route.params.id.toString();
+
+        const addBarcodesProduct = await addBarcodes(id, this.barcode);
+        const alert = await alertController.create({
+          cssClass: "my-custom-class",
+          header: "CONFIRMACIÓN !!!!",
+          subHeader: `Codigo de barras: ${this.barcode.barcode} Agregado !!!!`,
+          message: `${addBarcodesProduct.data.message} !!!!`,
+          buttons: ["OK"],
+        });
+        await alert.present();
+        this.barcode.barcode = "";
       } catch (error) {
         console.log(error);
       }
