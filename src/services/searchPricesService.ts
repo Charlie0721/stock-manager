@@ -4,7 +4,7 @@ import { IEditProduct } from "@/interfaces/editproduct.interface";
 import axios from "./axios"
 
 
-//**Funcion para obtener los productos con sus respectivas cantidades */
+/**Funcion para obtener los productos con sus respectivas cantidades */
 
 export const productsQuantities = async (limit: number, page: number, descripcion: string, barcode: string) => await axios.get(`/products/get-quantities?limit=${limit}&page=${page}&descripcion=${descripcion}&barcode=${barcode}`)
 

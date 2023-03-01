@@ -269,6 +269,13 @@
           @click="newOrder()"
           ><ion-icon :icon="i.refreshCircleSharp"></ion-icon> Nuevo Movimiento
         </ion-button>
+           <ion-button
+          expand="full"
+          color="mycolor"
+          class="btn-edit-product"
+          @click="goToTransfers()"
+          ><ion-icon :icon="i.arrowForwardSharp"></ion-icon>Traslados
+        </ion-button>
       </ion-content>
     </ion-content>
   </ion-page>
@@ -379,6 +386,9 @@ export default defineComponent({
   methods: {
     fabToggled(e: any) {
       e.stopPropagation();
+    },
+    goToTransfers(){
+      this.$router.push('/transfers')
     },
 
     async startScan() {
@@ -563,6 +573,7 @@ export default defineComponent({
         this.idMovement = id_Movement.data.length + 1;
       } catch (error) {
         console.log(error);
+        
       }
     },
     selectProduct(

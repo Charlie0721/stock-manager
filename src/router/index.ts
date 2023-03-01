@@ -85,6 +85,11 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/controlSuscription.vue'),
 
   },
+  {
+    path: '/transfers',
+    name: 'transfers',
+    component: () => import('@/views/transfers.vue')
+  }
 ]
 
 const router = createRouter({
