@@ -239,7 +239,7 @@
           @click="saveCompleteTradeOrder()"
           ><ion-icon :icon="i.saveSharp"></ion-icon> Grabar Pedido</ion-button
         >
-        <ion-modal
+            <ion-modal
           ref="modal"
           trigger="open-modal"
           :initial-breakpoint="0.25"
@@ -431,6 +431,7 @@ export default defineComponent({
     fabToggled(e: any) {
       e.stopPropagation();
     },
+ 
     newOrder() {
       location.reload();
     },
