@@ -8,7 +8,7 @@ export class InventoryMovements {
     static getIdInserted= async ()=> await axios.get('/mov-inventarios/id-movimiento')
 
     /**Metodo para obtener los terceros de la aplicación */
-    static obtainThirdParties = async () => await axios.get('/mov-inventarios/terceros');
+    static obtainThirdParties = async (limit:number, page:number, nombres:string, nit:string) => await axios.get(`/mov-inventarios/terceros?limit=${limit}&page=${page}&nombres=${nombres}&nit=${nit}`);
 
     /**Metodo para obtener los Almacenes de la aplicación */
     static obtainWarehouses = async () => await axios.get('/mov-inventarios/almacenes');

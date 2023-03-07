@@ -91,11 +91,22 @@
           debounce="500"
           placeholder="Buscar cliente"
           @ionChange="searchOneCustomer($event)"
+          @keypress.enter="searchCustomerItem()"
         >
         </ion-searchbar>
         <ion-content>
           <ion-card>
             <ion-card-header>
+              <ion-button
+                color="mycolor"
+                @click="prevPageCustomer()"
+                v-if="page > 1"
+                >Anterior</ion-button
+              >
+              <ion-button color="mycolor" @click="nextPageCustomer()"
+                >Siguiente</ion-button
+              >
+              <span> página {{ page }} </span>
               <ion-card-title>Seleccionar Cliente</ion-card-title>
               <ion-card-subtitle>Click sobre el cliente</ion-card-subtitle>
             </ion-card-header>
@@ -239,7 +250,7 @@
           @click="saveCompleteTradeOrder()"
           ><ion-icon :icon="i.saveSharp"></ion-icon> Grabar Pedido</ion-button
         >
-            <ion-modal
+        <ion-modal
           ref="modal"
           trigger="open-modal"
           :initial-breakpoint="0.25"
@@ -257,7 +268,7 @@
               :value="searchByBarcode"
               @input="searchByBarcode = $event.target.value"
               placeholder="Código de barras"
-               @keypress.enter="searchByBarcodeItem()"
+              @keypress.enter="searchByBarcodeItem()"
               :clear-input="true"
             ></ion-input>
             <ion-button
@@ -268,7 +279,7 @@
             >
               Buscar Código barras</ion-button
             >
-              <ion-button color="mycolor" @click="prevPage()" v-if="page > 1"
+            <ion-button color="mycolor" @click="prevPage()" v-if="page > 1"
               >Anterior</ion-button
             >
             <ion-button color="mycolor" @click="nextPage()"
@@ -282,12 +293,15 @@
                 </ion-label>
               </ion-item>
               <ion-item>
+                <ion-label> Cantidad:{{ product.cantidad }} </ion-label>
+              </ion-item>
+              <ion-item>
                 <ion-label>
                   $
                   {{
                     new Intl.NumberFormat("de-DE").format(product.precioventa)
                   }}
-                 
+
                   <ion-button
                     color="mycolor"
                     class="btn-edit-product"
@@ -421,6 +435,8 @@ export default defineComponent({
       descripcion: "" as string,
       barcode: "" as string,
       totalPages: 0 as number,
+      nombres: "" as string,
+      nit: "" as string,
     };
   },
   mounted() {
@@ -431,7 +447,7 @@ export default defineComponent({
     fabToggled(e: any) {
       e.stopPropagation();
     },
- 
+
     newOrder() {
       location.reload();
     },
@@ -610,7 +626,7 @@ export default defineComponent({
           const newClient = await TradeOrders.saveClientToOrder(
             this.saveClient
           );
-          console.log(newClient)
+          console.log(newClient);
           this.saveClient.nit = "";
           this.saveClient.nombres = "";
           this.saveClient.telefono = "";
@@ -782,7 +798,7 @@ export default defineComponent({
         console.log(error);
       }
     },
-     async searchOneProduct(e: any) {
+    async searchOneProduct(e: any) {
       try {
         this.searchProduct = e.detail.value;
         this.descripcion = this.searchProduct.toUpperCase();
@@ -792,7 +808,7 @@ export default defineComponent({
       } catch (error) {
         console.log(error);
       }
-    },   
+    },
     prevPage() {
       if (this.page > 1) {
         this.page--;
@@ -808,22 +824,24 @@ export default defineComponent({
     },
     async searchByBarcodeItem() {
       this.barcode = this.searchByBarcode;
-     await this.getProducts(this.barcode);
-      setTimeout(async() => {
-      this.barcode = "";
-      await  this.getProducts();
+      await this.getProducts(this.barcode);
+      setTimeout(async () => {
+        this.barcode = "";
+        await this.getProducts();
       }, 5000);
     },
     async getProducts() {
       try {
-
         let idAlm = localStorage.getItem("idAlmacen");
         this.idalmacen = JSON.parse(idAlm);
-        const response=await TradeOrders.getProducts(this.idalmacen,   this.limit,
-            this.page,
-            this.descripcion,
-            this.barcode)
-        this.products = response.data.products
+        const response = await TradeOrders.getProducts(
+          this.idalmacen,
+          this.limit,
+          this.page,
+          this.descripcion,
+          this.barcode
+        );
+        this.products = response.data.products;
       } catch (error) {
         console.log(error);
       }
@@ -884,25 +902,37 @@ export default defineComponent({
     async searchOneCustomer(event: any) {
       try {
         this.searhCustomer = event.detail.value;
-        this.searhCustomer = this.searhCustomer.toUpperCase();
+        this.nit=this.searhCustomer.toUpperCase();
+      
         if (this.searhCustomer === "") {
           return await this.getCustomers();
-        }
-        if (this.searhCustomer && this.searhCustomer.trim() != "") {
-          this.customers = this.customers.filter((customer: any) => {
-            return (
-              customer.nombres.toUpperCase().indexOf(this.searhCustomer) > -1 ||
-              customer.nit.indexOf(this.searhCustomer) > -1
-            );
-          });
         }
       } catch (error) {
         console.log(error);
       }
     },
+    async searchCustomerItem() {
+      await this.getCustomers(this.nit);
+    },
+
+    prevPageCustomer() {
+      if (this.page > 1) {
+        this.page--;
+        this.getCustomers();
+      }
+    },
+    nextPageCustomer() {
+      this.page++;
+      this.getCustomers();
+    },
     async getCustomers() {
       try {
-        const customers = await TradeOrders.getCustomers();
+        const customers = await TradeOrders.getCustomers(
+          this.limit,
+          this.page,
+          this.nombres,
+          this.nit
+        );
         this.customers = customers.data.customer;
       } catch (error) {
         console.log(error);

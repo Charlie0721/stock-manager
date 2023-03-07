@@ -93,9 +93,17 @@
               debounce="500"
               placeholder="Buscar Proveedor"
               @ionChange="searchSupplier($event)"
+              @keypress.enter="searchSupplierItem()"
             >
             </ion-searchbar>
             <ion-content>
+              <ion-button color="mycolor" @click="prevPageSupplier()" v-if="page > 1"
+              >Anterior</ion-button
+            >
+            <ion-button color="mycolor" @click="nextPageSupplier()"
+              >Siguiente</ion-button
+            >
+            <span> página {{ page }} </span>
               <ion-list>
                 <ion-label>
                   <ion-list
@@ -269,7 +277,7 @@
           @click="newOrder()"
           ><ion-icon :icon="i.refreshCircleSharp"></ion-icon> Nuevo Movimiento
         </ion-button>
-           <ion-button
+        <ion-button
           expand="full"
           color="mycolor"
           class="btn-edit-product"
@@ -377,6 +385,8 @@ export default defineComponent({
       descripcion: "" as string,
       barcode: "" as string,
       totalPages: 0 as number,
+      nombres: "" as string,
+      nit: "" as string,
     };
   },
   mounted() {
@@ -387,8 +397,8 @@ export default defineComponent({
     fabToggled(e: any) {
       e.stopPropagation();
     },
-    goToTransfers(){
-      this.$router.push('/transfers')
+    goToTransfers() {
+      this.$router.push("/transfers");
     },
 
     async startScan() {
@@ -518,10 +528,10 @@ export default defineComponent({
     },
     async searchByBarcodeItem() {
       this.barcode = this.searchByBarcode;
-     await this.getProducts(this.barcode);
-      setTimeout(async() => {
-      this.barcode = "";
-      await  this.getProducts();
+      await this.getProducts(this.barcode);
+      setTimeout(async () => {
+        this.barcode = "";
+        await this.getProducts();
       }, 5000);
     },
     searchItem() {
@@ -573,7 +583,6 @@ export default defineComponent({
         this.idMovement = id_Movement.data.length + 1;
       } catch (error) {
         console.log(error);
-        
       }
     },
     selectProduct(
@@ -639,21 +648,26 @@ export default defineComponent({
       try {
         this.searchSuppliers = event.detail.value;
 
-        this.searchSuppliers = this.searchSuppliers.toUpperCase();
+        this.nit = this.searchSuppliers.toUpperCase();
         if (this.searchSuppliers === "") {
           return await this.getSuppliersApp();
-        }
-        if (this.searchSuppliers && this.searchSuppliers.trim() != "") {
-          this.suppliers = this.suppliers.filter((supplier: any) => {
-            return (
-              supplier.nombres.toUpperCase().indexOf(this.searchSuppliers) >
-                -1 || supplier.nit.indexOf(this.searchSuppliers) > -1
-            );
-          });
         }
       } catch (error) {
         console.log(error);
       }
+    },
+    prevPageSupplier() {
+      if (this.page > 1) {
+        this.page--;
+        this.getSuppliersApp();
+      }
+    },
+    nextPageSupplier() {
+      this.page++;
+      this.getSuppliersApp();
+    },
+    searchSupplierItem() {
+      this.getSuppliersApp(this.nit);
     },
     selectSupplier(idTercero: number, nit: string, nombres: string) {
       this.supplierNit = nit;
@@ -662,8 +676,13 @@ export default defineComponent({
     },
     async getSuppliersApp() {
       try {
-        const suppliers = await InventoryMovements.obtainThirdParties();
-        this.suppliers = suppliers.data;
+        const suppliers = await InventoryMovements.obtainThirdParties(
+          this.limit,
+          this.page,
+          this.nombres,
+          this.nit
+        );
+        this.suppliers = suppliers.data.third;
       } catch (error) {
         console.log(error);
       }

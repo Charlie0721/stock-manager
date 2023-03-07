@@ -210,16 +210,16 @@ export default defineComponent({
         Almacen: ${this.order[0].nomalmacen}
         Fecha: ${this.order[0].fecha} Hora:${this.order[0].hora}      
         Pedido Nro: ${this.order[0].numero}
+        Datos del Cliente
         ${this.order[0].nombres}
         Nit/CC:${this.order[0].nit}
-        
-        Productos:
+ 
         ${cleanStr}
                         
         Total:$${new Intl.NumberFormat("de-DE").format(
           this.order[0].valortotal
         )}
-        software: https://conexionpos.com/
+Software: https://conexionpos.com/
         `;
       console.log(stringDataOne);
 
