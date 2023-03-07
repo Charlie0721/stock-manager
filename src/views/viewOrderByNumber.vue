@@ -214,7 +214,7 @@ export default defineComponent({
         Nit/CC:${this.order[0].nit}
         
         Productos:
-           ${cleanStr}
+        ${cleanStr}
                         
         Total:$${new Intl.NumberFormat("de-DE").format(
           this.order[0].valortotal
