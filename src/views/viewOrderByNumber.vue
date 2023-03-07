@@ -39,23 +39,32 @@
                 </ion-label>
               </ion-item>
             </ion-list>
-              <h4 class="letter-color">
-                TOTAL: $ {{ new Intl.NumberFormat("de-DE").format(totalValue) }}
-              </h4>
+            <h4 class="letter-color">
+              TOTAL: $ {{ new Intl.NumberFormat("de-DE").format(totalValue) }}
+            </h4>
           </ion-card-content>
-                </ion-card>
-              <div style="text-align:center;"> <h5 class="letter-color">software: https://conexionpos.com/</h5></div>
-                <br> <br> <br> <br>
-                 <br> <br> <br>
-        <a class="letter-color" href="/trade-orders">Volver</a>
+        </ion-card>
+        <div style="text-align: center">
+          <h5 class="letter-color">software: https://conexionpos.com/</h5>
+        </div>
+        <br />
+        <br />
+        <!-- <a class="letter-color" href="/trade-orders">Volver</a> -->
       </div>
-      <ion-button
+      <!-- <ion-button
         color="mycolor"
         class="btn-edit-product"
         expand="full"
         @click="print('content')"
         v-if="state === true"
         ><ion-icon :icon="i.printOutline"></ion-icon>Imprimir
+      </ion-button> -->
+      <ion-button
+        color="mycolor"
+        class="btn-edit-product"
+        expand="full"
+        @click="pdfGenerator()"
+        ><ion-icon :icon="i.printOutline"></ion-icon>Generar TXT
       </ion-button>
     </ion-content>
     <ion-footer collapse="fade">
@@ -64,7 +73,6 @@
           <a class="letter-color" href="/trade-orders">Volver</a>
         </ion-title>
       </ion-toolbar>
-       
     </ion-footer>
   </ion-page>
 </template>
@@ -95,6 +103,8 @@ import {
 } from "@ionic/vue";
 import { TradeOrders } from "../services/tradeOrder";
 import vueQr from "vue-qr/src/packages/vue-qr.vue";
+import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
+
 export default defineComponent({
   name: "viewOrder",
 
@@ -140,37 +150,135 @@ export default defineComponent({
     this.getOrderByNumber();
   },
   methods: {
-    async print(content) {
-      try {
-        console.log(content);
-        window.print();
-        window.document.close();
-        window.focus();
+    // async print(content) {
+    //   try {
+    //     console.log(content);
+    //     window.print();
+    //     window.document.close();
+    //     window.focus();
 
-        content = document.getElementById("content")?.innerHTML;
-        window.document.write(content);
-        const alert = await alertController.create({
-          cssClass: "my-custom-class",
-          header: "Atención !!!",
-          subHeader: `PARA CONTINUAR `,
-          message: "Tome un pantallazo para imprimir ",
-          buttons: ["ACEPTAR"],
-        });
-        await alert.present();
+    //     content = document.getElementById("content")?.innerHTML;
+    //     window.document.write(content);
+    //     const alert = await alertController.create({
+    //       cssClass: "my-custom-class",
+    //       header: "Atención !!!",
+    //       subHeader: `PARA CONTINUAR `,
+    //       message: "Tome un pantallazo para imprimir ",
+    //       buttons: ["ACEPTAR"],
+    //     });
+    //     await alert.present();
 
-        return true;
-      } catch (error) {
-        console.log(error);
-        const alert = await alertController.create({
-          cssClass: "my-custom-class",
-          header: "Error !!!",
-          subHeader: `PARA CONTINUAR `,
-          message: error,
-          buttons: ["ACEPTAR"],
+    //     return true;
+    //   } catch (error) {
+    //     console.log(error);
+    //     const alert = await alertController.create({
+    //       cssClass: "my-custom-class",
+    //       header: "Error !!!",
+    //       subHeader: `PARA CONTINUAR `,
+    //       message: error,
+    //       buttons: ["ACEPTAR"],
+    //     });
+    //     await alert.present();
+    //   }
+    // },
+    async pdfGenerator() {
+      const dataProducts = [];
+      const archivoNuevo = "pedido numero " + this.order[0].numero + ".txt";
+      this.order.forEach((product: any) => {
+        const products = [
+          {
+            Descripcion: product.descripcion,
+            Vr_Unit: new Intl.NumberFormat("de-DE").format(product.valorprod),
+            Cantidad: product.cantidad,
+            Vr_Total: new Intl.NumberFormat("de-DE").format(
+              product.valorprod * product.cantidad
+            ),
+          },
+        ];
+        dataProducts.push(products);
+      });
+      const directory = Directory.Documents;
+
+      const dataStringProducts = JSON.stringify(dataProducts, null, 1).replace(
+        /\n/g,
+        "\n"
+      );
+
+      const cleanStr = dataStringProducts.replace(/[[\]{},"]/g, "");
+
+      let stringDataOne = `
+        Almacen: ${this.order[0].nomalmacen}
+        Fecha: ${this.order[0].fecha} Hora:${this.order[0].hora}      
+        Pedido Nro: ${this.order[0].numero}
+        ${this.order[0].nombres}
+        Nit/CC:${this.order[0].nit}
+        
+        Productos:
+           ${cleanStr}
+                        
+        Total:$${new Intl.NumberFormat("de-DE").format(
+          this.order[0].valortotal
+        )}
+        software: https://conexionpos.com/
+        `;
+      console.log(stringDataOne);
+
+      Filesystem.writeFile({
+        path: `${directory}/${archivoNuevo}`,
+        data: stringDataOne,
+        encoding: Encoding.UTF8,
+        directory,
+        recursive: true,
+      })
+        .then(async () => {
+          const alert = await alertController.create({
+            cssClass: "my-custom-class",
+            header: "Atencion !!!",
+            subHeader: `OK `,
+            message: "Archivo generado con el nombre " + archivoNuevo,
+            buttons: ["ACEPTAR"],
+          });
+          await alert.present();
+          console.log("Archivo PDF generado correctamente");
+        })
+        .catch(async (error) => {
+          console.error("Ocurrió un error al generar el archivo PDF:", error);
+          const alert = await alertController.create({
+            cssClass: "my-custom-class",
+            header: "Atencion !!!",
+            subHeader: `Error ${error}`,
+            message: error,
+            buttons: ["ACEPTAR"],
+          });
+          await alert.present();
         });
-        await alert.present();
-      }
+
+      // Filesystem.readdir({
+      //   path: `${directory}/${archivoNuevo}`,
+      //   directory,
+      // })
+      //   .then(async () => {
+      //     const alert = await alertController.create({
+      //       cssClass: "my-custom-class",
+      //       header: "Atencion !!!",
+      //       subHeader: `OK `,
+      //       message: "Archivo en el directorio " + directory,
+      //       buttons: ["ACEPTAR"],
+      //     });
+      //     await alert.present();
+      //   })
+      //   .catch(async (error) => {
+      //     const alert = await alertController.create({
+      //       cssClass: "my-custom-class",
+      //       header: "Atencion !!!",
+      //       subHeader: `Error `,
+      //       message: error,
+      //       buttons: ["ACEPTAR"],
+      //     });
+      //     await alert.present();
+      //   });
     },
+
     async getOrderByNumber() {
       try {
         this.idalm = this.$route.params.idalmacen.toString();
@@ -207,5 +315,4 @@ ion-button {
   width: 5%;
   max-height: 5%;
 }
-
 </style>
