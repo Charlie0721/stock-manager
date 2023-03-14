@@ -165,15 +165,29 @@ export default defineComponent({
         id = this.$route.params.id.toString();
 
         const addBarcodesProduct = await addBarcodes(id, this.barcode);
-        const alert = await alertController.create({
-          cssClass: "my-custom-class",
-          header: "CONFIRMACIÓN !!!!",
-          subHeader: `Codigo de barras: ${this.barcode.barcode} Agregado !!!!`,
-          message: `${addBarcodesProduct.data.message} !!!!`,
-          buttons: ["OK"],
-        });
-        await alert.present();
-        this.barcode.barcode = "";
+        if (addBarcodesProduct.data.message === "barcode found") {
+          const alert = await alertController.create({
+            cssClass: "my-custom-class",
+            header: "ATENCION !!!!",
+            subHeader: `El Codigo de barras: ${this.barcode.barcode} Ya existe !!!!`,
+            message: `${addBarcodesProduct.data.message} !!!!`,
+            buttons: ["OK"],
+          });
+          await alert.present();
+          this.barcode.barcode = "";
+          return;
+        }
+        if (addBarcodesProduct.data.message === "barcode added") {
+          const alert = await alertController.create({
+            cssClass: "my-custom-class",
+            header: "CONFIRMACIÓN !!!!",
+            subHeader: `Codigo de barras: ${this.barcode.barcode} Agregado !!!!`,
+            message: `${addBarcodesProduct.data.message} !!!!`,
+            buttons: ["OK"],
+          });
+          await alert.present();
+          this.barcode.barcode = "";
+        }
       } catch (error) {
         console.log(error);
       }
