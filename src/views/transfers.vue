@@ -21,22 +21,22 @@
         class="btn-edit-product"
         expand="full"
         @click="getNumberTransfer()"
-        >Generar Consecutivo
-      </ion-button>
+        >Generar Consecutivo</ion-button
+      >
+
       <ion-list>
         <ion-item>
           <ion-select
-            :value="SelectOrigin"
+            placeholder="Seleccionar Origen"
             @ionChange="SelectOrigin = $event.target.value"
-            interface="action-sheet"
-            placeholder="Origén"
+            :value="SelectOrigin"
           >
             <ion-select-option
               :value="warehouse.idalmacen"
               v-for="warehouse in allWarehouses"
               :key="warehouse.idalmacen"
-              >{{ warehouse.nomalmacen }}
-            </ion-select-option>
+              >{{ warehouse.nomalmacen }}</ion-select-option
+            >
           </ion-select>
         </ion-item>
         <ion-button
@@ -52,17 +52,16 @@
       <ion-list>
         <ion-item>
           <ion-select
-            :value="SelectDestination"
+            placeholder="Seleccionar Destino"
             @ionChange="SelectDestination = $event.target.value"
-            interface="action-sheet"
-            placeholder="Destino"
+            :value="SelectDestination"
           >
             <ion-select-option
               :value="warehouse.idalmacen"
               v-for="warehouse in allWarehouses"
               :key="warehouse.idalmacen"
-              >{{ warehouse.nomalmacen }}
-            </ion-select-option>
+              >{{ warehouse.nomalmacen }}</ion-select-option
+            >
           </ion-select>
         </ion-item>
         <ion-button
@@ -160,10 +159,11 @@
           color="mycolor"
           class="btn-edit-product"
           expand="full"
-          @click=" goToInventoyMovements()"
-          ><ion-icon :icon="i.arrowBackSharp"></ion-icon>Movimientos de inventario
+          @click="goToInventoyMovements()"
+          ><ion-icon :icon="i.arrowBackSharp"></ion-icon>Movimientos de
+          inventario
         </ion-button>
-       
+
         <ion-modal
           ref="modal"
           trigger="open-modal"
@@ -596,7 +596,7 @@ export default defineComponent({
       }
     },
     goToInventoyMovements() {
-      this.$router.push('/tabs/tab3')
+      this.$router.push("/tabs/tab3");
     },
 
     async startScan() {
