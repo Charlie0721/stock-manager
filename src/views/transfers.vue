@@ -135,7 +135,8 @@
               Traslado
               {{ new Intl.NumberFormat("de-DE").format(product.cantidad) }}
             </h2>
-          </ion-card-content>
+            
+          </ion-card-content> 
         </ion-card>
 
         <ion-button
@@ -203,7 +204,7 @@
             <ion-list v-for="product in products" :key="product.idproduct">
               <ion-item>
                 <ion-label
-                  >{{ product.codigo }} | {{ product.descripcion }}
+                  >{{ product.descripcion }}
                 </ion-label>
               </ion-item>
               <ion-item>
