@@ -89,7 +89,13 @@ const routes: Array<RouteRecordRaw> = [
     path: '/transfers',
     name: 'transfers',
     component: () => import('@/views/transfers.vue')
+  },
+  {
+    path: '/create-one-product',
+    name: 'product',
+    component: () => import('@/views/CreateProducts.vue')
   }
+
 ]
 
 const router = createRouter({

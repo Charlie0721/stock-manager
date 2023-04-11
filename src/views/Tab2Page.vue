@@ -6,6 +6,14 @@
           ><img class="edit-image" src="../images/images_app/logo_header.png" />
           Listado de Productos</ion-title
         >
+        <ion-button
+          color="mycolor"
+          expand="block"
+          class="btn-edit-product"
+          @click="createProduct()"
+        >
+          Crear Productos</ion-button
+        >
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
@@ -182,6 +190,9 @@ export default defineComponent({
     reloadPage() {
       location.reload();
     },
+    createProduct() {
+      this.$router.push("/create-one-product"); 
+    },
 
     async getAllProducts() {
       try {
@@ -210,7 +221,6 @@ export default defineComponent({
       this.page++;
       this.getAllProducts();
     },
-
 
     async startScan() {
       try {
@@ -337,10 +347,10 @@ export default defineComponent({
     },
     async searchByBarcodeItem() {
       this.barcode = this.searchByBarcode;
-     await this.getAllProducts(this.barcode);
-      setTimeout(async() => {
-      this.barcode = "";
-      await  this.getAllProducts();
+      await this.getAllProducts(this.barcode);
+      setTimeout(async () => {
+        this.barcode = "";
+        await this.getAllProducts();
       }, 5000);
     },
 
