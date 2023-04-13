@@ -18,4 +18,6 @@ export class CreateProduct {
     static getTaxSales = async () => await axios.get('/products-tax-sales')
     /**Metodo para crear el producto */
     static saveProduct = async (data: ProductsI) => await axios.post('/products-create-product', data)
+    /**Metodo el cual valida si el codigo de barrar ingresado ya existe */
+    static searchByBarcode = async (barcode:string) => await axios.get(`/products-search-product-by-barcode?barcode=${barcode}`)
 }

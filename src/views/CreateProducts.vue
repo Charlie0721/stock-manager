@@ -6,16 +6,18 @@
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
-      <ion-button
-        id="open-modal"
-        expand="block"
-        color="mycolor"
-        class="btn-edit-product"
-        @click="getLines()"
-      >
-        <ion-icon :icon="i.searchCircleSharp"></ion-icon>Seleccionar
-        Linea</ion-button
-      >
+      <ion-card>
+        <ion-button
+          id="open-modal"
+          expand="block"
+          color="mycolor"
+          class="btn-edit-product"
+          @click="getLines()"
+        >
+          <ion-icon :icon="i.searchCircleSharp"></ion-icon>Seleccionar
+          Linea</ion-button
+        >
+      </ion-card>
       <ion-modal
         ref="modal"
         trigger="open-modal"
@@ -61,11 +63,23 @@
           </ion-list>
         </ion-content>
       </ion-modal>
-      <h4 class="letter-color">{{ levelCode }} {{ levelName }}</h4>
-      <h4 class="letter-color" v-if="productCode != ''">
-        Codigo del producto: {{ productCode }}
-      </h4>
 
+      <ion-card>
+        <ion-card-header>
+          <ion-card-title>
+            <h4 class="letter-color">{{ levelCode }} {{ levelName }}</h4>
+          </ion-card-title>
+          <ion-card-subtitle>
+            <h4 class="letter-color" v-if="productCode != ''">
+              Codigo del producto: {{ productCode }}
+            </h4>
+          </ion-card-subtitle>
+          Solo se pueden crear productos cuya estructura se encuentre definida
+          por: Linea y Producto
+        </ion-card-header>
+
+        <ion-card-content> </ion-card-content>
+      </ion-card>
       <ion-card>
         <ion-item>
           <ion-label position="floating">Codigo de barras</ion-label>
@@ -76,11 +90,19 @@
           >
           </ion-input>
         </ion-item>
+        <ion-button
+          color="mycolor"
+          expand="full"
+          class="btn-edit-product"
+          @click="startScan()"
+        >
+          Escanear Codigo barras</ion-button
+        >
         <ion-item>
           <ion-select
             placeholder="Unidad de medida"
-            @ionChange="selectUnitOfMeasure = $event.target.value"
-            :value="selectUnitOfMeasure"
+            @ionChange="unitOfMeasureId = $event.target.value"
+            :value="unitOfMeasureId"
           >
             <ion-select-option
               :value="unit.idunmedida"
@@ -90,15 +112,7 @@
             </ion-select-option>
           </ion-select>
         </ion-item>
-        <ion-button
-          v-if="selectUnitOfMeasure > 0"
-          color="mycolor"
-          class="btn-edit-product"
-          expand="full"
-          @click="getUnitMeasureID(selectUnitOfMeasure)"
-        >
-          Agregar Unidad de Medida</ion-button
-        >
+
         <ion-item>
           <ion-label position="floating">Descripcion</ion-label>
           <ion-input
@@ -122,15 +136,7 @@
             </ion-select-option>
           </ion-select>
         </ion-item>
-        <ion-button
-          v-if="taxIdPurchases != ''"
-          color="mycolor"
-          class="btn-edit-product"
-          expand="full"
-          @click="getTaxIdPurshases(taxIdPurchases)"
-        >
-          Agregar Iva Compras</ion-button
-        >
+
         <ion-item>
           <ion-label position="floating">Costo Unitario UC</ion-label>
           <ion-input
@@ -154,15 +160,7 @@
             </ion-select-option>
           </ion-select>
         </ion-item>
-        <ion-button
-          v-if="taxIdSales != ''"
-          color="mycolor"
-          class="btn-edit-product"
-          expand="full"
-          @click="getTaxIdSales(taxIdSales)"
-        >
-          Agregar Iva Ventas</ion-button
-        >
+
         <ion-item>
           <ion-label position="floating">Precio de Venta</ion-label>
           <ion-input
@@ -180,7 +178,20 @@
         >
           Grabar</ion-button
         >
+        <ion-button
+          color="mycolor"
+          class="btn-edit-product"
+          expand="full"
+          @click="searchBarcode()"
+        >
+          Buscar codigo</ion-button
+        >
       </ion-card>
+      <ion-card>
+        <ion-button color="danger" expand="full" @click="returnProducts()"
+          ><ion-icon :icon="i.arrowBackSharp"></ion-icon>Volver</ion-button
+        ></ion-card
+      >
     </ion-content>
   </ion-page>
 </template>
@@ -207,10 +218,19 @@ import {
   IonIcon,
   IonList,
   IonModal,
+  alertController,
+  IonCardContent,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardSubtitle,
 } from "@ionic/vue";
 import { CreateProduct } from "../services/createProducts";
 import { ProductsI } from "../interfaces/CreateProducts.interface";
 import * as allIcons from "ionicons/icons";
+import {
+  BarcodeScanner,
+  SupportedFormat,
+} from "@capacitor-community/barcode-scanner";
 export default defineComponent({
   name: "Create-Product",
   components: {
@@ -230,6 +250,10 @@ export default defineComponent({
     IonIcon,
     IonList,
     IonModal,
+    IonCardContent,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardSubtitle,
   },
   data() {
     return {
@@ -239,8 +263,8 @@ export default defineComponent({
       taxOnPurchases: [] as any,
       taxOnSales: [] as any,
       unitsOfMeasure: [] as any,
-      taxIdSales: "" as string,
-      taxIdPurchases: "" as string,
+      taxIdSales: "01" as string,
+      taxIdPurchases: "01" as string,
       unitOfMeasureId: 0 as number,
       selectUnitOfMeasure: 0 as number,
       limit: 10 as number,
@@ -259,6 +283,7 @@ export default defineComponent({
       estproductos: [] as any,
       responseProductId: [] as any,
       productId: 0 as number,
+      barcodeFound: "" as string,
     };
   },
   mounted() {
@@ -267,13 +292,18 @@ export default defineComponent({
     this.getUnitOfMeasure();
   },
   methods: {
+    returnProducts() {
+      this.$router.push("/tabs/tab2");
+    },
+    newProduct() {
+      location.reload();
+    },
     async getProductId() {
       const responseId = await CreateProduct.getProductId();
       this.responseProductId = responseId.data;
       this.responseProductId.forEach((id) => {
         this.productId = id.ultimo_id + 1;
       });
-      console.log(this.productId);
       const estProd = [
         {
           idproducto: this.productId,
@@ -287,33 +317,218 @@ export default defineComponent({
         this.estproductos.push(est);
       });
     },
-    saveProduct() {
+    async startScan() {
       try {
-        this.getProductId();
-        this.product.codigo = this.productCode;
+        this.didUserGrantPermission();
+        document.body.style.opacity = "0.2";
+        document.body.style.background = "transparent";
+
+        BarcodeScanner.hideBackground(); // make background of WebView transparent
+
+        const result = await BarcodeScanner.startScan({
+          targetedFormats: [
+            SupportedFormat.QR_CODE,
+            SupportedFormat.CODE_128,
+            SupportedFormat.EAN_13,
+            SupportedFormat.EAN_8,
+          ],
+        }); // start scanning and wait for a result
+
+        // if the result has content
+        if (result.hasContent) {
+          document.body.style.background = "";
+          document.body.style.opacity = "1";
+          console.log(result.content); // log the raw scanned content
+        }
+        this.product.barcode = result.content;
+      } catch (error) {
+        const alert = await alertController.create({
+          cssClass: "my-custom-class",
+          header: "Error !!! ",
+          message: `error: ${error.message}`,
+          buttons: ["ACEPTAR"],
+        });
+        await alert.present();
+        return false;
+      }
+    },
+    stopScan() {
+      BarcodeScanner.showBackground();
+      BarcodeScanner.stopScan();
+    },
+
+    deactivated() {
+      this.stopScan();
+    },
+
+    beforeDestroy() {
+      this.stopScan();
+    },
+    async didUserGrantPermission() {
+      try {
+        const status = await BarcodeScanner.checkPermission({ force: false });
+
+        if (status.granted) {
+          // user granted permission
+          return true;
+        }
+
+        if (status.denied) {
+          // user denied permission
+          return false;
+        }
+
+        if (status.asked) {
+          // system requested the user for permission during this call
+          // only possible when force set to true
+        }
+
+        if (status.neverAsked) {
+          // user has not been requested this permission before
+          // it is advised to show the user some sort of prompt
+          // this way you will not waste your only chance to ask for the permission
+          const c = confirm(
+            "We need your permission to use your camera to be able to scan barcodes"
+          );
+          if (!c) {
+            return false;
+          }
+        }
+
+        if (status.restricted || status.unknown) {
+          // ios only
+          // probably means the permission has been denied
+          return false;
+        }
+
+        const statusRequest = await BarcodeScanner.checkPermission({
+          force: true,
+        });
+
+        if (statusRequest.asked) {
+          // system requested the user for permission during this call
+          // only possible when force set to true
+        }
+
+        if (statusRequest.granted) {
+          // the user did grant the permission now
+          return true;
+        }
+
+        // user did not grant the permission, so he must have declined the request
+        return false;
+      } catch (error) {
+        const alert = await alertController.create({
+          cssClass: "my-custom-class",
+          header: "Error !!! " + error,
+          message: `error: ${error.message}`,
+          buttons: ["ACEPTAR"],
+        });
+        await alert.present();
+        return false;
+      }
+    },
+    async saveProduct() {
+      try {
         let description = this.product.descripcion;
-        this.product.descripcion = description.toUpperCase();
-        this.product.idunmedida = this.unitOfMeasureId;
-        this.product.codiva = this.taxIdSales;
-        this.product.codivacomp = this.taxIdPurchases;
-        let lastCost = this.product.costo;
-        this.product.ultcosto = lastCost;
-        this.product.tipo = 1;
-        this.product.estado = 1;
-        this.product.compuesto = 0;
-        this.product.idareaserv = 1;
-        this.product.agruparalfacturar = 0;
-        this.product.estproductos = this.estproductos;
-         console.log(this.product);
+        let lastCost: number = this.product.costo;
+        if (description === " " || description === undefined) {
+          const alert = await alertController.create({
+            cssClass: "my-custom-class",
+            header: "Atención !!! ",
+            message: `La descripción del producto es obligatoria`,
+            buttons: ["ACEPTAR"],
+          });
+          await alert.present();
+          return;
+        }
+        if (lastCost === 0 || lastCost === undefined) {
+          const alert = await alertController.create({
+            cssClass: "my-custom-class",
+            header: "Atención !!! ",
+            message: `El costo del producto debe ser mayor a 0`,
+            buttons: ["ACEPTAR"],
+          });
+          await alert.present();
+          return;
+        }
+        if (this.unitOfMeasureId === 0 || this.unitOfMeasureId === undefined) {
+          const alert = await alertController.create({
+            cssClass: "my-custom-class",
+            header: "Atención !!! ",
+            message: `Debe asignar la unidad de media`,
+            buttons: ["ACEPTAR"],
+          });
+          await alert.present();
+          return;
+        }
+        if (this.productCode === "") {
+          const alert = await alertController.create({
+            cssClass: "my-custom-class",
+            header: "Atención !!! ",
+            message: `Debe asignar Linea de producto`,
+            buttons: ["ACEPTAR"],
+          });
+          await alert.present();
+          return;
+        } else {
+          this.getProductId();
+          this.product.codigo = this.productCode;
+          this.product.descripcion = description.toUpperCase();
+          this.product.idunmedida = this.unitOfMeasureId;
+          this.product.codiva = this.taxIdSales;
+          this.product.codivacomp = this.taxIdPurchases;
+          let lastCost = this.product.costo;
+          this.product.ultcosto = lastCost;
+          this.product.tipo = 1;
+          this.product.estado = 1;
+          this.product.compuesto = 0;
+          this.product.idareaserv = 1;
+          this.product.agruparalfacturar = 0;
+          this.product.estproductos = this.estproductos;
+          this.searchBarcode();
+          if (this.barcodeFound === "barcode found") {
+            const alert = await alertController.create({
+              cssClass: "my-custom-class",
+              header: "ATENCION !!!!",
+              subHeader: `El Codigo de barras: ${this.product.barcode} Ya existe !!!!`,
+              message: `${this.barcodeFound} !!!!`,
+              buttons: ["OK"],
+            });
+            await alert.present();
+            this.product.barcode = "";
+            return false;
+          } else {
+            setTimeout(async () => {
+              const newProductCreated = await CreateProduct.saveProduct(
+                this.product
+              );
+              const alert = await alertController.create({
+                cssClass: "my-custom-class",
+                header: "Confirmación !!! ",
+                message: `Se ha creado el producto: ${newProductCreated.data.descripcion}`,
+                buttons: ["ACEPTAR"],
+              });
+              await alert.present();
+            }, 2000);
+            setTimeout(() => {
+              this.newProduct();
+            }, 5000);
+          }
+        }
       } catch (error) {
         console.log(error);
       }
     },
-    getTaxIdSales(codeIvaSale: string) {
-      this.taxIdSales = codeIvaSale;
-    },
-    getTaxIdPurshases(codeIvaPursh: string) {
-      this.taxIdPurchases = codeIvaPursh;
+    async searchBarcode() {
+      try {
+        let barcode = this.product.barcode;
+        const barcodeFound = await CreateProduct.searchByBarcode(barcode);
+        console.log(barcodeFound);
+        this.barcodeFound = barcodeFound.data.message;
+        } catch (error) {
+        console.log(error);
+      }
     },
     async getStructure() {
       try {
@@ -340,8 +555,8 @@ export default defineComponent({
     },
 
     selectLine(
-      idLevel: number,
       idRecord: number,
+      idLevel: number,
       name: string,
       levelCode: string
     ) {
@@ -412,9 +627,6 @@ export default defineComponent({
       } catch (error) {
         console.log(error);
       }
-    },
-    getUnitMeasureID(id: number) {
-      this.unitOfMeasureId = id;
     },
   },
 });
