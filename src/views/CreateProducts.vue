@@ -178,14 +178,6 @@
         >
           Grabar</ion-button
         >
-        <ion-button
-          color="mycolor"
-          class="btn-edit-product"
-          expand="full"
-          @click="searchBarcode()"
-        >
-          Buscar codigo</ion-button
-        >
       </ion-card>
       <ion-card>
         <ion-button color="danger" expand="full" @click="returnProducts()"
@@ -524,9 +516,8 @@ export default defineComponent({
       try {
         let barcode = this.product.barcode;
         const barcodeFound = await CreateProduct.searchByBarcode(barcode);
-        console.log(barcodeFound);
         this.barcodeFound = barcodeFound.data.message;
-        } catch (error) {
+      } catch (error) {
         console.log(error);
       }
     },
