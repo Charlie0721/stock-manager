@@ -479,34 +479,37 @@ export default defineComponent({
           this.product.agruparalfacturar = 0;
           this.product.estproductos = this.estproductos;
           this.searchBarcode();
-          if (this.barcodeFound === "barcode found") {
-            const alert = await alertController.create({
-              cssClass: "my-custom-class",
-              header: "ATENCION !!!!",
-              subHeader: `El Codigo de barras: ${this.product.barcode} Ya existe !!!!`,
-              message: `${this.barcodeFound} !!!!`,
-              buttons: ["OK"],
-            });
-            await alert.present();
-            this.product.barcode = "";
-            return false;
-          } else {
-            setTimeout(async () => {
-              const newProductCreated = await CreateProduct.saveProduct(
-                this.product
-              );
+          setTimeout(async()=>{
+
+            if (this.barcodeFound === "barcode found") {
               const alert = await alertController.create({
                 cssClass: "my-custom-class",
-                header: "Confirmación !!! ",
-                message: `Se ha creado el producto: ${newProductCreated.data.descripcion}`,
-                buttons: ["ACEPTAR"],
+                header: "ATENCION !!!!",
+                subHeader: `El Codigo de barras: ${this.product.barcode} Ya existe !!!!`,
+                message: `${this.barcodeFound} !!!!`,
+                buttons: ["OK"],
               });
               await alert.present();
-            }, 2000);
-            setTimeout(() => {
-              this.newProduct();
-            }, 5000);
-          }
+              this.product.barcode = "";
+              return false;
+            } else {
+              setTimeout(async () => {
+                const newProductCreated = await CreateProduct.saveProduct(
+                  this.product
+                );
+                const alert = await alertController.create({
+                  cssClass: "my-custom-class",
+                  header: "Confirmación !!! ",
+                  message: `Se ha creado el producto: ${newProductCreated.data.descripcion}`,
+                  buttons: ["ACEPTAR"],
+                });
+                await alert.present();
+              }, 2000);
+              setTimeout(() => {
+                this.newProduct();
+              }, 5000);
+            }
+          }, 2000)
         }
       } catch (error) {
         console.log(error);
