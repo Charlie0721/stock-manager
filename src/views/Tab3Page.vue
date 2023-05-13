@@ -9,12 +9,7 @@
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
-      <ion-fab
-        id="remote_controller"
-        vertical="start"
-        horizontal="start"
-        slot="fixed"
-      >
+      <ion-fab id="remote_controller" vertical="start" horizontal="start" slot="fixed">
         <ion-fab-button color="danger">
           <ion-icon :icon="i.add"></ion-icon>
         </ion-fab-button>
@@ -24,105 +19,56 @@
             <ion-card-content>
               <ion-item>
                 <ion-label>Almacen</ion-label>
-                <ion-select
-                  :value="SelectIdalmacen"
-                  @ionChange="SelectIdalmacen = $event.target.value"
-                >
-                  <ion-select-option
-                    :value="warehouse.idalmacen"
-                    v-for="warehouse in allWarehouses"
-                    :key="warehouse.idalmacen"
-                  >
+                <ion-select :value="SelectIdalmacen" @ionChange="SelectIdalmacen = $event.target.value">
+                  <ion-select-option :value="warehouse.idalmacen" v-for="warehouse in allWarehouses"
+                    :key="warehouse.idalmacen">
                     {{ warehouse.nomalmacen }}
                   </ion-select-option>
                 </ion-select>
               </ion-item>
-              <ion-button
-                color="mycolor"
-                class="btn-edit-product"
-                expand="full"
-                @click="getIdalmacen()"
-              >
-                Aceptar</ion-button
-              >
+
             </ion-card-content>
           </ion-card>
         </ion-fab-list>
       </ion-fab>
-      <ion-button
-        color="mycolor"
-        class="btn-edit-product"
-        expand="full"
-        @click="getNumbers(idalmacen)"
-        >Generar Consecutivo
+      <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="getNumbers(SelectIdalmacen)">Generar
+        Consecutivo
       </ion-button>
       <ion-card>
         <ion-card-content>
           <ion-item>
-            <ion-label position="floating" class="letter-color"
-              >Fecha
+            <ion-label position="floating" class="letter-color">Fecha
             </ion-label>
-            <ion-input
-              type="date"
-              :value="fecha"
-              @input="fecha = $event.target.value"
-            ></ion-input>
+            <ion-input type="date" :value="fecha" @input="fecha = $event.target.value"></ion-input>
           </ion-item>
           <ion-item>
-            <ion-label position="floating" class="letter-color"
-              >Detalle</ion-label
-            >
-            <ion-input
-              type="text"
-              :value="detail"
-              @input="detail = $event.target.value"
-            ></ion-input>
+            <ion-label position="floating" class="letter-color">Detalle</ion-label>
+            <ion-input type="text" :value="detail" @input="detail = $event.target.value"></ion-input>
           </ion-item>
-          <ion-button
-            id="nested-button"
-            color="mycolor"
-            class="btn-edit-product"
-            expand="full"
-            @click="getSuppliersApp()"
-            ><ion-icon :icon="i.peopleCircleOutline"></ion-icon> Seleccionar
+          <ion-button id="nested-button" color="mycolor" class="btn-edit-product" expand="full"
+            @click="getSuppliersApp()"><ion-icon :icon="i.peopleCircleOutline"></ion-icon> Seleccionar
             Tercero
           </ion-button>
           <ion-popover trigger="nested-button" :dismiss-on-select="false">
-            <ion-searchbar
-              animated
-              debounce="500"
-              placeholder="Buscar Proveedor"
-              @ionChange="searchSupplier($event)"
-              @keypress.enter="searchSupplierItem()"
-            >
+            <ion-searchbar animated debounce="500" placeholder="Buscar Proveedor" @ionChange="searchSupplier($event)"
+              @keypress.enter="searchSupplierItem()">
             </ion-searchbar>
             <ion-content>
-              <ion-button color="mycolor" @click="prevPageSupplier()" v-if="page > 1"
-              >Anterior</ion-button
-            >
-            <ion-button color="mycolor" @click="nextPageSupplier()"
-              >Siguiente</ion-button
-            >
-            <span> página {{ page }} </span>
+              <ion-button color="mycolor" @click="prevPageSupplier()" v-if="page > 1">Anterior</ion-button>
+              <ion-button color="mycolor" @click="nextPageSupplier()">Siguiente</ion-button>
+              <span> página {{ page }} </span>
               <ion-list>
                 <ion-label>
-                  <ion-list
-                    background-hover="92949c"
-                    v-for="supplier in suppliers"
-                    :key="supplier.idtercero"
-                    @click="
-                      selectSupplier(
-                        supplier.idtercero,
-                        supplier.nit,
-                        supplier.nombres
-                      )
-                    "
-                  >
+                  <ion-list background-hover="92949c" v-for="supplier in suppliers" :key="supplier.idtercero" @click="
+                    selectSupplier(
+                      supplier.idtercero,
+                      supplier.nit,
+                      supplier.nombres
+                    )
+                    ">
                     <ion-item :button="true" :detail="false">
                       NIT: {{ supplier.nit }}. {{ supplier.nombres }}
-                    </ion-item></ion-list
-                  ></ion-label
-                >
+                    </ion-item></ion-list></ion-label>
               </ion-list>
             </ion-content>
           </ion-popover>
@@ -140,149 +86,78 @@
           <ion-card-subtitle>
             <ion-item>
               <ion-label position="floating">Costo</ion-label>
-              <ion-input
-                type="number"
-                :value="product.costo"
-                @input="product.costo = $event.target.value"
-                disabled
-              ></ion-input>
+              <ion-input type="number" :value="product.costo" @input="product.costo = $event.target.value"
+                disabled></ion-input>
             </ion-item>
 
-            <ion-button
-              color="mycolor"
-              class="btn-edit-product"
-              @click="addAmount(product.idproducto)"
-              ><ion-icon :icon="i.addSharp"></ion-icon>
+            <ion-button color="mycolor" class="btn-edit-product" @click="addAmount(product.idproducto)"><ion-icon
+                :icon="i.addSharp"></ion-icon>
             </ion-button>
-            <ion-button
-              color="mycolor"
-              class="btn-edit-product"
-              @click="subtractAmount(product.idproducto)"
-              ><ion-icon :icon="i.removeSharp"></ion-icon>
+            <ion-button color="mycolor" class="btn-edit-product" @click="subtractAmount(product.idproducto)"><ion-icon
+                :icon="i.removeSharp"></ion-icon>
             </ion-button>
-            <ion-button
-              color="mycolor"
-              class="btn-edit-product"
-              @click="deleteProduct(product.idproducto)"
-              ><ion-icon :icon="i.trashOutline"></ion-icon>
+            <ion-button color="mycolor" class="btn-edit-product" @click="deleteProduct(product.idproducto)"><ion-icon
+                :icon="i.trashOutline"></ion-icon>
             </ion-button>
             <ion-item>
               <ion-label position="floating">Cantidad Actual</ion-label>
-              <ion-input
-                type="number"
-                :value="product.cantidadAct"
-                disabled
-              ></ion-input>
+              <ion-input type="number" :value="product.cantidadAct" disabled></ion-input>
             </ion-item>
           </ion-card-subtitle>
         </ion-card-header>
         <h5 text="dark">Cantidad: {{ product.entrada }}</h5>
       </ion-card>
       <ion-content class="ion-padding">
-        <ion-button
-          id="open-modal"
-          expand="block"
-          color="mycolor"
-          class="btn-edit-product"
-          @click="getProducts(this.idalmacen)"
-        >
+        <ion-button id="open-modal" expand="block" color="mycolor" class="btn-edit-product"
+          @click="getProducts(this.SelectIdalmacen)">
           <ion-icon :icon="i.searchCircleSharp"></ion-icon>Seleccionar
-          Productos</ion-button
-        >
-        <ion-button
-          color="mycolor"
-          class="btn-edit-product"
-          expand="full"
-          @click="saveInventory()"
-          ><ion-icon :icon="i.saveSharp"></ion-icon> Guardar Entrada de
-          productos</ion-button
-        >
-        <ion-modal
-          ref="modal"
-          trigger="open-modal"
-          :initial-breakpoint="0.25"
-          :breakpoints="[0, 0.25, 0.5, 0.75]"
-        >
+          Productos</ion-button>
+        <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="saveInventory()"><ion-icon
+            :icon="i.saveSharp"></ion-icon> Guardar Entrada de
+          productos</ion-button>
+        <ion-modal ref="modal" trigger="open-modal" :initial-breakpoint="0.25" :breakpoints="[0, 0.25, 0.5, 0.75]">
           <ion-content class="ion-padding">
-            <ion-searchbar
-              @click="$refs.modal.$el.setCurrentBreakpoint(0.75)"
-              placeholder="Buscar Producto"
-              @ionChange="searchOneProduct($event)"
-              @keypress.enter="searchItem()"
-            ></ion-searchbar>
-            <ion-input
-              type="search"
-              :value="searchByBarcode"
-              @input="searchByBarcode = $event.target.value"
-              placeholder="Código de barras"
-              :clear-input="true"
-              @keypress.enter="searchByBarcodeItem()"
-            ></ion-input>
-            <ion-button
-              color="mycolor"
-              expand="full"
-              class="btn-edit-product"
-              @click="startScan()"
-            >
-              Buscar Código barras</ion-button
-            >
-            <ion-button color="mycolor" @click="prevPage()" v-if="page > 1"
-              >Anterior</ion-button
-            >
-            <ion-button color="mycolor" @click="nextPage()"
-              >Siguiente</ion-button
-            >
+            <ion-searchbar @click="$refs.modal.$el.setCurrentBreakpoint(0.75)" placeholder="Buscar Producto"
+              @ionChange="searchOneProduct($event)" @keypress.enter="searchItem()"></ion-searchbar>
+            <ion-input type="search" :value="searchByBarcode" @input="searchByBarcode = $event.target.value"
+              placeholder="Código de barras" :clear-input="true" @keypress.enter="searchByBarcodeItem()"></ion-input>
+            <ion-button color="mycolor" expand="full" class="btn-edit-product" @click="startScan()">
+              Buscar Código barras</ion-button>
+            <ion-button color="mycolor" @click="prevPage()" v-if="page > 1">Anterior</ion-button>
+            <ion-button color="mycolor" @click="nextPage()">Siguiente</ion-button>
             <span> página {{ page }} </span>
             <ion-list v-for="product in products" :key="product.idproduct">
               <ion-item>
-                <ion-label
-                  >{{ product.codigo }} | {{ product.descripcion }}
+                <ion-label>{{ product.codigo }} | {{ product.descripcion }}
                 </ion-label>
               </ion-item>
               <ion-item>
-                <ion-label
-                  >Cantidad Actual : {{ product.cantidadAct }}
+                <ion-label>Cantidad Actual : {{ product.cantidadAct }}
                 </ion-label>
               </ion-item>
               <ion-item>
-                <ion-label
-                  >Costo: $
+                <ion-label>Costo: $
                   {{ new Intl.NumberFormat("de-DE").format(product.costo) }}
 
-                  <ion-button
-                    color="mycolor"
-                    class="btn-edit-product"
-                    expand="full"
-                    @click="
-                      selectProduct(
-                        product.idproducto,
-                        product.descripcion,
-                        product.costo,
-                        product.cantidadAct
-                      )
-                    "
-                    >Agregar<ion-icon
-                      :icon="i.checkmarkCircleOutline"
-                    ></ion-icon>
+                  <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="
+                    selectProduct(
+                      product.idproducto,
+                      product.descripcion,
+                      product.costo,
+                      product.cantidadAct
+                    )
+                    ">Agregar<ion-icon :icon="i.checkmarkCircleOutline"></ion-icon>
                   </ion-button>
                 </ion-label>
               </ion-item>
             </ion-list>
           </ion-content>
         </ion-modal>
-        <ion-button
-          expand="full"
-          color="mycolor"
-          class="btn-edit-product"
-          @click="newOrder()"
-          ><ion-icon :icon="i.refreshCircleSharp"></ion-icon> Nuevo Movimiento
+        <ion-button expand="full" color="mycolor" class="btn-edit-product" @click="newOrder()"><ion-icon
+            :icon="i.refreshCircleSharp"></ion-icon> Nuevo Movimiento
         </ion-button>
-        <ion-button
-          expand="full"
-          color="mycolor"
-          class="btn-edit-product"
-          @click="goToTransfers()"
-          ><ion-icon :icon="i.arrowForwardSharp"></ion-icon>Traslados
+        <ion-button expand="full" color="mycolor" class="btn-edit-product" @click="goToTransfers()"><ion-icon
+            :icon="i.arrowForwardSharp"></ion-icon>Traslados
         </ion-button>
       </ion-content>
     </ion-content>
@@ -360,7 +235,6 @@ export default defineComponent({
       saveInventoryMovements: {} as IIngMovInvEntrada,
       SelectIdalmacen: 0 as number,
       allWarehouses: [] as any,
-      idalmacen: 0 as number,
       finalNumber: 0 as number,
       fechadocprov: "" as string,
       fecha: "" as string,
@@ -540,7 +414,7 @@ export default defineComponent({
 
     async getProducts(id: number) {
       try {
-        id = this.idalmacen;
+        id = this.SelectIdalmacen;
 
         if (id === 0) {
           const alert = await alertController.create({
@@ -571,7 +445,7 @@ export default defineComponent({
         this.searchProduct = e.detail.value;
         this.descripcion = this.searchProduct.toUpperCase();
         if (this.searchProduct === "") {
-          return await this.getProducts(this.idalmacen);
+          return await this.getProducts(this.SelectIdalmacen);
         }
       } catch (error) {
         console.log(error);
@@ -585,6 +459,45 @@ export default defineComponent({
         console.log(error);
       }
     },
+    // selectProduct(
+    //   idproducto: number,
+    //   descripcion: string,
+    //   costo: number,
+    //   cantidadAct: number
+    // ) {
+    //   try {
+    //     const product = [
+    //       {
+    //         idajuste: this.idMovement,
+    //         idproducto: idproducto,
+    //         descripcion: descripcion,
+    //         costo: costo,
+    //         entrada: this.finalAmount,
+    //         cantidadAct: cantidadAct,
+    //         salida: 0,
+    //         idalmacen: this.SelectIdalmacen,
+    //       },
+    //     ];
+    //     const productFinal = JSON.stringify(product);
+    //     const finalProductParsed = JSON.parse(productFinal);
+
+    //     finalProductParsed.forEach((product: any) => {
+    //       this.productArray.push(product);
+    //     });
+    //     this.searchByBarcode = "";
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // },
+    // addAmount(idproducto: number) {
+    //   const producto = this.productArray.filter((r) => {
+    //     return r.idproducto === idproducto;
+    //   })[0];
+    //   if (producto) {
+    //     producto.entrada++;
+    //     this.finalAmount = producto.entrada;
+    //   }
+    // },
     selectProduct(
       idproducto: number,
       descripcion: string,
@@ -592,24 +505,17 @@ export default defineComponent({
       cantidadAct: number
     ) {
       try {
-        const product = [
-          {
-            idajuste: this.idMovement,
-            idproducto: idproducto,
-            descripcion: descripcion,
-            costo: costo,
-            entrada: this.finalAmount,
-            cantidadAct: cantidadAct,
-            salida: 0,
-            idalmacen: this.idalmacen,
-          },
-        ];
-        const productFinal = JSON.stringify(product);
-        const finalProductParsed = JSON.parse(productFinal);
-
-        finalProductParsed.forEach((product: any) => {
-          this.productArray.push(product);
-        });
+        const product = {
+          idajuste: this.idMovement,
+          idproducto: idproducto,
+          descripcion: descripcion,
+          costo: costo,
+          entrada: 1, // la cantidad se establece en 1 para cada instancia de producto
+          cantidadAct: cantidadAct,
+          salida: 0,
+          idalmacen: this.SelectIdalmacen,
+        };
+        this.productArray.push(product);
         this.searchByBarcode = "";
       } catch (error) {
         console.log(error);
@@ -624,6 +530,7 @@ export default defineComponent({
         this.finalAmount = producto.entrada;
       }
     },
+
     subtractAmount(idproducto: number) {
       const producto = this.productArray.filter((r) => {
         return r.idproducto === idproducto;
@@ -696,12 +603,10 @@ export default defineComponent({
         console.log(error);
       }
     },
-    getIdalmacen() {
-      this.idalmacen = this.SelectIdalmacen;
-    },
+
     async getNumbers(id: number) {
       try {
-        id = this.idalmacen;
+        id = this.SelectIdalmacen;
         if (id === 0) {
           const alert = await alertController.create({
             cssClass: "my-custom-class",
@@ -713,7 +618,7 @@ export default defineComponent({
           await alert.present();
         } else {
           const consecutiveNumber = await InventoryMovements.getConsecutive(
-            this.idalmacen
+            this.SelectIdalmacen
           );
           this.finalNumber = consecutiveNumber.data.number.length + 1;
           const alert = await alertController.create({
@@ -730,7 +635,7 @@ export default defineComponent({
       }
     },
     async saveInventory() {
-      if (this.idalmacen === 0) {
+      if (this.SelectIdalmacen === 0) {
         const alert = await alertController.create({
           cssClass: "my-custom-class",
           header: "ATENCIÓN !!!",
@@ -771,7 +676,7 @@ export default defineComponent({
         await alert.present();
         return false;
       } else {
-        this.saveInventoryMovements.idalmacen = this.idalmacen;
+        this.saveInventoryMovements.idalmacen = this.SelectIdalmacen;
         this.saveInventoryMovements.idusuario = 1;
         this.saveInventoryMovements.idconceptajuste = 1;
         this.saveInventoryMovements.numero = this.finalNumber;
@@ -806,15 +711,18 @@ export default defineComponent({
   padding-left: 100px !important;
   padding-right: 100px !important;
 }
+
 .edit-image {
   width: 10%;
   max-height: 10%;
   float: right;
 }
+
 .edit-image1 {
   width: 5%;
   max-height: 5%;
 }
+
 .btn-edit-product {
   border-radius: 30px;
 }
@@ -822,6 +730,7 @@ export default defineComponent({
 ion-button {
   background-color: var(--ion-color-mycolor);
 }
+
 .letter-color {
   color: #82230d;
   text-shadow: 1px 1px #fff;
