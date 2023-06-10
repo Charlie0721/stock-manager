@@ -2,8 +2,7 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title
-          ><img class="edit-image" src="../images/images_app/logo_header.png" />
+        <ion-title><img class="edit-image" src="../images/images_app/logo_header.png" />
           Recolector de Traslados
         </ion-title>
       </ion-toolbar>
@@ -13,112 +12,83 @@
         <ion-card-title>
           <h4>Almacenes</h4>
         </ion-card-title>
-        <ion-list v-for="warehouse in warehouses" :key="warehouse.idalmacen">
+        <!-- <ion-list v-for="warehouse in warehouses" :key="warehouse.idalmacen">
           <ion-item>
             <ion-label
               >{{ warehouse.idalmacen }}{{ warehouse.nomalmacen }}</ion-label
             >
           </ion-item>
+          
+        </ion-list> -->
+        <ion-list>
+          <ion-item>
+            <ion-select placeholder="Seleccionar Origen" @ionChange="SelectOrigin = $event.target.value"
+              :value="SelectOrigin">
+              <ion-select-option :value="warehouse.idalmacen" v-for="warehouse in warehouses"
+                :key="warehouse.idalmacen">{{ warehouse.nomalmacen }}</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+        </ion-list>
+        <ion-list>
+          <ion-item>
+            <ion-select placeholder="Seleccionar Destino" @ionChange="SelectDestination = $event.target.value"
+              :value="SelectDestination">
+              <ion-select-option :value="warehouse.idalmacen" v-for="warehouse in warehouses"
+                :key="warehouse.idalmacen">{{ warehouse.nomalmacen }}</ion-select-option>
+            </ion-select>
+          </ion-item>
+
         </ion-list>
       </ion-card>
       <ion-card>
         <ion-card-title>
-          <h4
-            class="letter-color"
-            v-for="item in this.descriptions"
-            :key="item.barcode"
-          >
+          <h4 class="letter-color" v-for="item in this.descriptions" :key="item.barcode">
             {{ item.descripcion }}
           </h4>
         </ion-card-title>
         <ion-card-subtitle>
           <ion-item>
             <ion-label position="floating">Id almacen origen</ion-label>
-            <ion-input
-              type="number"
-              :value="warehouseId1"
-              @input="warehouseId1 = $event.target.value"
-            ></ion-input>
+            <ion-input type="number" :value="SelectOrigin" @input="SelectOrigin = $event.target.value"></ion-input>
             <ion-label position="floating">Id almacen destino</ion-label>
-            <ion-input
-              type="number"
-              :value="warehouseId2"
-              @input="warehouseId2 = $event.target.value"
-            ></ion-input>
+            <ion-input type="number" :value="SelectDestination"
+              @input="SelectDestination = $event.target.value"></ion-input>
             <ion-label position="floating">Codigo de barras</ion-label>
-            <ion-input
-              type="text"
-              :value="barcode"
-              @input="barcodeScan.barcode = $event.target.value"
-            ></ion-input>
+            <ion-input type="text" :value="barcode" @input="barcodeScan.barcode = $event.target.value"></ion-input>
             <ion-label position="floating">Cantidad</ion-label>
-            <ion-input
-              type="number"
-              :value="amount"
-              @input="amount = $event.target.value"
-            ></ion-input>
+            <ion-input type="number" :value="amount" @input="amount = $event.target.value"></ion-input>
           </ion-item>
 
-          <ion-button
-            color="mycolor"
-            expand="full"
-            class="btn-edit-product"
-            @click="startScan()"
-            >Escanear Código barras</ion-button
-          >
+          <ion-button color="mycolor" expand="full" class="btn-edit-product" @click="startScan()">Escanear Código
+            barras</ion-button>
 
-          <ion-button
-            color="mycolor"
-            class="btn-edit-product"
-            expand="full"
-            @click="searchProduct()"
-          >
-            Busca Producto</ion-button
-          >
+          <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="searchProduct()">
+            Busca Producto</ion-button>
           <h4 class="letter-color">
             {{ barcode }}
           </h4>
           <ion-item>
             <ion-label position="floating">Cantidad</ion-label>
-            <ion-input
-              type="number"
-              :value="amount"
-              @input="amount = $event.target.value"
-              disabled
-            ></ion-input>
+            <ion-input type="number" :value="amount" @input="amount = $event.target.value" disabled></ion-input>
           </ion-item>
         </ion-card-subtitle>
       </ion-card>
-      <ion-list
-        v-for="collector in dataCollectorTransfers"
-        :key="collector.collector"
-      >
+      <ion-list v-for="collector in dataCollectorTransfers" :key="collector.collector">
         <ion-item>
-          <ion-label
-            >{{ collector.warehouse1 }}{{ collector.coma
-            }}{{ collector.warehouse2 }}{{ collector.coma1 }}
+          <ion-label>{{ collector.SelectOrigin }}{{ collector.coma
+          }}{{ collector.SelectDestination }}{{ collector.coma1 }}
             {{ collector.barcode }}{{ collector.coma2
-            }}{{ collector.amount }}</ion-label
-          >
+            }}{{ collector.amount }}</ion-label>
         </ion-item>
       </ion-list>
-      <ion-button
-        color="mycolor"
-        class="btn-edit-product"
-        expand="full"
-        @click="writeFile()"
-        ><ion-icon :icon="i.document"></ion-icon> Generar Archivo
-        txt</ion-button
-      >
-      <ion-button color="danger" expand="full" @click="returnProducts()"
-        ><ion-icon :icon="i.arrowBackSharp"></ion-icon>Volver</ion-button
-      >
-      <ion-button
-        expand="full"
-        color="mycolor"
-        class="btn-edit-product"
-        @click="newOrder()"
-        ><ion-icon :icon="i.refreshCircleSharp"></ion-icon> Iniciar
+      <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="writeFile()"><ion-icon
+          :icon="i.document"></ion-icon> Generar Archivo
+        txt</ion-button>
+      <ion-button color="danger" expand="full" @click="returnProducts()"><ion-icon
+          :icon="i.arrowBackSharp"></ion-icon>Volver</ion-button>
+      <ion-button expand="full" color="mycolor" class="btn-edit-product" @click="newOrder()"><ion-icon
+          :icon="i.refreshCircleSharp"></ion-icon> Iniciar
       </ion-button>
     </ion-content>
   </ion-page>
@@ -145,6 +115,8 @@ import {
   IonButton,
   IonCardSubtitle,
   IonIcon,
+  IonSelect,
+  IonSelectOption,
 } from "@ionic/vue";
 import { ISearchByBarcodeToCollector } from "@/interfaces/barcode.interface";
 import { BarcodeCollectorSearch } from "../services/dataRecolector";
@@ -168,6 +140,8 @@ export default defineComponent({
     IonButton,
     IonCardSubtitle,
     IonIcon,
+    IonSelect,
+    IonSelectOption,
   },
   data() {
     return {
@@ -181,6 +155,8 @@ export default defineComponent({
       coma2: "," as string,
       warehouseId1: 0 as number,
       warehouseId2: 0 as number,
+      SelectOrigin: 0 as number,
+      SelectDestination: 0 as number,
       dataCollectorTransfers: [] as any,
       descriptions: [] as any,
     };
@@ -342,15 +318,16 @@ export default defineComponent({
 
           const finalData = [
             {
-              warehouse1: this.warehouseId1,
+              SelectOrigin: this.SelectOrigin,
               coma: this.coma,
-              warehouse2: this.warehouseId2,
+              SelectDestination: this.SelectDestination,
               coma1: this.coma1,
               barcode: this.barcode,
               coma2: this.coma2,
               amount: amount,
             },
           ];
+
           const finalDataCollector = JSON.stringify(finalData);
           const finalDataParsed = JSON.parse(finalDataCollector);
           finalDataParsed.forEach((collector: any) => {
@@ -367,7 +344,6 @@ export default defineComponent({
     async writeFile() {
       try {
         let data = this.dataCollectorTransfers;
-        console.log(data);
         if (data.length > 0) {
           const createFile = await BarcodeCollectorSearch.generateTxtFileTransfers(data);
           console.log(createFile);
@@ -404,16 +380,20 @@ export default defineComponent({
   width: 5%;
   max-height: 5%;
 }
+
 .btn-edit-product {
   border-radius: 30px;
 }
+
 ion-button {
   background-color: var(--ion-color-mycolor);
 }
+
 .letter-color {
   color: #82230d;
   text-shadow: 1px 1px #fff;
 }
+
 .hideBg::part(background) {
   display: none;
 }
