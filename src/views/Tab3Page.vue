@@ -116,7 +116,7 @@
             :icon="i.saveSharp"></ion-icon> Guardar Entrada de
           productos</ion-button>
         <ion-modal ref="modal" trigger="open-modal" :initial-breakpoint="0.25" :breakpoints="[0, 0.25, 0.5, 0.75]">
-          <ion-content class="ion-padding">
+          <ion-content class="ion-padding custom-modal-content">
             <ion-searchbar @click="$refs.modal.$el.setCurrentBreakpoint(0.75)" placeholder="Buscar Producto"
               @ionChange="searchOneProduct($event)" @keypress.enter="searchItem()"></ion-searchbar>
             <ion-input type="search" :value="searchByBarcode" @input="searchByBarcode = $event.target.value"
@@ -459,45 +459,6 @@ export default defineComponent({
         console.log(error);
       }
     },
-    // selectProduct(
-    //   idproducto: number,
-    //   descripcion: string,
-    //   costo: number,
-    //   cantidadAct: number
-    // ) {
-    //   try {
-    //     const product = [
-    //       {
-    //         idajuste: this.idMovement,
-    //         idproducto: idproducto,
-    //         descripcion: descripcion,
-    //         costo: costo,
-    //         entrada: this.finalAmount,
-    //         cantidadAct: cantidadAct,
-    //         salida: 0,
-    //         idalmacen: this.SelectIdalmacen,
-    //       },
-    //     ];
-    //     const productFinal = JSON.stringify(product);
-    //     const finalProductParsed = JSON.parse(productFinal);
-
-    //     finalProductParsed.forEach((product: any) => {
-    //       this.productArray.push(product);
-    //     });
-    //     this.searchByBarcode = "";
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // },
-    // addAmount(idproducto: number) {
-    //   const producto = this.productArray.filter((r) => {
-    //     return r.idproducto === idproducto;
-    //   })[0];
-    //   if (producto) {
-    //     producto.entrada++;
-    //     this.finalAmount = producto.entrada;
-    //   }
-    // },
     selectProduct(
       idproducto: number,
       descripcion: string,
@@ -510,7 +471,6 @@ export default defineComponent({
           idproducto: idproducto,
           descripcion: descripcion,
           costo: costo,
-          entrada: 1, // la cantidad se establece en 1 para cada instancia de producto
           cantidadAct: cantidadAct,
           salida: 0,
           idalmacen: this.SelectIdalmacen,
@@ -735,4 +695,8 @@ ion-button {
   color: #82230d;
   text-shadow: 1px 1px #fff;
 }
+.custom-modal-content {
+    --overflow: auto;
+    --overflow-scroll-behavior: smooth;
+  }
 </style>

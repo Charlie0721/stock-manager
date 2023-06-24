@@ -97,7 +97,7 @@
         </ion-button>
 
         <ion-modal ref="modal" trigger="open-modal" :initial-breakpoint="0.25" :breakpoints="[0, 0.25, 0.5, 0.75]">
-          <ion-content class="ion-padding">
+          <ion-content class="ion-padding custom-modal-content">
             <ion-searchbar @click="$refs.modal.$el.setCurrentBreakpoint(0.75)" placeholder="Buscar Producto"
               @ionChange="searchOneProduct($event)" @keypress.enter="searchItem()"></ion-searchbar>
             <ion-input type="search" :value="searchByBarcode" @input="searchByBarcode = $event.target.value"
@@ -629,4 +629,8 @@ ion-button {
 .hideBg::part(background) {
   display: none;
 }
+.custom-modal-content {
+    --overflow: auto;
+    --overflow-scroll-behavior: smooth;
+  }
 </style>
