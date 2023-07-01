@@ -14,7 +14,8 @@
             </ion-item>
             <ion-button color="mycolor" class="btn-edit-product" expand="block " @click="chekSales"> Consultar</ion-button>
 
-            <ion-card v-for="sale in sales" :key="sale.idalmacen">
+            <ion-card v-for="(sale, index) in sales" :key="sale.idalmacen + index"
+                @click="showSales(sale.fecha, sale.idalmacen)">
 
                 <ion-card-header>
                     <ion-card-title>
@@ -24,16 +25,21 @@
                     </ion-card-title>
                 </ion-card-header>
                 <ion-card-content>
-                    subtotal:$ {{ new Intl.NumberFormat("de-DE").format(sale.subtot) }} <br>
-                    iva:$ {{ new Intl.NumberFormat("de-DE").format(sale.ivaimp) }} <br>
-                    retenciones:$ {{ new Intl.NumberFormat("de-DE").format(sale.retencion) }} <br>
-                    total:$ {{ new Intl.NumberFormat("de-DE").format(sale.total) }}<br><br>
-                    Cant Facturas:{{ sale.cantfact }} <br>
-                    Cant Productos Vendidos:{{ sale.prodvendid }}
-
+                    <h2>Subtotal: $ {{ new Intl.NumberFormat("de-DE").format(sale.subtot) }} </h2>
+                    <h2>Iva: $ {{ new Intl.NumberFormat("de-DE").format(sale.ivaimp) }} </h2>
+                    <h2>Retenciones: $ {{ new Intl.NumberFormat("de-DE").format(sale.retencion) }} </h2>
+                    <h2>Total: $ {{ new Intl.NumberFormat("de-DE").format(sale.total) }}</h2>
+                    <h2> Cant Facturas: {{ sale.cantfact }} </h2>
+                    <h2> Cant Productos Vendidos: {{ sale.prodvendid }}</h2>
                 </ion-card-content>
+                <ion-button color="mycolor" class="btn-edit-product" expand="block "
+                    @click="showSales(sale.fecha, sale.idalmacen)">Ver Facturas</ion-button>
 
             </ion-card>
+            <ion-button color="mycolor" class="btn-edit-product" expand="block " @click="newCheck">Nueva
+                Consulta</ion-button>
+            <ion-button color="danger" expand="full" @click="goBack"><ion-icon
+                    :icon="i.arrowBackSharp"></ion-icon>Volver</ion-button>
         </ion-content>
     </ion-page>
 </template>
@@ -44,6 +50,7 @@
 import { defineComponent } from "vue";
 import { CheckSalesOfTheDay } from '../services/check-sales-by-day';
 import { CheckSales } from '../interfaces/checkSales.interface'
+import * as allIcons from "ionicons/icons";
 import {
     IonPage,
     IonHeader,
@@ -59,6 +66,7 @@ import {
     IonInput,
     IonContent,
     IonCardTitle,
+    IonIcon,
 
 } from "@ionic/vue";
 
@@ -79,17 +87,20 @@ export default defineComponent({
         IonCardContent,
         IonCardHeader,
         IonCardTitle,
+        IonIcon,
     },
     data() {
 
         return {
+            i: allIcons,
             initialDate: {} as CheckSales,
             sales: [] as any
         }
-
     },
     methods: {
-
+        showSales(date: string, warehouseId: string) {
+            this.$router.push(`/check-sales-by-day/${date}/${warehouseId}`);
+        },
         async chekSales() {
 
             try {
@@ -100,7 +111,6 @@ export default defineComponent({
 
                 const responseSales = await CheckSalesOfTheDay.checkSales(dataToSearch)
                 this.sales = responseSales.data.sales
-                console.log(this.sales)
                 if (responseSales) {
                     const alert = await alertController.create({
                         cssClass: "my-custom-class",
@@ -109,7 +119,6 @@ export default defineComponent({
                         buttons: ["ACEPTAR"],
                     });
                     await alert.present();
-
                 }
 
             } catch (error) {
@@ -127,9 +136,15 @@ export default defineComponent({
 
             }
 
-        }
+        },
+        newCheck() {
+            location.reload();
+        },
+        goBack() {
+            this.$router.push("/trade-orders");
+        },
 
-    }
+    },
 
 })
 

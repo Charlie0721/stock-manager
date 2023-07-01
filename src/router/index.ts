@@ -99,6 +99,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/check-sales-by-day',
     name: 'check-sales',
     component: () => import('@/views/SalesOfTheDay.vue')
+  },
+  {
+    path: '/check-sales-by-day/:fecha/:idalmacen',
+    name: 'check-sales-by-warehouse',
+    component: () => import('@/views/AmountSalesday.vue')
   }
 
 ]

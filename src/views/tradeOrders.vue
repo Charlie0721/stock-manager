@@ -1,6 +1,8 @@
 <template>
   <ion-page>
     <ion-header>
+      <ion-button color="mycolor" expand="block" class="btn-edit-product" @click="checkSales">Consultar ventas del Día
+      </ion-button>
       <ion-toolbar>
         <ion-title>
           <img class="edit-image1" src="../images/images_app/logo_header.png" />
@@ -241,7 +243,6 @@ import {
 export default defineComponent({
   name: "Tab1Page",
   components: {
-    // ExploreContainer,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -256,7 +257,6 @@ export default defineComponent({
     IonItem,
     IonButton,
     IonList,
-    // IonListHeader,
     IonSearchbar,
     IonPopover,
     IonModal,
@@ -323,6 +323,10 @@ export default defineComponent({
     fabToggled(e: any) {
       e.stopPropagation();
     },
+    checkSales() {
+      this.$router.push("/check-sales-by-day");
+    },
+
 
     newOrder() {
       location.reload();
@@ -871,8 +875,9 @@ ion-button {
 .hideBg::part(background) {
   display: none;
 }
+
 .custom-modal-content {
-    --overflow: auto;
-    --overflow-scroll-behavior: smooth;
-  }
+  --overflow: auto;
+  --overflow-scroll-behavior: smooth;
+}
 </style>
