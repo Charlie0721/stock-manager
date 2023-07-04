@@ -104,6 +104,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/check-sales-by-day/:fecha/:idalmacen',
     name: 'check-sales-by-warehouse',
     component: () => import('@/views/AmountSalesday.vue')
+  },
+  {
+    path: '/check-sales-by-day/detail/:idalmacen/:numero',
+    name: 'check-sales-by-warehouse-detail',
+    component: () => import('@/views/DetailSalesDay.vue')
   }
 
 ]

@@ -32,6 +32,8 @@
                         <h4>Almacén: {{ sale.nomalmacen }} </h4>
                     </ion-label>
                 </ion-item>
+                <ion-button color="mycolor" class="btn-edit-product" expand="block "
+                    @click="getDetail(sale.idalmacen, sale.numero)">Ver Detalle </ion-button>
 
             </ion-list>
             <ion-button color="mycolor" class="btn-edit-product" expand="block " @click="reloaPage"><ion-icon
@@ -118,7 +120,7 @@ export default defineComponent({
 
                     this.sales = response.data.sales
                     const count = this.sales.length
-                    for (let i = 0; i < count; i++) {
+                    for (let i = 0; i <= count; i++) {
                         this.totalSales += this.sales[i].valortotal;
                         this.amounTax += this.sales[i].valimpuesto;
                         this.subTotal += this.sales[i].subtotal;
@@ -141,6 +143,11 @@ export default defineComponent({
         goBack() {
             this.$router.push("/check-sales-by-day/");
         },
+        getDetail(warehouseId: number, number: number) {
+            this.$router.push(`/check-sales-by-day/detail/${warehouseId}/${number}`);
+
+
+        }
 
     },
 
