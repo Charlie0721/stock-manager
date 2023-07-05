@@ -252,7 +252,7 @@ export default defineComponent({
       idMovement: 0 as number,
       salida: 0 as number,
       searchByBarcode: "" as string,
-      limit: 10 as number,
+      limit: 2 as number,
       page: 1 as number,
       offset: 0 as number,
       codigo: "" as string,

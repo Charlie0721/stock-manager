@@ -266,7 +266,7 @@ export default defineComponent({
       taxes: [] as any,
       porcentaje: 0 as number,
       searchByBarcode: "" as string,
-      limit: 10 as number,
+      limit: 2 as number,
       page: 1 as number,
       offset: 0 as number,
       codigo: "" as string,
