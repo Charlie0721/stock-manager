@@ -2,7 +2,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'io.ionic.starter',
-  appName: 'new-app-search-prices',
+  appName: 'stock-manager',
   webDir: 'dist',
   bundledWebRuntime: false
 };
