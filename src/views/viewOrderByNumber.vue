@@ -239,10 +239,10 @@ Software: https://conexionpos.com/
             buttons: ["ACEPTAR"],
           });
           await alert.present();
-          console.log("Archivo PDF generado correctamente");
+          console.log("Archivo TXT generado correctamente");
         })
         .catch(async (error) => {
-          console.error("Ocurrió un error al generar el archivo PDF:", error);
+          console.error("Ocurrió un error al generar el archivo TXT:", error);
           const alert = await alertController.create({
             cssClass: "my-custom-class",
             header: "Atencion !!!",
