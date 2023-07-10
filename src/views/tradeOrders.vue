@@ -550,28 +550,6 @@ export default defineComponent({
 
     async saveCompleteTradeOrder() {
       try {
-        if (this.idvendedor === 0) {
-          const alert = await alertController.create({
-            cssClass: "my-custom-class",
-            header: "ATENCION !!!",
-            subHeader: `NO PASA VALIDACION `,
-            message: `DEBE SELECCIONAR VENDEDOR`,
-            buttons: ["ACEPTAR"],
-          });
-          await alert.present();
-          return false;
-        }
-        if (this.idtercero === 0) {
-          const alert = await alertController.create({
-            cssClass: "my-custom-class",
-            header: "ATENCION !!!",
-            subHeader: `NO PASA VALIDACION `,
-            message: `DEBE SELECCIONAR CLIENTE`,
-            buttons: ["ACEPTAR"],
-          });
-          await alert.present();
-          return false;
-        }
 
         if (this.addTotals === 0 || this.addTotals < 0) {
           const alert = await alertController.create({
@@ -585,6 +563,22 @@ export default defineComponent({
           return false;
         } else {
           await this.getNumbers();
+          if (this.idtercero === 0) {
+            let idCustom = localStorage.getItem("idCustomer");
+            this.idtercero = JSON.parse(idCustom);
+            this.saveTradeOrder.idtercero = this.idtercero;
+
+          } else {
+            this.saveTradeOrder.idtercero = this.idtercero;
+
+          }
+          if (this.idvendedor === 0) {
+            let idEmploy = localStorage.getItem("idEmployee");
+            this.idvendedor = JSON.parse(idEmploy);
+            this.saveTradeOrder.idvendedor = this.idvendedor;
+          } else {
+            this.saveTradeOrder.idvendedor = this.idvendedor;
+          }
           this.saveTradeOrder.numero = this.finalNumber;
           this.saveTradeOrder.fecha = this.date;
           this.saveTradeOrder.subtotal = this.addTotals;
@@ -593,8 +587,6 @@ export default defineComponent({
           this.saveTradeOrder.valretenciones = 0;
           this.saveTradeOrder.idalmacen = this.idalmacen;
           this.saveTradeOrder.estado = 3;
-          this.saveTradeOrder.idtercero = this.idtercero;
-          this.saveTradeOrder.idvendedor = this.idvendedor;
           this.saveTradeOrder.idsoftware = 2;
           this.saveTradeOrder.detalle = "Pedido desde app movil";
           this.saveTradeOrder.fechacrea = this.date;
