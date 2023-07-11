@@ -49,16 +49,7 @@
         </div>
         <br />
         <br />
-        <!-- <a class="letter-color" href="/trade-orders">Volver</a> -->
       </div>
-      <!-- <ion-button
-        color="mycolor"
-        class="btn-edit-product"
-        expand="full"
-        @click="print('content')"
-        v-if="state === true"
-        ><ion-icon :icon="i.printOutline"></ion-icon>Imprimir
-      </ion-button> -->
       <ion-button
         color="mycolor"
         class="btn-edit-product"
@@ -111,7 +102,6 @@ export default defineComponent({
   components: {
     vueQr,
     IonPage,
-    //  IonHeader,
     IonToolbar,
     IonTitle,
     IonCard,
@@ -150,37 +140,7 @@ export default defineComponent({
     this.getOrderByNumber();
   },
   methods: {
-    // async print(content) {
-    //   try {
-    //     console.log(content);
-    //     window.print();
-    //     window.document.close();
-    //     window.focus();
-
-    //     content = document.getElementById("content")?.innerHTML;
-    //     window.document.write(content);
-    //     const alert = await alertController.create({
-    //       cssClass: "my-custom-class",
-    //       header: "Atención !!!",
-    //       subHeader: `PARA CONTINUAR `,
-    //       message: "Tome un pantallazo para imprimir ",
-    //       buttons: ["ACEPTAR"],
-    //     });
-    //     await alert.present();
-
-    //     return true;
-    //   } catch (error) {
-    //     console.log(error);
-    //     const alert = await alertController.create({
-    //       cssClass: "my-custom-class",
-    //       header: "Error !!!",
-    //       subHeader: `PARA CONTINUAR `,
-    //       message: error,
-    //       buttons: ["ACEPTAR"],
-    //     });
-    //     await alert.present();
-    //   }
-    // },
+   
     async pdfGenerator() {
       const dataProducts = [];
       const archivoNuevo = "pedido numero " + this.order[0].numero + ".txt";
@@ -253,31 +213,7 @@ Software: https://conexionpos.com/
           await alert.present();
         });
 
-      // Filesystem.readdir({
-      //   path: `${directory}/${archivoNuevo}`,
-      //   directory,
-      // })
-      //   .then(async () => {
-      //     const alert = await alertController.create({
-      //       cssClass: "my-custom-class",
-      //       header: "Atencion !!!",
-      //       subHeader: `OK `,
-      //       message: "Archivo en el directorio " + directory,
-      //       buttons: ["ACEPTAR"],
-      //     });
-      //     await alert.present();
-      //   })
-      //   .catch(async (error) => {
-      //     const alert = await alertController.create({
-      //       cssClass: "my-custom-class",
-      //       header: "Atencion !!!",
-      //       subHeader: `Error `,
-      //       message: error,
-      //       buttons: ["ACEPTAR"],
-      //     });
-      //     await alert.present();
-      //   });
-    },
+        },
 
     async getOrderByNumber() {
       try {
