@@ -605,7 +605,14 @@ export default defineComponent({
           this.saveTradeOrder.detpedidos = finalProduct;
 
           const saveOrder1 = await TradeOrders.saveOrder(this.saveTradeOrder);
-          console.log(saveOrder1);
+          const alert = await alertController.create({
+            cssClass: "my-custom-class",
+            header: "CONFIRMACION !!!",
+            subHeader: `PEDIDO GENERADO `,
+            message: `SE HA GENRADO EL PEDIDO COMERCIAL `,
+            buttons: ["ACEPTAR"],
+          });
+          await alert.present();
         }
         this.viewOrder(this.idalmacen, this.finalNumber);
       } catch (error) {
@@ -640,7 +647,7 @@ export default defineComponent({
           valorprod: precioventa,
           costoprod: costoprod,
           codiva: codiva,
-          cantidad: 1, // asignamos una cantidad inicial de 1
+          cantidad: 1, 
           despachado: this.despachado,
           descuento: this.descuentoProd,
         };
@@ -661,7 +668,6 @@ export default defineComponent({
         );
       }
     },
-
     async searchOneProduct(e: any) {
       try {
         this.searchProduct = e.detail.value;

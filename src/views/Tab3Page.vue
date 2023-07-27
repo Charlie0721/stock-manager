@@ -246,7 +246,7 @@ export default defineComponent({
       products: [] as any,
       searchProduct: "" as string,
       productArray: [] as any,
-      finalAmount: 0 as number,
+      finalAmount: 1 as number,
       cost: 0 as number,
       detail: "" as string,
       idMovement: 0 as number,
@@ -470,6 +470,7 @@ export default defineComponent({
           idajuste: this.idMovement,
           idproducto: idproducto,
           descripcion: descripcion,
+          entrada: 1,
           costo: costo,
           cantidadAct: cantidadAct,
           salida: 0,
@@ -482,13 +483,12 @@ export default defineComponent({
       }
     },
     addAmount(idproducto: number) {
-      const producto = this.productArray.filter((r) => {
-        return r.idproducto === idproducto;
-      })[0];
+      const producto = this.productArray.find((r) => r.idproducto === idproducto);
       if (producto) {
         producto.entrada++;
-        this.finalAmount = producto.entrada;
+
       }
+
     },
 
     subtractAmount(idproducto: number) {
@@ -497,7 +497,6 @@ export default defineComponent({
       })[0];
       if (producto) {
         producto.entrada--;
-        this.finalAmount = producto.entrada;
       }
     },
     async deleteProduct(id: number) {
@@ -625,7 +624,7 @@ export default defineComponent({
         });
         await alert.present();
         return false;
-      } else if (this.finalAmount === 0 || this.idMovement === 0) {
+      } else if (this.idMovement === 0) {
         const alert = await alertController.create({
           cssClass: "my-custom-class",
           header: "ATENCIÓN !!!",
@@ -695,8 +694,9 @@ ion-button {
   color: #82230d;
   text-shadow: 1px 1px #fff;
 }
+
 .custom-modal-content {
-    --overflow: auto;
-    --overflow-scroll-behavior: smooth;
-  }
+  --overflow: auto;
+  --overflow-scroll-behavior: smooth;
+}
 </style>

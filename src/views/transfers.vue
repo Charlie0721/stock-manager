@@ -338,29 +338,29 @@ export default defineComponent({
       }
     },
     selectProduct(
-  idproducto: number,
-  descripcion: string,
-  costo: number,
-  cantidadAct: number,
-  precio: number
-) {
-  try {
-    const product = {
-      idproducto: idproducto,
-      descripcion: descripcion,
-      costo: costo,
-      cantidad: this.finalAmount,
-      cantidadAct: cantidadAct,
-      precio: precio,
-      idalmacendest: this.SelectDestination,
-    };
-    const newProduct = { ...product, cantidad: 1 };
-    this.productArray.push(newProduct);
-    this.searchByBarcode = "";
-  } catch (error) {
-    console.log(error);
-  }
-},
+      idproducto: number,
+      descripcion: string,
+      costo: number,
+      cantidadAct: number,
+      precio: number
+    ) {
+      try {
+        const product = {
+          idproducto: idproducto,
+          descripcion: descripcion,
+          costo: costo,
+          cantidad: this.finalAmount,
+          cantidadAct: cantidadAct,
+          precio: precio,
+          idalmacendest: this.SelectDestination,
+        };
+        const newProduct = { ...product, cantidad: 1 };
+        this.productArray.push(newProduct);
+        this.searchByBarcode = "";
+      } catch (error) {
+        console.log(error);
+      }
+    },
     addAmount(idproducto: number) {
       const producto = this.productArray.filter((r) => {
         return r.idproducto === idproducto;
@@ -452,10 +452,10 @@ export default defineComponent({
           finalProduct.forEach((product) => {
             const newProducts = finalProduct.find(
               (item) => item.idproducto === product.idproducto
-              );
-              newProducts.idtraslado = this.idTransfer;
-            });
-            
+            );
+            newProducts.idtraslado = this.idTransfer;
+          });
+
           this.transfer.dettraslado = finalProduct;
           console.log(this.transfer.dettraslado.length);
 
@@ -473,6 +473,15 @@ export default defineComponent({
           const saveTransfer = await TransfersToApp.sendTransfers(
             this.transfer
           );
+          console.log(saveTransfer)
+          const alert = await alertController.create({
+            cssClass: "my-custom-class",
+            header: "ATENCIÓN !!!",
+            subHeader: `Traslado Generado `,
+            message: `SE HA GENERADO TRASLADO PARA CONEXION POS CON EL NUMERO ${this.finalNumber}`,
+            buttons: ["ACEPTAR"],
+          });
+          await alert.present();
         }
       } catch (error) {
         console.log(error);
@@ -629,8 +638,9 @@ ion-button {
 .hideBg::part(background) {
   display: none;
 }
+
 .custom-modal-content {
-    --overflow: auto;
-    --overflow-scroll-behavior: smooth;
-  }
+  --overflow: auto;
+  --overflow-scroll-behavior: smooth;
+}
 </style>
