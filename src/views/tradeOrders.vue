@@ -562,7 +562,7 @@ export default defineComponent({
           await alert.present();
           return false;
         } else {
-          await this.getNumbers();
+        await this.getNumbers(this.idalmacen);
           if (this.idtercero === 0) {
             let idCustom = localStorage.getItem("idCustomer");
             this.idtercero = JSON.parse(idCustom);
@@ -603,7 +603,7 @@ export default defineComponent({
           });
 
           this.saveTradeOrder.detpedidos = finalProduct;
-
+          console.log(this.finalNumber)
           const saveOrder1 = await TradeOrders.saveOrder(this.saveTradeOrder);
           const alert = await alertController.create({
             cssClass: "my-custom-class",
