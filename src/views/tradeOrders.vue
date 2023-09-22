@@ -148,7 +148,7 @@
         </ion-card-content>
       </ion-card>
 
-      <ion-text color="dark" v-if="addTotals">
+      <ion-text color="dark" v-if="addTotals>0">
         <h1>
           TOTAL: $
           {{ new Intl.NumberFormat("de-DE").format(addTotals) }}
@@ -613,7 +613,9 @@ export default defineComponent({
             buttons: ["ACEPTAR"],
           });
           await alert.present();
+          console.log(saveOrder1);
         }
+        
         this.viewOrder(this.idalmacen, this.finalNumber);
       } catch (error) {
         console.log(error);
@@ -647,7 +649,7 @@ export default defineComponent({
           valorprod: precioventa,
           costoprod: costoprod,
           codiva: codiva,
-          cantidad: 1, 
+          cantidad: 0, 
           despachado: this.despachado,
           descuento: this.descuentoProd,
         };
