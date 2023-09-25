@@ -135,20 +135,23 @@
 
         <ion-card-content>
           <h5 text="dark">Cantidad: {{ product.cantidad }}</h5>
-          <h2 text="dark">
-            Valor Unitario $
-            {{ new Intl.NumberFormat("de-DE").format(product.valorprod) }} Valor
-            Total: $
-            {{
-              new Intl.NumberFormat("de-DE").format(
-                (TotalProduct = product.valorprod * product.cantidad)
-              )
-            }}
-          </h2>
+
+          <ion-label position="floating">Valor Unitario $:</ion-label>
+          <ion-input type="number" :value="product.valorprod"
+            @input="updateValorProd(product, $event.target.value)"></ion-input>
+
+
+          Total: $
+          {{
+            new Intl.NumberFormat("de-DE").format(
+              (TotalProduct = product.valorprod * product.cantidad)
+            )
+          }}
+
         </ion-card-content>
       </ion-card>
 
-      <ion-text color="dark" v-if="addTotals>0">
+      <ion-text color="dark" v-if="addTotals > 0">
         <h1>
           TOTAL: $
           {{ new Intl.NumberFormat("de-DE").format(addTotals) }}
@@ -280,7 +283,6 @@ export default defineComponent({
       products: [] as any,
       searchProduct: "" as string,
       productArray: [] as any,
-      addTotals: 0 as number,
       saveTradeOrder: {} as ItradeOrderHeader,
       employeeName: "" as string,
       employeeNit: "" as string,
@@ -531,9 +533,6 @@ export default defineComponent({
         this.$router.push(`/view-order/${number}/${idalmacen}`);
       }
     },
-
-
-
     subtractAmount(idproducto: number) {
       const producto = this.productArray.filter((r) => {
         return r.idproducto === idproducto;
@@ -562,7 +561,7 @@ export default defineComponent({
           await alert.present();
           return false;
         } else {
-        await this.getNumbers(this.idalmacen);
+          await this.getNumbers(this.idalmacen);
           if (this.idtercero === 0) {
             let idCustom = localStorage.getItem("idCustomer");
             this.idtercero = JSON.parse(idCustom);
@@ -615,7 +614,7 @@ export default defineComponent({
           await alert.present();
           console.log(saveOrder1);
         }
-        
+
         this.viewOrder(this.idalmacen, this.finalNumber);
       } catch (error) {
         console.log(error);
@@ -646,10 +645,10 @@ export default defineComponent({
         const product = {
           idproducto: idproducto,
           descripcion: descripcion,
-          valorprod: precioventa,
+          valorprod: precioventa, 
           costoprod: costoprod,
           codiva: codiva,
-          cantidad: 0, 
+          cantidad: 1, 
           despachado: this.despachado,
           descuento: this.descuentoProd,
         };
@@ -660,14 +659,11 @@ export default defineComponent({
       }
     },
 
-    addAmount(idproducto: number) {
+
+    addAmount(idproducto) {
       const producto = this.productArray.find((r) => r.idproducto === idproducto);
       if (producto) {
         producto.cantidad++;
-        this.addTotals = this.productArray.reduce(
-          (total, { cantidad, valorprod }) => total + cantidad * valorprod,
-          0
-        );
       }
     },
     async searchOneProduct(e: any) {
@@ -680,6 +676,9 @@ export default defineComponent({
       } catch (error) {
         console.log(error);
       }
+    },
+    updateValorProd(producto, nuevoValor) {
+      producto.valorprod = parseFloat(nuevoValor);
     },
     prevPage() {
       if (this.page > 1) {
@@ -840,6 +839,14 @@ export default defineComponent({
       }
     },
   },
+  computed: {
+    addTotals() {
+      return this.productArray.reduce(
+        (total, { cantidad, valorprod }) => total + cantidad * valorprod,
+        0
+      );
+    }
+  }
 });
 </script>
 <style scoped>
