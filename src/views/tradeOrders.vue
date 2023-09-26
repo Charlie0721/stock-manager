@@ -135,8 +135,10 @@
 
         <ion-card-content>
           <h5 text="dark">Cantidad: {{ product.cantidad }}</h5>
-          <h5 text="dark">Base: {{new Intl.NumberFormat("de-DE").format(base=product.valorprod - product.taxValue)  }}</h5>
-          <h5 text="dark">IVA: {{new Intl.NumberFormat("de-DE").format(product.taxValue)  }}</h5>
+          <h5 text="dark">Base: {{ new Intl.NumberFormat("de-DE").format(base = (product.valorprod - product.taxValue)  * product.cantidad) }}
+          </h5>
+          <h5 text="dark" v-if="product.taxValue > 0">IVA: {{ new
+            Intl.NumberFormat("de-DE").format(taxValue = (product.valorprod - product.baseValue) * product.cantidad) }}</h5>
           <ion-label position="floating">Valor Unitario $:</ion-label>
           <ion-input type="number" :value="product.valorprod"
             @input="updateValorProd(product, $event.target.value)"></ion-input>
@@ -149,26 +151,28 @@
 
         </ion-card-content>
       </ion-card>
-      <ion-text color="dark" v-if="subtotal > 0">
-        <h1>
-          SUBTOTAL: $
-          {{ new Intl.NumberFormat("de-DE").format(subtotal) }}
-        </h1>
-      </ion-text>
-
-      <ion-text color="dark" v-if="valimpuesto > 0">
-        <h1>
-          IVA: $
-          {{ new Intl.NumberFormat("de-DE").format(valimpuesto) }}
-        </h1>
-      </ion-text>
-      <ion-text color="dark" v-if="total > 0">
-        <h1>
-          TOTAL: $
-          {{ new Intl.NumberFormat("de-DE").format(total) }}
-        </h1>
-      </ion-text>
-
+      <ion-card>
+        <ion-card-content>
+          <ion-text color="dark" v-if="subtotal > 0">
+            <h3>
+              SUBTOTAL: $
+              {{ new Intl.NumberFormat("de-DE").format(subtotal) }}
+            </h3>
+          </ion-text>
+          <ion-text color="dark" v-if="valimpuesto > 0">
+            <h3>
+              IVA: $
+              {{ new Intl.NumberFormat("de-DE").format(valimpuesto) }}
+            </h3>
+          </ion-text>
+          <ion-text color="dark" v-if="total > 0">
+            <h1>
+              TOTAL: $
+              {{ new Intl.NumberFormat("de-DE").format(total) }}
+            </h1>
+          </ion-text>
+        </ion-card-content>
+      </ion-card>
       <ion-content class="ion-padding">
         <ion-button id="open-modal" expand="block" color="mycolor" class="btn-edit-product" @click="getProducts()">
           <ion-icon :icon="i.searchCircleSharp"></ion-icon>Seleccionar
@@ -708,10 +712,6 @@ export default defineComponent({
       this.subtotal;
       this.valimpuesto;
       this.total;
-
-      console.log("subtotal:", this.subtotal);
-      console.log("valimpuesto:", this.valimpuesto);
-      console.log("total:", this.total);
     },
     prevPage() {
       if (this.page > 1) {
@@ -876,15 +876,13 @@ export default defineComponent({
   computed: {
     subtotal() {
       return this.productArray.reduce(
-        (total, { cantidad, baseValue }) => total + cantidad * baseValue,
+        (total, { cantidad, valorprod, taxValue }) => total + (valorprod - taxValue)*cantidad  ,
         0
       );
     },
     valimpuesto() {
-
       return this.productArray.reduce(
-
-        (total, { cantidad, taxValue }) => total + cantidad * taxValue,
+        (total, { cantidad, valorprod, baseValue }) => total + (valorprod - baseValue)* cantidad ,
         0
       );
     },
