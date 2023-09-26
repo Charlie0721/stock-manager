@@ -135,12 +135,11 @@
 
         <ion-card-content>
           <h5 text="dark">Cantidad: {{ product.cantidad }}</h5>
-
+          <h5 text="dark">Base: {{new Intl.NumberFormat("de-DE").format(base=product.valorprod - product.taxValue)  }}</h5>
+          <h5 text="dark">IVA: {{new Intl.NumberFormat("de-DE").format(product.taxValue)  }}</h5>
           <ion-label position="floating">Valor Unitario $:</ion-label>
           <ion-input type="number" :value="product.valorprod"
             @input="updateValorProd(product, $event.target.value)"></ion-input>
-
-
           Total: $
           {{
             new Intl.NumberFormat("de-DE").format(
@@ -150,11 +149,23 @@
 
         </ion-card-content>
       </ion-card>
+      <ion-text color="dark" v-if="subtotal > 0">
+        <h1>
+          SUBTOTAL: $
+          {{ new Intl.NumberFormat("de-DE").format(subtotal) }}
+        </h1>
+      </ion-text>
 
-      <ion-text color="dark" v-if="addTotals > 0">
+      <ion-text color="dark" v-if="valimpuesto > 0">
+        <h1>
+          IVA: $
+          {{ new Intl.NumberFormat("de-DE").format(valimpuesto) }}
+        </h1>
+      </ion-text>
+      <ion-text color="dark" v-if="total > 0">
         <h1>
           TOTAL: $
-          {{ new Intl.NumberFormat("de-DE").format(addTotals) }}
+          {{ new Intl.NumberFormat("de-DE").format(total) }}
         </h1>
       </ion-text>
 
@@ -196,7 +207,10 @@
                     product.descripcion,
                     product.precioventa,
                     product.ultcosto,
-                    product.codiva
+                    product.codiva,
+                    product.baseValue,
+                    product.taxValue,
+                    product.porcentaje
                   )
                     ">Agregar<ion-icon :icon="i.checkmarkCircleOutline"></ion-icon>
                   </ion-button>
@@ -315,6 +329,8 @@ export default defineComponent({
       totalPages: 0 as number,
       nombres: "" as string,
       nit: "" as string,
+      base: 0 as number,
+      taxValue: 0 as number
     };
   },
   mounted() {
@@ -540,7 +556,7 @@ export default defineComponent({
       if (producto) {
         producto.cantidad--;
         this.finalAmount = producto.cantidad;
-        this.addTotals = this.productArray.reduce(
+        this.total = this.productArray.reduce(
           (total, { cantidad, valorprod }) => total + cantidad * valorprod,
           0
         );
@@ -550,7 +566,7 @@ export default defineComponent({
     async saveCompleteTradeOrder() {
       try {
 
-        if (this.addTotals === 0 || this.addTotals < 0) {
+        if (this.total === 0 || this.total < 0) {
           const alert = await alertController.create({
             cssClass: "my-custom-class",
             header: "ATENCION !!!",
@@ -580,8 +596,9 @@ export default defineComponent({
           }
           this.saveTradeOrder.numero = this.finalNumber;
           this.saveTradeOrder.fecha = this.date;
-          this.saveTradeOrder.subtotal = this.addTotals;
-          this.saveTradeOrder.valortotal = this.addTotals;
+          this.saveTradeOrder.subtotal = this.subtotal;
+          this.saveTradeOrder.valortotal = this.total;
+          this.saveTradeOrder.valimpuesto = this.valimpuesto;
           this.saveTradeOrder.valdescuentos = 0;
           this.saveTradeOrder.valretenciones = 0;
           this.saveTradeOrder.idalmacen = this.idalmacen;
@@ -602,7 +619,6 @@ export default defineComponent({
           });
 
           this.saveTradeOrder.detpedidos = finalProduct;
-          console.log(this.finalNumber)
           const saveOrder1 = await TradeOrders.saveOrder(this.saveTradeOrder);
           const alert = await alertController.create({
             cssClass: "my-custom-class",
@@ -620,16 +636,17 @@ export default defineComponent({
         console.log(error);
       }
     },
-
     deleteProduct(id: number) {
       try {
-        this.productArray.forEach((p: any) => {
-          if (p.idproducto === id) {
-            this.addTotals -= p.valorprod;
-            this.productArray.splice(p, 1);
-          }
-          console.log(this.productArray);
-        });
+        const productIndex = this.productArray.findIndex((p) => p.idproducto === id);
+        if (productIndex !== -1) {
+          const deletedProduct = this.productArray[productIndex];
+          this.total -= deletedProduct.valorprod;
+          const deletedTaxValue = deletedProduct.cantidad * deletedProduct.taxValue;
+          deletedProduct.valorprod -= deletedTaxValue;
+          this.valimpuesto -= deletedTaxValue;
+          this.productArray.splice(productIndex, 1);
+        }
       } catch (error) {
         console.log(error);
       }
@@ -639,27 +656,32 @@ export default defineComponent({
       descripcion: string,
       precioventa: number,
       costoprod: number,
-      codiva: string
+      codiva: string,
+      baseValue: number,
+      taxValue: number,
+      porcentaje: number
     ) {
       try {
         const product = {
           idproducto: idproducto,
           descripcion: descripcion,
-          valorprod: precioventa, 
+          valorprod: precioventa,
           costoprod: costoprod,
           codiva: codiva,
-          cantidad: 1, 
+          cantidad: 1,
           despachado: this.despachado,
           descuento: this.descuentoProd,
+          baseValue,
+          taxValue,
+          porcentaje
         };
+
         this.productArray.push(product);
         this.searchByBarcode = "";
       } catch (error) {
         console.log(error);
       }
     },
-
-
     addAmount(idproducto) {
       const producto = this.productArray.find((r) => r.idproducto === idproducto);
       if (producto) {
@@ -679,6 +701,17 @@ export default defineComponent({
     },
     updateValorProd(producto, nuevoValor) {
       producto.valorprod = parseFloat(nuevoValor);
+      this.recalcularPropiedadesComputadas();
+
+    },
+    recalcularPropiedadesComputadas() {
+      this.subtotal;
+      this.valimpuesto;
+      this.total;
+
+      console.log("subtotal:", this.subtotal);
+      console.log("valimpuesto:", this.valimpuesto);
+      console.log("total:", this.total);
     },
     prevPage() {
       if (this.page > 1) {
@@ -712,7 +745,8 @@ export default defineComponent({
           this.descripcion,
           this.barcode
         );
-        this.products = response.data.products;
+        this.products = response.data.newProducts;
+
       } catch (error) {
         console.log(error);
       }
@@ -840,13 +874,29 @@ export default defineComponent({
     },
   },
   computed: {
-    addTotals() {
+    subtotal() {
+      return this.productArray.reduce(
+        (total, { cantidad, baseValue }) => total + cantidad * baseValue,
+        0
+      );
+    },
+    valimpuesto() {
+
+      return this.productArray.reduce(
+
+        (total, { cantidad, taxValue }) => total + cantidad * taxValue,
+        0
+      );
+    },
+    total() {
       return this.productArray.reduce(
         (total, { cantidad, valorprod }) => total + cantidad * valorprod,
         0
-      );
-    }
+      )
+    },
   }
+
+
 });
 </script>
 <style scoped>
