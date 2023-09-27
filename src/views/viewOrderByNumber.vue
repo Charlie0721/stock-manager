@@ -126,6 +126,8 @@ export default defineComponent({
       name: "" as string,
       lastName: "" as string,
       totalValue: 0 as number,
+      subtotal: 0 as number,
+      taxValue: 0 as number,
       urlWebPage: "" as string,
       state: true as boolean,
       hour: "" as string,
@@ -228,6 +230,8 @@ Software: https://conexionpos.com/
         this.name = this.order[0].nombres;
         this.lastName = this.order[0].apellidos;
         this.totalValue = this.order[0].valortotal;
+        this.subtotal=this.order[0].subtotal;
+        this.taxValue=this.order[0].valimpuesto;
         this.hour = this.order[0].hora;
         this.date = this.order[0].fecha;
         this.nit = this.order[0].nit;

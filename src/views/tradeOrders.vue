@@ -135,10 +135,12 @@
 
         <ion-card-content>
           <h5 text="dark">Cantidad: {{ product.cantidad }}</h5>
-          <h5 text="dark">Base: {{ new Intl.NumberFormat("de-DE").format(base = (product.valorprod - product.taxValue)  * product.cantidad) }}
+          <h5 text="dark">Base: {{ new Intl.NumberFormat("de-DE").format(base = (product.valorprod - product.ivaprod) *
+            product.cantidad) }}
           </h5>
-          <h5 text="dark" v-if="product.taxValue > 0">IVA: {{ new
-            Intl.NumberFormat("de-DE").format(taxValue = (product.valorprod - product.baseValue) * product.cantidad) }}</h5>
+          <h5 text="dark" v-if="product.ivaprod > 0">IVA: {{ new
+            Intl.NumberFormat("de-DE").format(taxValue = (product.valorprod - product.base) * product.cantidad) }}
+          </h5>
           <ion-label position="floating">Valor Unitario $:</ion-label>
           <ion-input type="number" :value="product.valorprod"
             @input="updateValorProd(product, $event.target.value)"></ion-input>
@@ -628,7 +630,7 @@ export default defineComponent({
             cssClass: "my-custom-class",
             header: "CONFIRMACION !!!",
             subHeader: `PEDIDO GENERADO `,
-            message: `SE HA GENRADO EL PEDIDO COMERCIAL `,
+            message: `SE HA GENERADO EL PEDIDO COMERCIAL `,
             buttons: ["ACEPTAR"],
           });
           await alert.present();
@@ -666,6 +668,7 @@ export default defineComponent({
       porcentaje: number
     ) {
       try {
+
         const product = {
           idproducto: idproducto,
           descripcion: descripcion,
@@ -675,9 +678,9 @@ export default defineComponent({
           cantidad: 1,
           despachado: this.despachado,
           descuento: this.descuentoProd,
-          baseValue,
-          taxValue,
-          porcentaje
+          base: baseValue,
+          ivaprod: taxValue,
+          porciva: porcentaje
         };
 
         this.productArray.push(product);
@@ -708,11 +711,13 @@ export default defineComponent({
       this.recalcularPropiedadesComputadas();
 
     },
+
     recalcularPropiedadesComputadas() {
       this.subtotal;
       this.valimpuesto;
       this.total;
     },
+
     prevPage() {
       if (this.page > 1) {
         this.page--;
@@ -876,13 +881,13 @@ export default defineComponent({
   computed: {
     subtotal() {
       return this.productArray.reduce(
-        (total, { cantidad, valorprod, taxValue }) => total + (valorprod - taxValue)*cantidad  ,
+        (total, { cantidad, valorprod, ivaprod }) => total + (valorprod - ivaprod) * cantidad,
         0
       );
     },
     valimpuesto() {
       return this.productArray.reduce(
-        (total, { cantidad, valorprod, baseValue }) => total + (valorprod - baseValue)* cantidad ,
+        (total, { cantidad, valorprod, base }) => total + (valorprod - base) * cantidad,
         0
       );
     },
