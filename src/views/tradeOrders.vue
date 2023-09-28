@@ -202,26 +202,37 @@
               </ion-item>
               <ion-item>
                 <ion-label>
-                  $
-                  {{
-                    new Intl.NumberFormat("de-DE").format(product.precioventa)
-                  }}
-
-                  <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="
-                  selectProduct(
-                    product.idproducto,
-                    product.descripcion,
-                    product.precioventa,
-                    product.ultcosto,
-                    product.codiva,
-                    product.baseValue,
-                    product.taxValue,
-                    product.porcentaje
-                  )
-                    ">Agregar<ion-icon :icon="i.checkmarkCircleOutline"></ion-icon>
-                  </ion-button>
+                  <ion-button color="mycolor" @click="selectPrice(product.precioventa)"> $
+                    {{
+                      new Intl.NumberFormat("de-DE").format(product.precioventa)
+                    }} </ion-button>
+                  <ion-button color="mycolor" @click="selectPrice(product.precioespecial1)"
+                    v-if="product.precioespecial1 > 0"> $
+                    {{
+                      new Intl.NumberFormat("de-DE").format(product.precioespecial1)
+                    }} </ion-button>
+                  <ion-button color="mycolor" @click="selectPrice(product.precioespecial2)"
+                    v-if="product.precioespecial2 > 0"> $
+                    {{
+                      new Intl.NumberFormat("de-DE").format(product.precioespecial2)
+                    }} </ion-button>
                 </ion-label>
               </ion-item>
+
+
+              <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="
+              selectProduct(
+                product.idproducto,
+                product.descripcion,
+                product.ultcosto,
+                product.codiva,
+                product.baseValue,
+                product.taxValue,
+                product.porcentaje
+              )
+                ">Agregar<ion-icon :icon="i.checkmarkCircleOutline"></ion-icon>
+              </ion-button>
+
             </ion-list>
           </ion-content>
         </ion-modal>
@@ -336,7 +347,8 @@ export default defineComponent({
       nombres: "" as string,
       nit: "" as string,
       base: 0 as number,
-      taxValue: 0 as number
+      taxValue: 0 as number,
+      finalPrice: 0 as number,
     };
   },
   mounted() {
@@ -640,6 +652,14 @@ export default defineComponent({
         this.viewOrder(this.idalmacen, this.finalNumber);
       } catch (error) {
         console.log(error);
+        const alert = await alertController.create({
+            cssClass: "my-custom-class",
+            header: "CONFIRMACION !!!",
+            subHeader: `${error} `,
+            message: `${error.message} `,
+            buttons: ["ACEPTAR"],
+          });
+          await alert.present();
       }
     },
     deleteProduct(id: number) {
@@ -657,10 +677,13 @@ export default defineComponent({
         console.log(error);
       }
     },
-    selectProduct(
+
+    selectPrice(price: number) {
+      this.finalPrice = price;
+    },
+    async selectProduct(
       idproducto: number,
       descripcion: string,
-      precioventa: number,
       costoprod: number,
       codiva: string,
       baseValue: number,
@@ -668,11 +691,22 @@ export default defineComponent({
       porcentaje: number
     ) {
       try {
-
+        this.selectPrice(this.finalPrice)
+        if (this.finalPrice === 0) {
+          const alert = await alertController.create({
+            cssClass: "my-custom-class",
+            header: "ATENCIÓN !!!",
+            subHeader: `NO PASA VALIDACIÓN `,
+            message: `DEBE SELECCIONAR PRECIO`,
+            buttons: ["ACEPTAR"],
+          });
+          await alert.present();
+          return
+        }
         const product = {
           idproducto: idproducto,
           descripcion: descripcion,
-          valorprod: precioventa,
+          valorprod: this.finalPrice,
           costoprod: costoprod,
           codiva: codiva,
           cantidad: 1,
@@ -682,14 +716,22 @@ export default defineComponent({
           ivaprod: taxValue,
           porciva: porcentaje
         };
-
         this.productArray.push(product);
         this.searchByBarcode = "";
+        this.finalPrice = 0;
       } catch (error) {
         console.log(error);
+        const alert = await alertController.create({
+          cssClass: "my-custom-class",
+          header: "ATENCIÓN !!!",
+          subHeader: `${error} `,
+          message: `Error ${error.message}`,
+          buttons: ["ACEPTAR"],
+        });
+        await alert.present();
       }
     },
-    addAmount(idproducto) {
+    addAmount(idproducto: number) {
       const producto = this.productArray.find((r) => r.idproducto === idproducto);
       if (producto) {
         producto.cantidad++;
@@ -704,6 +746,14 @@ export default defineComponent({
         }
       } catch (error) {
         console.log(error);
+        const alert = await alertController.create({
+          cssClass: "my-custom-class",
+          header: "ATENCIÓN !!!",
+          subHeader: `${error} `,
+          message: `Error ${error.message}`,
+          buttons: ["ACEPTAR"],
+        });
+        await alert.present();
       }
     },
     updateValorProd(producto, nuevoValor) {
@@ -751,9 +801,16 @@ export default defineComponent({
           this.barcode
         );
         this.products = response.data.newProducts;
-
       } catch (error) {
         console.log(error);
+        const alert = await alertController.create({
+          cssClass: "my-custom-class",
+          header: "ATENCIÓN !!!",
+          subHeader: `${error} `,
+          message: `Error ${error.message}`,
+          buttons: ["ACEPTAR"],
+        });
+        await alert.present();
       }
     },
     getDate() {
