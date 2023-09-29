@@ -6,17 +6,18 @@ export interface ItradeOrderHeader {
     idvendedor: number;
     subtotal: number;
     valortotal: number;
-    valdescuento: number;
-    valdescuentos: number; 
+    valimpuesto:number;
+    valdescuentos: number;
     valretenciones: number;
+    valiva: number;
     idalmacen: number;
     estado: number;
-    detalle?: string,
+    detalle?: string;
     fechacrea:string;
     hora:string;
     idsoftware: number;
     plazo: number;
-    detpedidos: ItradeOrderDetail[]; 
+    detpedidos: ItradeOrderDetail[];
 }
 
 export interface ItradeOrderDetail {

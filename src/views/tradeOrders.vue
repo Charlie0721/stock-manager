@@ -617,6 +617,7 @@ export default defineComponent({
           this.saveTradeOrder.subtotal = this.subtotal;
           this.saveTradeOrder.valortotal = this.total;
           this.saveTradeOrder.valimpuesto = this.valimpuesto;
+          this.saveTradeOrder.valiva = this.valimpuesto;
           this.saveTradeOrder.valdescuentos = 0;
           this.saveTradeOrder.valretenciones = 0;
           this.saveTradeOrder.idalmacen = this.idalmacen;
@@ -653,13 +654,13 @@ export default defineComponent({
       } catch (error) {
         console.log(error);
         const alert = await alertController.create({
-            cssClass: "my-custom-class",
-            header: "CONFIRMACION !!!",
-            subHeader: `${error} `,
-            message: `${error.message} `,
-            buttons: ["ACEPTAR"],
-          });
-          await alert.present();
+          cssClass: "my-custom-class",
+          header: "CONFIRMACION !!!",
+          subHeader: `${error} `,
+          message: `${error.message} `,
+          buttons: ["ACEPTAR"],
+        });
+        await alert.present();
       }
     },
     deleteProduct(id: number) {
@@ -988,17 +989,21 @@ ion-button {
   font-size: 1rem;
   margin: 5px;
 }
+
 ion-button:hover {
   transform: scale(1.05);
 }
+
 ion-page {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
+
 ion-header {
   padding: 10px;
 }
+
 ion-card {
   border: 0.5px solid #ccc;
   border-radius: 10px;
@@ -1015,6 +1020,7 @@ ion-title {
   margin: 0;
   text-align: center;
 }
+
 ion-text {
   font-size: 1rem;
 }
@@ -1039,5 +1045,4 @@ h4 {
 .custom-modal-content {
   --overflow: auto;
   --overflow-scroll-behavior: smooth;
-}
-</style>
+}</style>

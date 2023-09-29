@@ -247,12 +247,83 @@ Software: https://conexionpos.com/
 ion-button {
   background-color: var(--ion-color-mycolor);
 }
+
 .letter-color {
   color: #82230d;
   text-shadow: 1px 1px #fff;
+}
+ion-card-header {
+ 
+  color: #fff;
+  text-align: center;
+  padding: 10px;
+}
+/* Estilos para los títulos dentro del encabezado de la tarjeta */
+ion-card-header h5 {
+  margin: 5px 0;
+  font-weight: bold;
+}
+
+/* Estilos para el contenido de la tarjeta */
+ion-card-content {
+  padding: 10px;
+}
+/* Estilos para la lista de productos */
+ion-list {
+  margin-top: 10px;
+  border-top: 1px solid #ccc;
+}
+
+/* Estilos para los elementos de la lista de productos */
+ion-item {
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
+/* Estilos para el pie de página */
+ion-footer {
+  background-color: var(--ion-color-mycolor);
+  color: #fff;
+  text-align: center;
+}
+
+/* Estilos para el enlace de "Volver" */
+ion-footer a {
+  color: #fff;
+  text-decoration: none;
+}
+/* Estilos para el botón "Generar TXT" */
+.btn-edit-product {
+  margin: 20px auto;
+  width: 80%;
+}
+
+/* Estilos para el ícono dentro del botón */
+ion-button ion-icon {
+  margin-right: 8px;
+}
+div[style="text-align: center"] h5 {
+  margin-top: 20px;
+}
+
+/* Añadir sombra a la tarjeta */
+ion-card {
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+}
+/* Añadir un fondo blanco al contenido principal */
+
+/* Añadir margen inferior al último botón */
+ion-button:last-child {
+  margin-bottom: 20px;
 }
 .edit-image1 {
   width: 5%;
   max-height: 5%;
 }
+ion-button {
+  background-color: var(--ion-color-mycolor);
+  color: #fff; /* Cambiar el color del texto para que sea visible en el fondo corporativo */
+  font-weight: bold; /* Hacer el texto más audaz */
+  border-radius: 10px; /* Añadir esquinas redondeadas */
+}
+
 </style>
