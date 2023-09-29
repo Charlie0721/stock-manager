@@ -689,11 +689,133 @@ export default defineComponent({
 
 .btn-edit-product {
   border-radius: 30px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-top: 10px;
+}
+/* Estilos para botones con iconos */
+.btn-edit-product ion-icon {
+  margin-right: 8px;
 }
 
 ion-button {
+  --border-radius: 30px; /* Bordes redondeados */
   background-color: var(--ion-color-mycolor);
+  --color: #fff; /* Color del texto */
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-top: 10px;
 }
+ion-card {
+  background-color: #fff; /* Fondo blanco */
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+  margin-bottom: 10px;
+}
+ion-card-content {
+  padding: 10px;
+}
+
+ion-card-header {
+  background-color: var(--ion-color-mycolor); /* Fondo del encabezado de la tarjeta */
+  color: #fff; /* Color del texto del encabezado de la tarjeta */
+  font-weight: bold;
+  border-radius: 10px 10px 0 0;
+  padding: 10px;
+}
+ion-select {
+  /* background-color: #fff; */
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+ion-item {
+  border-bottom: 1px solid #ccc;
+  padding: 10px;
+}
+/* Estilos para el encabezado de la página */
+ion-header {
+  background-color: #fff;
+  border-bottom: 1px solid #ccc;
+}
+/* Estilos para el título en el encabezado */
+ion-title {
+  color: #bebbbb;
+  font-weight: bold;
+}
+ion-content {
+  background-color: #f4f5f8;
+  padding: 10px;
+}
+ion-icon {
+  font-size: 24px;
+}
+ion-label {
+  color: #333;
+  font-weight: bold;
+}
+
+/* Estilos para input de ion-input */
+ion-input {
+  background-color: #f7f7f7;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+  color: #333; /* Color de texto predeterminado */
+}
+
+/* Estilos para input de ion-input cuando está en foco (hover) */
+ion-input:hover {
+  border-color: #3880ff; /* Cambia el color del borde cuando se hace hover */
+}
+
+/* Estilos para input de ion-input cuando está en foco (focus) */
+ion-input:focus {
+  border-color: #3880ff; /* Cambia el color del borde cuando está en foco */
+  box-shadow: 0 0 5px rgba(56, 128, 255, 0.7); /* Agrega una sombra cuando está en foco */
+  color: #333; /* Color de texto cuando está en foco */
+}
+
+/* Estilos para ion-popover */
+ion-popover {
+  --background: #fff;
+  --border-radius: 10px;
+}
+
+/* Estilos para ion-list */
+ion-list {
+  background-color: transparent;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* Estilos para ion-item en ion-list */
+ion-item {
+  border-bottom: 1px solid #ccc;
+  padding: 10px;
+}
+
+/* Estilos para el texto en ion-item */
+ion-item ion-label {
+  color: #333;
+}
+
+/* Estilos para el botón en ion-item */
+ion-item .btn-edit-product {
+  --border-radius: 5px;
+  --background: #3880ff;
+  --color: #fff;
+  --padding-end: 10px;
+  --padding-start: 10px;
+  margin-left: auto;
+}
+
+/* Estilos para el botón en ion-list */
+ion-list ion-button.btn-edit-product {
+  margin-top: 0;
+}
+
 
 .letter-color {
   color: #82230d;

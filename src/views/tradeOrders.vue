@@ -982,6 +982,49 @@ export default defineComponent({
 
 ion-button {
   background-color: var(--ion-color-mycolor);
+  border-radius: 30px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  font-weight: bold;
+  font-size: 1rem;
+  margin: 5px;
+}
+ion-button:hover {
+  transform: scale(1.05);
+}
+ion-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+ion-header {
+  padding: 10px;
+}
+ion-card {
+  border: 0.5px solid #ccc;
+  border-radius: 10px;
+  margin: 10px 0;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+ion-card-title {
+  font-size: 1.2rem;
+}
+
+ion-title {
+  font-size: 1.2rem;
+  margin: 0;
+  text-align: center;
+}
+ion-text {
+  font-size: 1rem;
+}
+
+h3 {
+  margin: 5px 0;
+}
+
+h4 {
+  margin: 0;
 }
 
 .letter-color {

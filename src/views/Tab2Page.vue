@@ -74,44 +74,30 @@
           </ion-item>
         </ion-list>
       </ion-card>
-      <ion-card v-for="product in allProducts" :key="product.idproducto">
+      <ion-card v-for="product in allProducts" :key="product.idproducto" class="product-card">
         <ion-card-header>
-          <ion-card-title>
-            <h4 class="letter-color">
-              {{ product.descripcion }}
-            </h4>
-          </ion-card-title>
-          <ion-card-subtitle
-            >Código Barras: {{ product.barcode }}
-          </ion-card-subtitle>
-          <ion-card-subtitle
-            >Código Interno: {{ product.codigo }}</ion-card-subtitle
-          >
+          <ion-card-title class="product-title">{{ product.descripcion }}</ion-card-title>
+          <ion-card-subtitle class="product-subtitle">Código de Barras: {{ product.barcode }}</ion-card-subtitle>
+          <ion-card-subtitle class="product-subtitle">Código Interno: {{ product.codigo }}</ion-card-subtitle>
         </ion-card-header>
-
         <ion-card-content>
-          Precio: ${{
-            new Intl.NumberFormat("de-DE").format(product.precioventa)
-          }}
+          Precio: ${{ new Intl.NumberFormat("de-DE").format(product.precioventa) }}
         </ion-card-content>
         <ion-card-content>
-          Precio Especial 1: ${{
-            new Intl.NumberFormat("de-DE").format(product.precioespecial1)
-          }}
+          Precio Especial 1: ${{ new Intl.NumberFormat("de-DE").format(product.precioespecial1) }}
         </ion-card-content>
         <ion-card-content>
-          Precio Especial 2: ${{
-            new Intl.NumberFormat("de-DE").format(product.precioespecial2)
-          }}
+          Precio Especial 2: ${{ new Intl.NumberFormat("de-DE").format(product.precioespecial2) }}
         </ion-card-content>
-
         <ion-button
           color="mycolor"
           expand="full"
           class="btn-edit-product"
           @click="editProduct(product.idproducto)"
-          >Editar Producto</ion-button
-        >
+        >   <ion-icon
+            :icon="i.createSharp"></ion-icon> Editar Producto
+         
+        </ion-button>
       </ion-card>
     </ion-content>
   </ion-page>
@@ -138,6 +124,7 @@ import {
   IonSelect,
   IonList,
   IonItem,
+  IonIcon
 } from "@ionic/vue";
 import { Products } from "@/services/Products";
 import * as allIcons from "ionicons/icons";
@@ -165,6 +152,7 @@ export default defineComponent({
     IonSelect,
     IonList,
     IonItem,
+    IonIcon
   },
   data() {
     return {
@@ -371,14 +359,49 @@ export default defineComponent({
   max-height: 5%;
 }
 .btn-edit-product {
-  border-radius: 30px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff; /* Texto en blanco */
+  font-weight: bold;
+}
+
+/* Estilo para el ícono de edición */
+ion-icon {
+  margin-right: 8px; /* Espacio entre el ícono y el texto */
+  font-size: 1.2rem; /* Tamaño del ícono */
 }
 
 ion-button {
   background-color: var(--ion-color-mycolor);
 }
+
+/* Estilos para las tarjetas de productos */
+.product-card {
+  border-radius: 8px;
+  margin: 10px 0;
+  padding: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: #2c2c2c; /* Color de fondo más oscuro */
+}
+
+/* Estilo para el título de la tarjeta */
+.product-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #fff; /* Color de texto en blanco */
+}
+
+/* Estilo para el subtítulo de la tarjeta */
+.product-subtitle {
+  font-size: 1rem;
+  color: #bbb; /* Color de texto ligeramente más claro que el fondo */
+}
+
+/* Estilo mejorado para .letter-color */
 .letter-color {
-  color: #82230d;
-  text-shadow: 1px 1px #fff;
+  color: #ff9900; /* Color más llamativo, en este caso, naranja */
+  text-shadow: 1px 1px #333; /* Sombra de texto */
 }
 </style>

@@ -2,66 +2,32 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title
-          ><img class="edit-image" src="../images/images_app/logo_header.png" />
+        <ion-title><img class="edit-image" src="../images/images_app/logo_header.png" />
           Consultar Inventarios
-          <ion-button
-            color="mycolor"
-            class="btn-edit-product"
-            @click="goToCollector()"
-          >
+          <ion-button color="mycolor" class="btn-edit-product" @click="goToCollector()">
             Recolector
           </ion-button>
         </ion-title>
       </ion-toolbar>
-      <ion-searchbar
-        animated
-        debounce="500"
-        placeholder="Buscar Producto"
-        @ionChange="searchOneProduct($event)"
-        @keypress.enter="searchItem()"
-      >
+      <ion-searchbar animated debounce="500" placeholder="Buscar Producto" @ionChange="searchOneProduct($event)"
+        @keypress.enter="searchItem()">
       </ion-searchbar>
     </ion-header>
     <ion-content :fullscreen="true">
-      <ion-input
-        type="text"
-        :value="searchByBarcode"
-        @input="searchByBarcode = $event.target.value"
-        placeholder="Código de barras"
-        :clear-input="true"
-        @keypress.enter="searchByBarcodeItem()"
-      ></ion-input>
-      <ion-button
-        color="mycolor"
-        expand="full"
-        class="btn-edit-product"
-        @click="startScan()"
-      >
-        Buscar Código barras</ion-button
-      >
-      <ion-button color="mycolor" @click="prevPage()" v-if="page > 1"
-        >Anterior</ion-button
-      >
+      <ion-input type="text" :value="searchByBarcode" @input="searchByBarcode = $event.target.value"
+        placeholder="Código de barras" :clear-input="true" @keypress.enter="searchByBarcodeItem()"></ion-input>
+      <ion-button color="mycolor" expand="full" class="btn-edit-product" @click="startScan()">
+        Buscar Código barras</ion-button>
+      <ion-button color="mycolor" @click="prevPage()" v-if="page > 1">Anterior</ion-button>
       <ion-button color="mycolor" @click="nextPage()">Siguiente</ion-button>
       <span> página {{ page }} </span>
-      <ion-card v-for="product in products" :key="product.product">
+      <ion-card v-for="product in products" :key="product.product" class="product-card">
         <ion-card-header>
-          <ion-card-title>
-            <h4 class="letter-color">
-              {{ product.descripcion }}
-            </h4></ion-card-title
-          >
-          <ion-card-title> Existencias: {{ product.cantidad }}</ion-card-title>
-          <ion-card-subtitle
-            >Código Barras: {{ product.barcode }}
-          </ion-card-subtitle>
-
-          <ion-card-subtitle
-            >Código Interno: {{ product.codigo }}</ion-card-subtitle
-          >
+          <ion-card-title class="product-title">{{ product.descripcion }}</ion-card-title>
+          <ion-card-subtitle class="product-subtitle">Existencias: {{ product.cantidad }}</ion-card-subtitle>
+          <ion-card-subtitle class="product-subtitle">Código de Barras: {{ product.barcode }}</ion-card-subtitle>
+          <ion-card-subtitle class="product-subtitle">Código Interno: {{ product.codigo }}</ion-card-subtitle>
         </ion-card-header>
-
         <ion-card-content>
           {{ product.nomalmacen }}
         </ion-card-content>
@@ -280,10 +246,10 @@ export default defineComponent({
     },
     async searchByBarcodeItem() {
       this.barcode = this.searchByBarcode;
-     await this.getProductsQuantities(this.barcode);
-      setTimeout(async() => {
-      this.barcode = "";
-      await  this.getProductsQuantities();
+      await this.getProductsQuantities(this.barcode);
+      setTimeout(async () => {
+        this.barcode = "";
+        await this.getProductsQuantities();
       }, 5000);
     },
     searchItem() {
@@ -301,15 +267,46 @@ export default defineComponent({
   width: 5%;
   max-height: 5%;
 }
+
 .btn-edit-product {
   border-radius: 10px;
+  background-color: var(--ion-color-mycolor);
+  color: #fff;
+  /* Texto en color blanco para resaltar en el botón */
 }
 
 ion-button {
   background-color: var(--ion-color-mycolor);
 }
-.letter-color {
-  color: #82230d;
-  text-shadow: 1px 1px #fff;
+
+.product-card {
+  border-radius: 8px;
+  margin: 10px 0;
+  padding: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: #2c2c2c;
+  /* Color de fondo más oscuro */
 }
-</style>
+
+/* Estilo para el título de la tarjeta */
+.product-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #fff;
+  /* Color de texto en blanco */
+}
+
+/* Estilo para el subtítulo de la tarjeta */
+.product-subtitle {
+  font-size: 1rem;
+  color: #bbb;
+  /* Color de texto ligeramente más claro que el fondo */
+}
+
+/* Estilo mejorado para .letter-color */
+.letter-color {
+  color: #ff9900;
+  /* Color más llamativo, en este caso, naranja */
+  text-shadow: 1px 1px #333;
+  /* Sombra de texto */
+}</style>
