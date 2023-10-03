@@ -34,11 +34,17 @@
                             product.valorprod * product.cantidad)
                         )
                       }}
-                    </h4></ion-text
-                  >
+                    </h4>
+                  </ion-text>
                 </ion-label>
               </ion-item>
             </ion-list>
+            <h4 class="letter-color">
+              SUBTOTAL: $ {{ new Intl.NumberFormat("de-DE").format(subtotal) }}
+            </h4>
+            <h4 class="letter-color">
+              IVA: $ {{ new Intl.NumberFormat("de-DE").format(taxValue) }}
+            </h4>
             <h4 class="letter-color">
               TOTAL: $ {{ new Intl.NumberFormat("de-DE").format(totalValue) }}
             </h4>
@@ -50,12 +56,8 @@
         <br />
         <br />
       </div>
-      <ion-button
-        color="mycolor"
-        class="btn-edit-product"
-        expand="full"
-        @click="pdfGenerator()"
-        ><ion-icon :icon="i.printOutline"></ion-icon>Generar TXT
+      <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="pdfGenerator()"><ion-icon
+          :icon="i.printOutline"></ion-icon>Generar TXT
       </ion-button>
     </ion-content>
     <ion-footer collapse="fade">
@@ -142,7 +144,7 @@ export default defineComponent({
     this.getOrderByNumber();
   },
   methods: {
-   
+
     async pdfGenerator() {
       const dataProducts = [];
       const archivoNuevo = "pedido numero " + this.order[0].numero + ".txt";
@@ -179,8 +181,8 @@ export default defineComponent({
         ${cleanStr}
                         
         Total:$${new Intl.NumberFormat("de-DE").format(
-          this.order[0].valortotal
-        )}
+        this.order[0].valortotal
+      )}
 Software: https://conexionpos.com/
         `;
       console.log(stringDataOne);
@@ -215,7 +217,7 @@ Software: https://conexionpos.com/
           await alert.present();
         });
 
-        },
+    },
 
     async getOrderByNumber() {
       try {
@@ -230,8 +232,8 @@ Software: https://conexionpos.com/
         this.name = this.order[0].nombres;
         this.lastName = this.order[0].apellidos;
         this.totalValue = this.order[0].valortotal;
-        this.subtotal=this.order[0].subtotal;
-        this.taxValue=this.order[0].valimpuesto;
+        this.subtotal = this.order[0].subtotal;
+        this.taxValue = this.order[0].valimpuesto;
         this.hour = this.order[0].hora;
         this.date = this.order[0].fecha;
         this.nit = this.order[0].nit;
@@ -252,12 +254,14 @@ ion-button {
   color: #82230d;
   text-shadow: 1px 1px #fff;
 }
+
 ion-card-header {
- 
+
   color: #fff;
   text-align: center;
   padding: 10px;
 }
+
 /* Estilos para los títulos dentro del encabezado de la tarjeta */
 ion-card-header h5 {
   margin: 5px 0;
@@ -268,6 +272,7 @@ ion-card-header h5 {
 ion-card-content {
   padding: 10px;
 }
+
 /* Estilos para la lista de productos */
 ion-list {
   margin-top: 10px;
@@ -279,6 +284,7 @@ ion-item {
   padding: 10px;
   border-bottom: 1px solid #ccc;
 }
+
 /* Estilos para el pie de página */
 ion-footer {
   background-color: var(--ion-color-mycolor);
@@ -291,6 +297,7 @@ ion-footer a {
   color: #fff;
   text-decoration: none;
 }
+
 /* Estilos para el botón "Generar TXT" */
 .btn-edit-product {
   margin: 20px auto;
@@ -301,6 +308,7 @@ ion-footer a {
 ion-button ion-icon {
   margin-right: 8px;
 }
+
 div[style="text-align: center"] h5 {
   margin-top: 20px;
 }
@@ -309,21 +317,25 @@ div[style="text-align: center"] h5 {
 ion-card {
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
 }
+
 /* Añadir un fondo blanco al contenido principal */
 
 /* Añadir margen inferior al último botón */
 ion-button:last-child {
   margin-bottom: 20px;
 }
+
 .edit-image1 {
   width: 5%;
   max-height: 5%;
 }
+
 ion-button {
   background-color: var(--ion-color-mycolor);
-  color: #fff; /* Cambiar el color del texto para que sea visible en el fondo corporativo */
-  font-weight: bold; /* Hacer el texto más audaz */
-  border-radius: 10px; /* Añadir esquinas redondeadas */
-}
-
-</style>
+  color: #fff;
+  /* Cambiar el color del texto para que sea visible en el fondo corporativo */
+  font-weight: bold;
+  /* Hacer el texto más audaz */
+  border-radius: 10px;
+  /* Añadir esquinas redondeadas */
+}</style>

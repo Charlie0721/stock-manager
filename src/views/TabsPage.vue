@@ -56,7 +56,17 @@ export default defineComponent({
 </script>
 <style scoped>
 .edit-image {
-  width: 100%;
-  max-height: 100%;
+  max-width: 50px; /* Ajusta el ancho máximo según tus preferencias */
+  margin: 0 auto; /* Centra la imagen horizontalmente en el botón de pestaña */
+  display: block; /* Elimina cualquier espacio adicional alrededor de la imagen */
+  transition: transform 0.3s ease-in-out;
+  border-radius: 10px; 
 }
+.edit-image:hover {
+  transform: scale(1.1); /* Ajusta el factor de escala según tus preferencias */
+}
+.ion-tab-button {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Ajusta la sombra según tus preferencias */
+}
+
 </style>

@@ -109,7 +109,22 @@ const routes: Array<RouteRecordRaw> = [
     path: '/check-sales-by-day/detail/:idalmacen/:numero',
     name: 'check-sales-by-warehouse-detail',
     component: () => import('@/views/DetailSalesDay.vue')
-  }
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: () => import('@/views/users/Login.vue')
+  },
+  {
+    path: '/conexion-pos-user',
+    name: 'user-pos',
+    component: () => import('@/views/users/ConexionPosUser.vue')
+  },
+  {
+    path: '/signin',
+    name: 'signinUser',
+    component: () => import('@/views/users/Signin.vue')
+  },
 
 ]
 

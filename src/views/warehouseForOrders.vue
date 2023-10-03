@@ -319,7 +319,8 @@ export default defineComponent({
             id: idAlm
           })
         }
-        this.$router.push("/tabs/tab1");
+
+        this.$router.push("/login");
       } else {
         this.$router.push("/warehouse-for-orders");
         const alert = await alertController.create({
