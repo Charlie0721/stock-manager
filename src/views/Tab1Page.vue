@@ -96,6 +96,7 @@ export default defineComponent({
     this.getProductsQuantities();
   },
   methods: {
+  
     async getProductsQuantities() {
       try {
         const responseProducts = await productsQuantities(
@@ -309,4 +310,5 @@ ion-button {
   /* Color más llamativo, en este caso, naranja */
   text-shadow: 1px 1px #333;
   /* Sombra de texto */
-}</style>
+}
+</style>

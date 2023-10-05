@@ -6,7 +6,6 @@ const routes: Array<RouteRecordRaw> = [
 
   {
     path: '/',
-    //redirect: '/tabs/tab1'
     name: 'connectApi',
     component: () => import('@/views/connectApi.vue'),
 

@@ -362,8 +362,6 @@ export default defineComponent({
     checkSales() {
       this.$router.push("/check-sales-by-day");
     },
-
-
     newOrder() {
       location.reload();
     },
