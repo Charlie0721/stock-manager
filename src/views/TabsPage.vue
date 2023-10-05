@@ -11,16 +11,16 @@
           <img class="edit-image" src="../images/images_app/productos.png" />
         </ion-tab-button>
 
-        <ion-tab-button tab="tab3" href="/tabs/tab3">
-          <img class="edit-image" src="../images/images_app/entrada_prod.png" v-if="canAccessTab2"/>
+        <ion-tab-button tab="tab3" href="/tabs/tab3" v-if="canAccessTab2">
+          <img class="edit-image" src="../images/images_app/entrada_prod.png" />
 
         </ion-tab-button>
-        <ion-tab-button tab="tab4" href="/enter-purchases">
-          <img class="edit-image" src="../images/images_app/compras.png" v-if="canAccessTab2"/>
+        <ion-tab-button tab="tab4" href="/enter-purchases" v-if="canAccessTab2">
+          <img class="edit-image" src="../images/images_app/compras.png" />
 
         </ion-tab-button>
-        <ion-tab-button tab="tab5" href="/trade-orders">
-          <img class="edit-image" src="../images/images_app/pedidos.png" v-if="canAccessTab4"/>
+        <ion-tab-button tab="tab5" href="/trade-orders" v-if="canAccessTab4">
+          <img class="edit-image" src="../images/images_app/pedidos.png" />
 
         </ion-tab-button>
       </ion-tab-bar>
@@ -100,7 +100,7 @@ export default defineComponent({
   display: block;
   /* Elimina cualquier espacio adicional alrededor de la imagen */
   transition: transform 0.3s ease-in-out;
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 .edit-image:hover {

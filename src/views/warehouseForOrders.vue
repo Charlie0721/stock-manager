@@ -32,17 +32,18 @@
               <ion-card-subtitle>Click sobre el cliente</ion-card-subtitle>
             </ion-card-header>
             <ion-card-content>
-              <ion-list background-hover="92949c" v-for="customer in customers" :key="customer.idtercero" @click="
-                selectCustomer(
-                  customer.idtercero,
-                  customer.nit,
-                  customer.nombres
-                )
-                ">
+              <ion-list background-hover="92949c" v-for="customer in customers" :key="customer.idtercero">
                 <ion-item>
                   <ion-label> NIT: {{ customer.nit }}</ion-label>
                 </ion-item>
                 <ion-item> {{ customer.nombres }} </ion-item>
+                <ion-button color="mycolor" @click="
+                  selectCustomer(
+                    customer.idtercero,
+                    customer.nit,
+                    customer.nombres
+                  )
+                  ">Seleccionar</ion-button>
               </ion-list>
             </ion-card-content>
           </ion-card>
@@ -57,16 +58,16 @@
         <ion-content>
           <ion-list>
             <ion-label>
-              <ion-list background-hover="92949c" v-for="employee in employees" :key="employee.idtercero" @click="
-                selectEmployee(
-                  employee.idtercero,
-                  employee.nit,
-                  employee.nombres
-                )
-                ">
+              <ion-list background-hover="92949c" v-for="employee in employees" :key="employee.idtercero">
                 <ion-item :button="true" :detail="false">
                   NIT: {{ employee.nit }}. {{ employee.nombres }}
-                </ion-item></ion-list></ion-label>
+                </ion-item> <ion-button color="mycolor" @click="
+                  selectEmployee(
+                    employee.idtercero,
+                    employee.nit,
+                    employee.nombres
+                  )
+                  ">Seleccionar</ion-button></ion-list> </ion-label>
           </ion-list>
         </ion-content>
       </ion-popover>
@@ -91,11 +92,16 @@
           </ion-card>
         </ion-fab-list>
       </ion-fab>
+      
     </ion-content>
-  <ion-content>
+    <ion-content>
+      <ion-card class="login-card">
 
-    <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="getIdalmacen()"> Aceptar</ion-button>
-  </ion-content>
+        <p v-if="this.customerName !== ''">CLIENTE: {{ this.customerName }}</p>
+        <p v-if="this.employeeName !== ''">VENDEDOR: {{ this.employeeName }}</p>
+      </ion-card>
+      <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="getIdalmacen()"> Aceptar</ion-button>
+    </ion-content>
   </ion-page>
 </template>
   
@@ -174,6 +180,7 @@ export default defineComponent({
       totalPages: 0 as number,
       nombres: "" as string,
       nit: "" as string,
+      customerName: "" as string,
 
     };
   },
@@ -304,7 +311,7 @@ export default defineComponent({
         await alert.present();
         return
       }
-      this.$router.push("/tabs/tab1");
+      this.$router.push("/login");
 
     },
     fabToggled(e: any) {
@@ -344,7 +351,10 @@ export default defineComponent({
 ion-button {
   background-color: var(--ion-color-mycolor);
 }
-
+ion-card.login-card {
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
 .edit-image1 {
   width: 5%;
   max-height: 5%;

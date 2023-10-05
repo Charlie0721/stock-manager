@@ -6,13 +6,13 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <ion-card>
+      <ion-card class="login-card">
         <ion-card-header>
           <ion-card-title>Ingresar IP del servidor </ion-card-title>
         </ion-card-header>
 
         <ion-card-content>
-          <ion-item>
+          <ion-item class="input-item">
             <ion-label position="floating">Http:</ion-label>
             <ion-input
               type="text"
@@ -20,7 +20,7 @@
               disabled
             ></ion-input>
           </ion-item>
-          <ion-item>
+          <ion-item class="input-item">
             <ion-label position="floating">Primer Octeto</ion-label>
             <ion-input
               type="number"
@@ -30,7 +30,7 @@
               @input="dataConnections.iP1 = $event.target.value"
             ></ion-input>
           </ion-item>
-          <ion-item>
+          <ion-item class="input-item">
             <ion-label position="floating">punto separador</ion-label>
             <ion-input
               type="text"
@@ -39,7 +39,7 @@
             ></ion-input
           ></ion-item>
 
-          <ion-item>
+          <ion-item class="input-item">
             <ion-label position="floating">Segundo Octeto</ion-label>
             <ion-input
               type="number"
@@ -49,7 +49,7 @@
               @input="dataConnections.iP2 = $event.target.value"
             ></ion-input>
           </ion-item>
-          <ion-item>
+          <ion-item class="input-item">
             <ion-label position="floating">punto separador</ion-label>
             <ion-input
               type="text"
@@ -59,7 +59,7 @@
               disabled
             ></ion-input>
           </ion-item>
-          <ion-item>
+          <ion-item class="input-item">
             <ion-label position="floating">Tercer Octeto</ion-label>
             <ion-input
               type="number"
@@ -69,7 +69,7 @@
               @input="dataConnections.iP3 = $event.target.value"
             ></ion-input>
           </ion-item>
-          <ion-item>
+          <ion-item class="input-item">
             <ion-label position="floating">punto separador</ion-label>
             <ion-input
               type="text"
@@ -79,7 +79,7 @@
               disabled
             ></ion-input>
           </ion-item>
-          <ion-item>
+          <ion-item class="input-item">
             <ion-label position="floating">Cuarto Octeto</ion-label>
             <ion-input
               type="number"
@@ -89,7 +89,7 @@
               @input="dataConnections.iP4 = $event.target.value"
             ></ion-input>
           </ion-item>
-          <ion-item>
+          <ion-item class="input-item">
             <ion-input
               type="text"
               :min="1"
@@ -98,7 +98,7 @@
               disabled
             ></ion-input>
           </ion-item>
-          <ion-item>
+          <ion-item class="input-item">
             <ion-label position="floating">Puerto</ion-label>
             <ion-input
               type="number"
@@ -106,7 +106,7 @@
               disabled
             ></ion-input>
           </ion-item>
-          <ion-button color="success" expand="full" @click="sendConnections()"
+          <ion-button color="mycolor" expand="full" @click="sendConnections()"
             >Conectar</ion-button
           >
         </ion-card-content>
@@ -186,7 +186,17 @@ export default defineComponent({
 
           this.getConnectionstoApi();
         })
-        .catch((err) => console.log(err));
+        .catch(async (err) =>{
+          const alert = await alertController.create({
+            cssClass: "my-custom-class",
+            header: "Error !!!",
+            subHeader: `${err}`,
+            message: `${err.message}`,
+            buttons: ["OK"],
+          });
+          await alert.present(); 
+          console.log(err)
+        } );
     },
  async   getConnectionstoApi() {
       if (localStorage.getItem("connection")) {
@@ -213,3 +223,24 @@ export default defineComponent({
   },
 });
 </script>
+<style scoped>
+ion-button {
+  background-color: var(--ion-color-mycolor);
+  border-radius: 30px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  font-weight: bold;
+  font-size: 1rem;
+  margin: 5px;
+}
+ion-card.login-card {
+    border: 2px solid var(--ion-color-mycolor);
+    /* Añade un borde de 2px sólido en el color mycolor */
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+ion-card.login-card:focus-within {
+    border-color: var(--ion-color-mynewcolor);
+    /* Cambia el color del borde cuando la card se enfoca */
+}
+</style>
