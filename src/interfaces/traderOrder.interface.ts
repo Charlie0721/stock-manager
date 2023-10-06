@@ -20,6 +20,7 @@ export interface ItradeOrderHeader {
     detpedidos: ItradeOrderDetail[];
 }
 
+
 export interface ItradeOrderDetail {
 
     idpedido: string;
@@ -27,10 +28,12 @@ export interface ItradeOrderDetail {
     cantidad: number;
     valorprod: number;
     descuento: number;
+    porcdesc:number;
     codiva: string;
     porciva?: number;
     costoprod: number;
     despachado: number;
     base:number;
     ivaprod: number;
+
 }
