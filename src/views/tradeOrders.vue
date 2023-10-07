@@ -371,7 +371,7 @@ export default defineComponent({
         document.body.style.opacity = "0.2";
         document.body.style.background = "transparent";
 
-        BarcodeScanner.hideBackground(); // make background of WebView transparent
+        BarcodeScanner.hideBackground(); 
 
         const result = await BarcodeScanner.startScan({
           targetedFormats: [
@@ -380,13 +380,11 @@ export default defineComponent({
             SupportedFormat.EAN_13,
             SupportedFormat.EAN_8,
           ],
-        }); // start scanning and wait for a result
-
-        // if the result has content
+        });         
         if (result.hasContent) {
           document.body.style.background = "";
           document.body.style.opacity = "1";
-          console.log(result.content); // log the raw scanned content
+          console.log(result.content); 
         }
         this.searchByBarcode = result.content;
       } catch (error) {
