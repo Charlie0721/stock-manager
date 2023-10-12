@@ -112,7 +112,7 @@
         </h3>
       </ion-text>
 
-      <ion-card v-for="(product, index) in productArray" :key="product.id">
+      <ion-card v-for="(product, index) in productArray" :key="product.idproducto">
         <ion-card-header>
           <ion-card-title>
             <h4 class="letter-color">
@@ -141,15 +141,16 @@
           <h5 text="dark" v-if="product.ivaprod > 0">IVA: {{ new
             Intl.NumberFormat("de-DE").format(taxValue = (product.valorprod - product.base) * product.cantidad) }}
           </h5>
+
+          <ion-label position="floating">% Descuento :</ion-label>
+          <ion-input type="number" :value="product.porcdesc" @input="product.porcdesc = $event.target.value"><ion-button
+              color="mycolor" class="btn-edit-product" @click="updateDiscount(product, product.porcdesc)"
+              v-if="product.porcdesc > 0">%</ion-button></ion-input>
           <ion-label position="floating">Valor Unitario $:</ion-label>
-          <ion-input type="number" :value="product.valorprod"
+          <ion-input type="number" :value="computedValorProd(product)"
             @input="updateValorProd(product, $event.target.value)"></ion-input>
-          Total: $
-          {{
-            new Intl.NumberFormat("de-DE").format(
-              (TotalProduct = product.valorprod * product.cantidad)
-            )
-          }}
+
+          Total: ${{ new Intl.NumberFormat("de-DE").format(computedTotal(product)) }}
 
         </ion-card-content>
       </ion-card>
@@ -159,6 +160,12 @@
             <h3>
               SUBTOTAL: $
               {{ new Intl.NumberFormat("de-DE").format(subtotal) }}
+            </h3>
+          </ion-text>
+          <ion-text color="dark" v-if="valdescuentos > 0">
+            <h3>
+              DESCUENTOS: $
+              {{ new Intl.NumberFormat("de-DE").format(valdescuentos) }}
             </h3>
           </ion-text>
           <ion-text color="dark" v-if="valimpuesto > 0">
@@ -228,7 +235,7 @@
                 product.codiva,
                 product.baseValue,
                 product.taxValue,
-                product.porcentaje
+                product.porcentaje,
               )
                 ">Agregar<ion-icon :icon="i.checkmarkCircleOutline"></ion-icon>
               </ion-button>
@@ -248,7 +255,7 @@ import {
   BarcodeScanner,
   SupportedFormat,
 } from "@capacitor-community/barcode-scanner";
-import { ItradeOrderHeader } from "@/interfaces/traderOrder.interface";
+import { ItradeOrderDetail, ItradeOrderHeader } from "@/interfaces/traderOrder.interface";
 import { IcreateClient } from "@/interfaces/createClient.interface";
 import {
   IonPage,
@@ -321,7 +328,6 @@ export default defineComponent({
       customerNit: "" as string,
       despachado: 0 as number,
       idTradeOrder: "" as string,
-      descuentoProd: 0 as number,
       finalAmount: 0 as number,
       finalSalePrice: 0 as number,
       totalProduct: 0,
@@ -349,6 +355,8 @@ export default defineComponent({
       base: 0 as number,
       taxValue: 0 as number,
       finalPrice: 0 as number,
+      discount: 0 as number,
+      discountPercentage: 0 as number,
     };
   },
   mounted() {
@@ -371,7 +379,7 @@ export default defineComponent({
         document.body.style.opacity = "0.2";
         document.body.style.background = "transparent";
 
-        BarcodeScanner.hideBackground(); 
+        BarcodeScanner.hideBackground();
 
         const result = await BarcodeScanner.startScan({
           targetedFormats: [
@@ -380,11 +388,11 @@ export default defineComponent({
             SupportedFormat.EAN_13,
             SupportedFormat.EAN_8,
           ],
-        });         
+        });
         if (result.hasContent) {
           document.body.style.background = "";
           document.body.style.opacity = "1";
-          console.log(result.content); 
+          console.log(result.content);
         }
         this.searchByBarcode = result.content;
       } catch (error) {
@@ -564,19 +572,16 @@ export default defineComponent({
       }
     },
     subtractAmount(idproducto: number) {
-      const producto = this.productArray.filter((r) => {
-        return r.idproducto === idproducto;
-      })[0];
+      const producto = this.productArray.find((r) => r.idproducto === idproducto);
       if (producto) {
-        producto.cantidad--;
-        this.finalAmount = producto.cantidad;
-        this.total = this.productArray.reduce(
-          (total, { cantidad, valorprod }) => total + cantidad * valorprod,
-          0
-        );
+        if (producto.cantidad > 1) {
+          producto.cantidad--;
+          this.recalcularDescuentos();
+        } else {
+          this.deleteProduct(producto.idproducto);
+        }
       }
     },
-
     async saveCompleteTradeOrder() {
       try {
 
@@ -614,7 +619,7 @@ export default defineComponent({
           this.saveTradeOrder.valortotal = this.total;
           this.saveTradeOrder.valimpuesto = this.valimpuesto;
           this.saveTradeOrder.valiva = this.valimpuesto;
-          this.saveTradeOrder.valdescuentos = 0;
+          this.saveTradeOrder.valdescuentos = this.valdescuentos;
           this.saveTradeOrder.valretenciones = 0;
           this.saveTradeOrder.idalmacen = this.idalmacen;
           this.saveTradeOrder.estado = 3;
@@ -651,7 +656,7 @@ export default defineComponent({
         console.log(error);
         const alert = await alertController.create({
           cssClass: "my-custom-class",
-          header: "CONFIRMACION !!!",
+          header: "ERROR !!!",
           subHeader: `${error} `,
           message: `${error.message} `,
           buttons: ["ACEPTAR"],
@@ -669,6 +674,8 @@ export default defineComponent({
           deletedProduct.valorprod -= deletedTaxValue;
           this.valimpuesto -= deletedTaxValue;
           this.productArray.splice(productIndex, 1);
+
+          this.recalcularDescuentos();
         }
       } catch (error) {
         console.log(error);
@@ -677,6 +684,26 @@ export default defineComponent({
 
     selectPrice(price: number) {
       this.finalPrice = price;
+    },
+    async updateDiscount(product: ItradeOrderDetail, discountPercentage: number) {
+      let discount = Number(discountPercentage)
+      if (discount < 0 || discount > 100) {
+        const alert = await alertController.create({
+          cssClass: "my-custom-class",
+          header: "ERROR !!!",
+          subHeader: "No valido",
+          message: `El descuento no puede se superio a 100% o menor a 0 `,
+          buttons: ["ACEPTAR"],
+        });
+        await alert.present();
+        return
+      }
+      this.valdescuentos -= product.descuento;
+      product.porcdesc = discount;
+      this.discount = (product.porcdesc / 100) * product.valorprod;
+      product.descuento = this.discount;
+      this.valdescuentos += product.descuento;
+      this.recalcularPropiedadesComputadas();
     },
     async selectProduct(
       idproducto: number,
@@ -708,7 +735,8 @@ export default defineComponent({
           codiva: codiva,
           cantidad: 1,
           despachado: this.despachado,
-          descuento: this.descuentoProd,
+          descuento: this.discount,
+          porcdesc: 0,
           base: baseValue,
           ivaprod: taxValue,
           porciva: porcentaje
@@ -732,8 +760,32 @@ export default defineComponent({
       const producto = this.productArray.find((r) => r.idproducto === idproducto);
       if (producto) {
         producto.cantidad++;
+        this.recalcularDescuentos();
       }
     },
+    recalcularDescuentos() {
+      this.valdescuentos = this.productArray.reduce(
+        (total, { cantidad, descuento }) => total + (descuento * cantidad), 0
+      );
+    },
+
+    updateValorProd(product, newValue) {
+      // Asegúrate de convertir el nuevo valor a un número
+      const newPrice = parseFloat(newValue);
+
+      if (!isNaN(newPrice)) {
+        // Ahora, calcula y actualiza los totales nuevamente
+        this.recalcularPropiedadesComputadas();
+      }
+    },
+
+    recalcularPropiedadesComputadas() {
+      this.subtotal;
+      this.valimpuesto;
+      this.total;
+      this.valdescuentos
+    },
+
     async searchOneProduct(e: any) {
       try {
         this.searchProduct = e.detail.value;
@@ -752,17 +804,6 @@ export default defineComponent({
         });
         await alert.present();
       }
-    },
-    updateValorProd(producto, nuevoValor) {
-      producto.valorprod = parseFloat(nuevoValor);
-      this.recalcularPropiedadesComputadas();
-
-    },
-
-    recalcularPropiedadesComputadas() {
-      this.subtotal;
-      this.valimpuesto;
-      this.total;
     },
 
     prevPage() {
@@ -935,25 +976,34 @@ export default defineComponent({
   computed: {
     subtotal() {
       return this.productArray.reduce(
-        (total, { cantidad, valorprod, ivaprod }) => total + (valorprod - ivaprod) * cantidad,
+        (total, { cantidad, valorprod, ivaprod, descuento }) => total + (valorprod - ivaprod - descuento) * cantidad,
         0
       );
     },
     valimpuesto() {
       return this.productArray.reduce(
-        (total, { cantidad, valorprod, base }) => total + (valorprod - base) * cantidad,
+        (total, { cantidad, valorprod, base, }) => total + (valorprod - base) * cantidad,
         0
       );
     },
     total() {
       return this.productArray.reduce(
-        (total, { cantidad, valorprod }) => total + cantidad * valorprod,
+        (total, { cantidad, valorprod, descuento }) => total + (valorprod - descuento) * cantidad,
         0
       )
     },
+    valdescuentos() {
+      return this.productArray.reduce(
+        (total, { cantidad, descuento }) => total + (descuento * cantidad), 0
+      );
+    },
+    computedValorProd(product) {
+      return (product) => product.valorprod - (product.valorprod * product.porcdesc / 100);
+    },
+    computedTotal() {
+      return (product) => product.cantidad * this.computedValorProd(product);
+    },
   }
-
-
 });
 </script>
 <style scoped>
@@ -1041,4 +1091,5 @@ h4 {
 .custom-modal-content {
   --overflow: auto;
   --overflow-scroll-behavior: smooth;
-}</style>
+}
+</style>
