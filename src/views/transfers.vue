@@ -13,9 +13,6 @@
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
-      <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="getNumberTransfer()">Generar
-        Consecutivo</ion-button>
-
       <ion-list>
         <ion-item>
           <ion-select placeholder="Seleccionar Origen" @ionChange="SelectOrigin = $event.target.value"
@@ -256,6 +253,8 @@ export default defineComponent({
         const numberTransfer = await TransfersToApp.getNumberTransfer();
         this.numberTransfer = numberTransfer.data[0].result;
         this.finalNumber = this.numberTransfer + 1;
+        console.log("numero: ",this.finalNumber);
+        
       } catch (error) {
         console.log(error);
       }
@@ -426,17 +425,8 @@ export default defineComponent({
           await alert.present();
           return;
         }
-        if (this.finalNumber === 0) {
-          const alert = await alertController.create({
-            cssClass: "my-custom-class",
-            header: "ATENCIÓN !!!",
-            subHeader: `NO PASA VALIDACIÓN `,
-            message: `DEBE GENERAR NUMERO CONSECUTIVO !!`,
-            buttons: ["ACEPTAR"],
-          });
-          await alert.present();
-          return;
-        } else {
+        else {
+          await this.getNumberTransfer()
           this.transfer.documento = this.transfer.documento.toUpperCase();
           this.transfer.detalle = this.transfer.detalle.toUpperCase();
           this.transfer.hora = this.currentTime;

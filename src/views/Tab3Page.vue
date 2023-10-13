@@ -31,9 +31,6 @@
           </ion-card>
         </ion-fab-list>
       </ion-fab>
-      <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="getNumbers(SelectIdalmacen)">Generar
-        Consecutivo
-      </ion-button>
       <ion-card>
         <ion-card-content>
           <ion-item>
@@ -604,16 +601,6 @@ export default defineComponent({
         });
         await alert.present();
         return false;
-      } else if (this.finalNumber === 0) {
-        const alert = await alertController.create({
-          cssClass: "my-custom-class",
-          header: "ATENCIÓN !!!",
-          subHeader: `NO PASA VALIDACIÓN `,
-          message: `DEBE GENERAR EL NÚMERO DE INVENTARIO !!`,
-          buttons: ["ACEPTAR"],
-        });
-        await alert.present();
-        return false;
       } else if (this.idtercero === 0) {
         const alert = await alertController.create({
           cssClass: "my-custom-class",
@@ -635,6 +622,7 @@ export default defineComponent({
         await alert.present();
         return false;
       } else {
+        await this.getNumbers(this.SelectIdalmacen)
         this.saveInventoryMovements.idalmacen = this.SelectIdalmacen;
         this.saveInventoryMovements.idusuario = 1;
         this.saveInventoryMovements.idconceptajuste = 1;
@@ -648,13 +636,10 @@ export default defineComponent({
           await InventoryMovements.movementInventorySave(
             this.saveInventoryMovements
           );
-
-        console.log(saveInventoryMovementsToPos);
-
         const alert = await alertController.create({
           cssClass: "my-custom-class",
-          header: "CONFIRMACION !!!",
-          subHeader: `MOVIMIENTO ${this.finalNumber} GUARDADA SATISFACTORIAMENTE `,
+          header: `CONFIRMACION !!! ${saveInventoryMovementsToPos.statusText}`,
+          subHeader: `MOVIMIENTO ${this.finalNumber} GUARDADO SATISFACTORIAMENTE `,
           message: `APROBAR LA ENTRADA DE PRODUCTOS EN CONEXION POS CON EL NUMERO ${this.finalNumber}`,
           buttons: ["ACEPTAR"],
         });

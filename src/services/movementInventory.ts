@@ -21,7 +21,6 @@ export class InventoryMovements {
 
     /**Metodo para cargar productos y su respectiva cantidad segun el almacen */
     static getStockItem = async (id: number,limit:number, page:number, descripcion:string, barcode:string) => await axios.get(`/mov-inventarios/obetener-cantidades/${id}/stock?limit=${limit}&page=${page}&descripcion=${descripcion}&barcode=${barcode}`)
-
 }
 
 
