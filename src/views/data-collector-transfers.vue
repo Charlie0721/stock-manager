@@ -68,6 +68,8 @@
           <h4 class="letter-color">
             {{ barcode }}
           </h4>
+          <ion-button color="mycolor" expand="full" class="btn-edit-product" @click="stopScan()">
+            Detener busqueda</ion-button>
           <ion-item>
             <ion-label position="floating">Cantidad</ion-label>
             <ion-input type="number" :value="amount" @input="amount = $event.target.value" disabled></ion-input>
@@ -218,8 +220,10 @@ export default defineComponent({
     stopScan() {
       BarcodeScanner.showBackground();
       BarcodeScanner.stopScan();
+      setTimeout(() => {
+        location.reload();
+      }, 1000)
     },
-
     deactivated() {
       this.stopScan();
     },

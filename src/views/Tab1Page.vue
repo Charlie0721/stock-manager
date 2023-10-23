@@ -18,6 +18,8 @@
         placeholder="Código de barras" :clear-input="true" @keypress.enter="searchByBarcodeItem()"></ion-input>
       <ion-button color="mycolor" expand="full" class="btn-edit-product" @click="startScan()">
         Buscar Código barras</ion-button>
+      <ion-button color="mycolor" expand="full" class="btn-edit-product" @click="stopScan()">
+        Detener busqueda</ion-button>
       <ion-button color="mycolor" @click="prevPage()" v-if="page > 1">Anterior</ion-button>
       <ion-button color="mycolor" @click="nextPage()">Siguiente</ion-button>
       <span> página {{ page }} </span>
@@ -96,7 +98,7 @@ export default defineComponent({
     this.getProductsQuantities();
   },
   methods: {
-  
+
     async getProductsQuantities() {
       try {
         const responseProducts = await productsQuantities(
@@ -128,7 +130,7 @@ export default defineComponent({
         document.body.style.opacity = "0.2";
         document.body.style.background = "transparent";
 
-        BarcodeScanner.hideBackground(); // make background of WebView transparent
+        BarcodeScanner.hideBackground();
 
         const result = await BarcodeScanner.startScan({
           targetedFormats: [
@@ -137,15 +139,15 @@ export default defineComponent({
             SupportedFormat.EAN_13,
             SupportedFormat.EAN_8,
           ],
-        }); // start scanning and wait for a result
+        });
 
-        // if the result has content
         if (result.hasContent) {
           document.body.style.background = "";
           document.body.style.opacity = "1";
-          console.log(result.content); // log the raw scanned content
         }
         this.searchByBarcode = result.content;
+
+
       } catch (error) {
         const alert = await alertController.create({
           cssClass: "my-custom-class",
@@ -160,6 +162,10 @@ export default defineComponent({
     stopScan() {
       BarcodeScanner.showBackground();
       BarcodeScanner.stopScan();
+      setTimeout(() => {
+        location.reload();
+      }, 1000)
+
     },
 
     deactivated() {

@@ -7,34 +7,16 @@
     </ion-header>
     <ion-content :fullscreen="true">
       <ion-card>
-        <ion-button
-          id="open-modal"
-          expand="block"
-          color="mycolor"
-          class="btn-edit-product"
-          @click="getLines()"
-        >
+        <ion-button id="open-modal" expand="block" color="mycolor" class="btn-edit-product" @click="getLines()">
           <ion-icon :icon="i.searchCircleSharp"></ion-icon>Seleccionar
-          Linea</ion-button
-        >
+          Linea</ion-button>
       </ion-card>
-      <ion-modal
-        ref="modal"
-        trigger="open-modal"
-        :initial-breakpoint="0.25"
-        :breakpoints="[0, 0.25, 0.5, 0.75]"
-      >
+      <ion-modal ref="modal" trigger="open-modal" :initial-breakpoint="0.25" :breakpoints="[0, 0.25, 0.5, 0.75]">
         <ion-content class="ion-padding">
-          <ion-searchbar
-            @click="$refs.modal.$el.setCurrentBreakpoint(0.75)"
-            placeholder="Buscar Linea"
-            @ionChange="searchOneLine($event)"
-            @keypress.enter="searchLine()"
-          ></ion-searchbar>
+          <ion-searchbar @click="$refs.modal.$el.setCurrentBreakpoint(0.75)" placeholder="Buscar Linea"
+            @ionChange="searchOneLine($event)" @keypress.enter="searchLine()"></ion-searchbar>
 
-          <ion-button color="mycolor" @click="prevPage()" v-if="page > 1"
-            >Anterior</ion-button
-          >
+          <ion-button color="mycolor" @click="prevPage()" v-if="page > 1">Anterior</ion-button>
           <ion-button color="mycolor" @click="nextPage()">Siguiente</ion-button>
           <span> página {{ page }} </span>
           <ion-list v-for="line in lines" :key="line.idregistro">
@@ -44,19 +26,14 @@
 
             <ion-item>
               <ion-label>
-                <ion-button
-                  color="mycolor"
-                  class="btn-edit-product"
-                  expand="full"
-                  @click="
-                    selectLine(
-                      line.idregistro,
-                      line.idnivel,
-                      line.nombre,
-                      line.codigo
-                    )
-                  "
-                  >Aceptar<ion-icon :icon="i.checkmarkCircleOutline"></ion-icon>
+                <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="
+                  selectLine(
+                    line.idregistro,
+                    line.idnivel,
+                    line.nombre,
+                    line.codigo
+                  )
+                  ">Aceptar<ion-icon :icon="i.checkmarkCircleOutline"></ion-icon>
                 </ion-button>
               </ion-label>
             </ion-item>
@@ -83,107 +60,59 @@
       <ion-card>
         <ion-item>
           <ion-label position="floating">Codigo de barras</ion-label>
-          <ion-input
-            type="text"
-            :value="product.barcode"
-            @input="product.barcode = $event.target.value"
-          >
+          <ion-input type="text" :value="product.barcode" @input="product.barcode = $event.target.value">
           </ion-input>
         </ion-item>
-        <ion-button
-          color="mycolor"
-          expand="full"
-          class="btn-edit-product"
-          @click="startScan()"
-        >
-          Escanear Codigo barras</ion-button
-        >
+        <ion-button color="mycolor" expand="full" class="btn-edit-product" @click="startScan()">
+          Escanear Codigo barras</ion-button>
+        <ion-button color="mycolor" expand="full" class="btn-edit-product" @click="stopScan()">
+          Detener busqueda</ion-button>
         <ion-item>
-          <ion-select
-            placeholder="Unidad de medida"
-            @ionChange="unitOfMeasureId = $event.target.value"
-            :value="unitOfMeasureId"
-          >
-            <ion-select-option
-              :value="unit.idunmedida"
-              v-for="unit in unitsOfMeasure"
-              :key="unit.idunmedida"
-              >{{ unit.nommedida }}
+          <ion-select placeholder="Unidad de medida" @ionChange="unitOfMeasureId = $event.target.value"
+            :value="unitOfMeasureId">
+            <ion-select-option :value="unit.idunmedida" v-for="unit in unitsOfMeasure" :key="unit.idunmedida">{{
+              unit.nommedida }}
             </ion-select-option>
           </ion-select>
         </ion-item>
 
         <ion-item>
           <ion-label position="floating">Descripcion</ion-label>
-          <ion-input
-            type="text"
-            :value="product.descripcion"
-            @input="product.descripcion = $event.target.value"
-          >
+          <ion-input type="text" :value="product.descripcion" @input="product.descripcion = $event.target.value">
           </ion-input>
         </ion-item>
         <ion-item>
-          <ion-select
-            placeholder="I.V.A Compras"
-            @ionChange="taxIdPurchases = $event.target.value"
-            :value="taxIdPurchases"
-          >
-            <ion-select-option
-              :value="tax.codiva"
-              v-for="tax in taxOnPurchases"
-              :key="tax.codiva"
-              >{{ tax.nombre }}
+          <ion-select placeholder="I.V.A Compras" @ionChange="taxIdPurchases = $event.target.value"
+            :value="taxIdPurchases">
+            <ion-select-option :value="tax.codiva" v-for="tax in taxOnPurchases" :key="tax.codiva">{{ tax.nombre }}
             </ion-select-option>
           </ion-select>
         </ion-item>
 
         <ion-item>
           <ion-label position="floating">Costo Unitario UC</ion-label>
-          <ion-input
-            type="number"
-            :value="product.costo"
-            @input="product.costo = $event.target.value"
-          >
+          <ion-input type="number" :value="product.costo" @input="product.costo = $event.target.value">
           </ion-input>
         </ion-item>
         <ion-item>
-          <ion-select
-            placeholder="I.V.A Ventas Precio 1"
-            @ionChange="taxIdSales = $event.target.value"
-            :value="taxIdSales"
-          >
-            <ion-select-option
-              :value="tax.codiva"
-              v-for="tax in taxOnSales"
-              :key="tax.codiva"
-              >{{ tax.nombre }}
+          <ion-select placeholder="I.V.A Ventas Precio 1" @ionChange="taxIdSales = $event.target.value"
+            :value="taxIdSales">
+            <ion-select-option :value="tax.codiva" v-for="tax in taxOnSales" :key="tax.codiva">{{ tax.nombre }}
             </ion-select-option>
           </ion-select>
         </ion-item>
 
         <ion-item>
           <ion-label position="floating">Precio de Venta</ion-label>
-          <ion-input
-            type="number"
-            :value="product.precioventa"
-            @input="product.precioventa = $event.target.value"
-          >
+          <ion-input type="number" :value="product.precioventa" @input="product.precioventa = $event.target.value">
           </ion-input>
         </ion-item>
-        <ion-button
-          color="mycolor"
-          class="btn-edit-product"
-          expand="full"
-          @click="saveProduct()"
-        >
-          Grabar</ion-button
-        >
+        <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="saveProduct()">
+          Grabar</ion-button>
       </ion-card>
       <ion-card>
-        <ion-button color="danger" expand="full" @click="returnProducts()"
-          ><ion-icon :icon="i.arrowBackSharp"></ion-icon>Volver</ion-button
-        ></ion-card
-      >
+        <ion-button color="danger" expand="full" @click="returnProducts()"><ion-icon
+            :icon="i.arrowBackSharp"></ion-icon>Volver</ion-button></ion-card>
     </ion-content>
   </ion-page>
 </template>
@@ -324,13 +253,11 @@ export default defineComponent({
             SupportedFormat.EAN_13,
             SupportedFormat.EAN_8,
           ],
-        }); // start scanning and wait for a result
-
-        // if the result has content
+        });
         if (result.hasContent) {
           document.body.style.background = "";
           document.body.style.opacity = "1";
-          console.log(result.content); // log the raw scanned content
+          console.log(result.content);
         }
         this.product.barcode = result.content;
       } catch (error) {
@@ -347,12 +274,13 @@ export default defineComponent({
     stopScan() {
       BarcodeScanner.showBackground();
       BarcodeScanner.stopScan();
+      setTimeout(() => {
+        location.reload();
+      }, 1000)
     },
-
     deactivated() {
       this.stopScan();
     },
-
     beforeDestroy() {
       this.stopScan();
     },
@@ -479,7 +407,7 @@ export default defineComponent({
           this.product.agruparalfacturar = 0;
           this.product.estproductos = this.estproductos;
           this.searchBarcode();
-          setTimeout(async()=>{
+          setTimeout(async () => {
 
             if (this.barcodeFound === "barcode found") {
               const alert = await alertController.create({
@@ -630,15 +558,18 @@ export default defineComponent({
   padding-left: 100px !important;
   padding-right: 100px !important;
 }
+
 .edit-image {
   width: 10%;
   max-height: 10%;
   float: right;
 }
+
 .edit-image1 {
   width: 5%;
   max-height: 5%;
 }
+
 .btn-edit-product {
   border-radius: 30px;
 }
@@ -646,10 +577,12 @@ export default defineComponent({
 ion-button {
   background-color: var(--ion-color-mycolor);
 }
+
 .letter-color {
   color: #82230d;
   text-shadow: 1px 1px #fff;
 }
+
 .hideBg::part(background) {
   display: none;
 }

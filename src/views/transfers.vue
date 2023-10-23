@@ -101,6 +101,8 @@
               placeholder="Código de barras" :clear-input="true" @keypress.enter="searchByBarcodeItem()"></ion-input>
             <ion-button color="mycolor" expand="full" class="btn-edit-product" @click="startScan()">
               Buscar Código barras</ion-button>
+            <ion-button color="mycolor" expand="full" class="btn-edit-product" @click="stopScan()">
+              Detener busqueda</ion-button>
             <ion-button color="mycolor" @click="prevPage()" v-if="page > 1">Anterior</ion-button>
             <ion-button color="mycolor" @click="nextPage()">Siguiente</ion-button>
             <span> página {{ page }} </span>
@@ -253,8 +255,8 @@ export default defineComponent({
         const numberTransfer = await TransfersToApp.getNumberTransfer();
         this.numberTransfer = numberTransfer.data[0].result;
         this.finalNumber = this.numberTransfer + 1;
-        console.log("numero: ",this.finalNumber);
-        
+        console.log("numero: ", this.finalNumber);
+
       } catch (error) {
         console.log(error);
       }
@@ -519,12 +521,13 @@ export default defineComponent({
     stopScan() {
       BarcodeScanner.showBackground();
       BarcodeScanner.stopScan();
+      setTimeout(() => {
+        location.reload();
+      }, 1000)
     },
-
     deactivated() {
       this.stopScan();
     },
-
     beforeDestroy() {
       this.stopScan();
     },

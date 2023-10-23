@@ -120,6 +120,8 @@
               placeholder="Código de barras" :clear-input="true" @keypress.enter="searchByBarcodeItem()"></ion-input>
             <ion-button color="mycolor" expand="full" class="btn-edit-product" @click="startScan()">
               Buscar Código barras</ion-button>
+            <ion-button color="mycolor" expand="full" class="btn-edit-product" @click="stopScan()">
+              Detener busqueda</ion-button>
             <ion-button color="mycolor" @click="prevPage()" v-if="page > 1">Anterior</ion-button>
             <ion-button color="mycolor" @click="nextPage()">Siguiente</ion-button>
             <span> página {{ page }} </span>
@@ -310,12 +312,13 @@ export default defineComponent({
     stopScan() {
       BarcodeScanner.showBackground();
       BarcodeScanner.stopScan();
+      setTimeout(() => {
+        location.reload();
+      }, 1000)
     },
-
     deactivated() {
       this.stopScan();
     },
-
     beforeDestroy() {
       this.stopScan();
     },
@@ -674,46 +677,77 @@ export default defineComponent({
 
 ion-button {
   background-color: var(--ion-color-mycolor);
-  border-radius: 30px; /* Bordes redondeados */
-  text-transform: uppercase; /* Texto en mayúsculas */
-  font-weight: bold; /* Texto en negrita */
-  margin-top: 10px; /* Espacio superior */
+  border-radius: 30px;
+  /* Bordes redondeados */
+  text-transform: uppercase;
+  /* Texto en mayúsculas */
+  font-weight: bold;
+  /* Texto en negrita */
+  margin-top: 10px;
+  /* Espacio superior */
 
 }
+
 ion-icon {
-  margin-right: 8px; /* Espacio entre el icono y el texto */
+  margin-right: 8px;
+  /* Espacio entre el icono y el texto */
 }
+
 ion-header {
-  background-color: #fff; /* Fondo blanco */
-  border-bottom: 1px solid #ccc; /* Borde inferior gris */
+  background-color: #fff;
+  /* Fondo blanco */
+  border-bottom: 1px solid #ccc;
+  /* Borde inferior gris */
 }
+
 ion-title {
-  color: #d6d5d5; /* Color de texto */
-  font-weight: bold; /* Texto en negrita */
+  color: #d6d5d5;
+  /* Color de texto */
+  font-weight: bold;
+  /* Texto en negrita */
 }
+
 ion-content {
-  background-color: #f4f5f8; /* Fondo gris claro */
-  padding: 10px; /* Espaciado interior */
+  background-color: #f4f5f8;
+  /* Fondo gris claro */
+  padding: 10px;
+  /* Espaciado interior */
 }
+
 ion-list {
-  background-color: transparent; /* Fondo transparente */
-  margin-top: 0; /* Sin margen superior */
-  margin-bottom: 0; /* Sin margen inferior */
+  background-color: transparent;
+  /* Fondo transparente */
+  margin-top: 0;
+  /* Sin margen superior */
+  margin-bottom: 0;
+  /* Sin margen inferior */
 }
+
 ion-item {
-  border-bottom: 1px solid #ccc; /* Borde inferior gris */
-  padding: 10px; /* Espaciado interior */
+  border-bottom: 1px solid #ccc;
+  /* Borde inferior gris */
+  padding: 10px;
+  /* Espaciado interior */
 }
+
 ion-label {
-  color: #333; /* Color de texto */
+  color: #333;
+  /* Color de texto */
 }
+
 ion-button.button-in-item {
-  --border-radius: 5px; /* Bordes redondeados */
-  --background: #3880ff; /* Fondo azul */
-  --color: #fff; /* Texto blanco */
-  --padding-end: 10px; /* Espaciado derecho */
-  --padding-start: 10px; /* Espaciado izquierdo */
-  margin-left: auto; /* Margen izquierdo automático */
+  --border-radius: 5px;
+  /* Bordes redondeados */
+  --background: #3880ff;
+  /* Fondo azul */
+  --color: #fff;
+  /* Texto blanco */
+  --padding-end: 10px;
+  /* Espaciado derecho */
+  --padding-start: 10px;
+  /* Espaciado izquierdo */
+  margin-left: auto;
+  /* Margen izquierdo automático */
 }
 
 .letter-color {

@@ -2,8 +2,7 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title
-          ><img class="edit-image" src="../images/images_app/logo_header.png" />
+        <ion-title><img class="edit-image" src="../images/images_app/logo_header.png" />
           Recolector de Inventarios
         </ion-title>
       </ion-toolbar>
@@ -11,92 +10,49 @@
     <ion-content className=".hideBg">
       <ion-card>
         <ion-card-title>
-          <h4
-            class="letter-color"
-            v-for="item in this.descriptions"
-            :key="item.barcode"
-          >
+          <h4 class="letter-color" v-for="item in this.descriptions" :key="item.barcode">
             {{ item.descripcion }}
           </h4>
         </ion-card-title>
         <ion-card-subtitle>
           <ion-item>
             <ion-label position="floating">Codigo de Barras</ion-label>
-            <ion-input
-              type="text"
-              :value="barcode"
-              @input="barcodeScan.barcode = $event.target.value"
-            ></ion-input>
+            <ion-input type="text" :value="barcode" @input="barcodeScan.barcode = $event.target.value"></ion-input>
             <ion-label position="floating">Cantidad</ion-label>
-            <ion-input
-              type="number"
-              :value="amount"
-              @input="amount = $event.target.value"
-            ></ion-input>
+            <ion-input type="number" :value="amount" @input="amount = $event.target.value"></ion-input>
           </ion-item>
 
-          <ion-button
-            color="mycolor"
-            expand="full"
-            class="btn-edit-product"
-            @click="startScan()"
-            >Escanear Código barras</ion-button
-          >
+          <ion-button color="mycolor" expand="full" class="btn-edit-product" @click="startScan()">Escanear Código
+            barras</ion-button>
 
-          <ion-button
-            color="mycolor"
-            class="btn-edit-product"
-            expand="full"
-            @click="searchProduct()"
-          >
-            Busca Producto</ion-button
-          >
+          <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="searchProduct()">
+            Busca Producto</ion-button>
           <h4 class="letter-color">
             {{ barcode }}
           </h4>
+          <ion-button color="mycolor" expand="full" class="btn-edit-product" @click="stopScan()">
+            Detener busqueda</ion-button>
           <ion-item>
             <ion-label position="floating">Cantidad</ion-label>
-            <ion-input
-              type="number"
-              :value="amount"
-              @input="amount = $event.target.value"
-              disabled
-            ></ion-input>
+            <ion-input type="number" :value="amount" @input="amount = $event.target.value" disabled></ion-input>
           </ion-item>
         </ion-card-subtitle>
       </ion-card>
       <ion-list v-for="collector in dataCollector" :key="collector.collector">
         <ion-item>
-          <ion-label
-            >{{ collector.barcode }}{{ collector.coma
-            }}{{ collector.amount }}</ion-label
-          >
+          <ion-label>{{ collector.barcode }}{{ collector.coma
+          }}{{ collector.amount }}</ion-label>
         </ion-item>
       </ion-list>
-      <ion-button
-        color="mycolor"
-        class="btn-edit-product"
-        expand="full"
-        @click="writeFile()"
-        ><ion-icon :icon="i.document"></ion-icon> Generar Archivo
-        txt</ion-button
-      >
-      <ion-button color="danger" expand="full" @click="returnProducts()"
-        ><ion-icon :icon="i.arrowBackSharp"></ion-icon>Volver</ion-button
-      >
-      <ion-button
-        expand="full"
-        color="mycolor"
-        class="btn-edit-product"
-        @click="newOrder()"
-        ><ion-icon :icon="i.refreshCircleSharp"></ion-icon> Iniciar
+      <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="writeFile()"><ion-icon
+          :icon="i.document"></ion-icon> Generar Archivo
+        txt</ion-button>
+      <ion-button color="danger" expand="full" @click="returnProducts()"><ion-icon
+          :icon="i.arrowBackSharp"></ion-icon>Volver</ion-button>
+      <ion-button expand="full" color="mycolor" class="btn-edit-product" @click="newOrder()"><ion-icon
+          :icon="i.refreshCircleSharp"></ion-icon> Iniciar
       </ion-button>
-      <ion-button
-        expand="full"
-        color="mycolor"
-        class="btn-edit-product"
-        @click="goToCollectorTransfer()"
-      >
+      <ion-button expand="full" color="mycolor" class="btn-edit-product" @click="goToCollectorTransfer()">
         Recolector de traslados
       </ion-button>
     </ion-content>
@@ -208,12 +164,13 @@ export default defineComponent({
     stopScan() {
       BarcodeScanner.showBackground();
       BarcodeScanner.stopScan();
+      setTimeout(() => {
+        location.reload();
+      }, 1000)
     },
-
     deactivated() {
       this.stopScan();
     },
-
     beforeDestroy() {
       this.stopScan();
     },
@@ -365,16 +322,20 @@ export default defineComponent({
   width: 5%;
   max-height: 5%;
 }
+
 .btn-edit-product {
   border-radius: 30px;
 }
+
 ion-button {
   background-color: var(--ion-color-mycolor);
 }
+
 .letter-color {
   color: #82230d;
   text-shadow: 1px 1px #fff;
 }
+
 .hideBg::part(background) {
   display: none;
 }

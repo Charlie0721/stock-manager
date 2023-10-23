@@ -130,13 +130,15 @@
         <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="savePurshaseToPos()"><ion-icon
             :icon="i.saveSharp"></ion-icon> Grabar Compra</ion-button>
         <ion-modal ref="modal" trigger="open-modal" :initial-breakpoint="0.25" :breakpoints="[0, 0.25, 0.5, 0.75]">
-          <ion-content class="ion-padding custom-modal-content" >
+          <ion-content class="ion-padding custom-modal-content">
             <ion-searchbar @click="$refs.modal.$el.setCurrentBreakpoint(0.75)" placeholder="Buscar Producto"
               @ionChange="searchOneProduct($event)" @keypress.enter="searchItem()"></ion-searchbar>
             <ion-input type="search" :value="searchByBarcode" @input="searchByBarcode = $event.target.value"
               placeholder="Código de barras" :clear-input="true" @keypress.enter="searchByBarcodeItem()"></ion-input>
             <ion-button color="mycolor" expand="full" class="btn-edit-product" @click="startScan()">
               Buscar Código barras</ion-button>
+            <ion-button color="mycolor" expand="full" class="btn-edit-product" @click="stopScan()">
+              Detener busqueda</ion-button>
             <ion-button color="mycolor" @click="prevPage()" v-if="page > 1">Anterior</ion-button>
             <ion-button color="mycolor" @click="nextPage()">Siguiente</ion-button>
             <span> página {{ page }} </span>
@@ -334,12 +336,13 @@ export default defineComponent({
     stopScan() {
       BarcodeScanner.showBackground();
       BarcodeScanner.stopScan();
+      setTimeout(() => {
+        location.reload();
+      }, 1000)
     },
-
     deactivated() {
       this.stopScan();
     },
-
     beforeDestroy() {
       this.stopScan();
     },
@@ -694,9 +697,11 @@ export default defineComponent({
 }
 
 ion-button {
-  border-radius: 30px; /* Bordes redondeados */
+  border-radius: 30px;
+  /* Bordes redondeados */
   background-color: var(--ion-color-mycolor);
-  --color: #fff; /* Color del texto */
+  --color: #fff;
+  /* Color del texto */
   font-weight: bold;
   text-transform: uppercase;
   margin-top: 10px;
@@ -747,13 +752,15 @@ ion-list ion-button.btn-edit-product {
   color: #82230d;
   text-shadow: 1px 1px #fff;
 }
+
 .custom-modal-content {
-    --overflow: auto;
-    --overflow-scroll-behavior: smooth;
-  }
-  .logo {
-  width: 40px; /* Ajusta el tamaño del logo según tus necesidades */
+  --overflow: auto;
+  --overflow-scroll-behavior: smooth;
+}
+
+.logo {
+  width: 40px;
+  /* Ajusta el tamaño del logo según tus necesidades */
   height: auto;
   margin-right: 8px;
-}
-</style>
+}</style>

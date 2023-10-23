@@ -47,6 +47,8 @@
       >
         Buscar Código barras</ion-button
       >
+      <ion-button color="mycolor" expand="full" class="btn-edit-product" @click="stopScan()">
+        Detener busqueda</ion-button>
       <ion-button color="mycolor" @click="prevPage()" v-if="page > 1"
         >Anterior</ion-button
       >
@@ -248,8 +250,10 @@ export default defineComponent({
     stopScan() {
       BarcodeScanner.showBackground();
       BarcodeScanner.stopScan();
+      setTimeout(() => {
+        location.reload();
+      }, 1000)
     },
-
     deactivated() {
       this.stopScan();
     },
