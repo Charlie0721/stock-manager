@@ -51,9 +51,11 @@
         @click="getCustomers()"><ion-icon :icon="i.peopleCircleOutline"></ion-icon> Seleccionar Cliente
       </ion-button>
       <ion-popover trigger="nested-button" :dismiss-on-select="false">
-        <ion-searchbar animated debounce="500" placeholder="Buscar cliente" @ionChange="searchOneCustomer($event)"
-          @keypress.enter="searchCustomerItem()">
-        </ion-searchbar>
+        <ion-card>
+          <ion-searchbar animated debounce="500" placeholder="Buscar cliente" @ionChange="searchOneCustomer($event)"
+            @keypress.enter="searchCustomerItem()">
+          </ion-searchbar>
+        </ion-card>
         <ion-content>
           <ion-card>
             <ion-card-header>
@@ -64,17 +66,18 @@
               <ion-card-subtitle>Click sobre el cliente</ion-card-subtitle>
             </ion-card-header>
             <ion-card-content>
-              <ion-list background-hover="92949c" v-for="customer in customers" :key="customer.idtercero" @click="
-                selectCustomer(
-                  customer.idtercero,
-                  customer.nit,
-                  customer.nombres
-                )
-                ">
+              <ion-list background-hover="92949c" v-for="customer in customers" :key="customer.idtercero">
                 <ion-item>
                   <ion-label> NIT: {{ customer.nit }}</ion-label>
                 </ion-item>
                 <ion-item> {{ customer.nombres }} </ion-item>
+                <ion-button color="mycolor" @click="
+                  selectCustomer(
+                    customer.idtercero,
+                    customer.nit,
+                    customer.nombres
+                  )
+                  ">Seleccionar</ion-button>
               </ion-list>
             </ion-card-content>
           </ion-card>
@@ -103,13 +106,13 @@
         </ion-content>
       </ion-popover>
       <ion-text color="medium" v-if="customerName">
-        <h3>
-          {{ customerName }}
-        </h3>
-
-        <h3>
-          {{ customerNit }}
-        </h3>
+        <ion-card>
+          <ion-card-content>
+            <h3>
+              CLIENTE: {{ customerNit }} {{ customerName }}
+            </h3>
+          </ion-card-content>
+        </ion-card>
       </ion-text>
 
       <ion-card v-for="(product, index) in productArray" :key="product.idproducto">
@@ -148,7 +151,7 @@
               v-if="product.porcdesc > 0">%</ion-button></ion-input>
           <ion-label position="floating">Valor Unitario $:</ion-label>
           <ion-input type="number" :value="computedValorProd(product)"
-            @input="updateValorProd(product, $event.target.value)"></ion-input>
+            @input="updateValorProd(index, $event.target.value)"></ion-input>
 
           Total: ${{ new Intl.NumberFormat("de-DE").format(computedTotal(product)) }}
 
@@ -549,7 +552,20 @@ export default defineComponent({
           const newClient = await TradeOrders.saveClientToOrder(
             this.saveClient
           );
-          console.log(newClient);
+          if (newClient.data.message === '¡Customer already exist!') {
+            const alert = await alertController.create({
+              cssClass: "my-custom-class",
+              header: "ATENCION !!!",
+              message: `Cliente ya existe en la base de datos`,
+              buttons: ["ACEPTAR"],
+            });
+            await alert.present();
+            return false;
+          }
+
+          let customerId = newClient.data.data[0].insertId
+          this.selectCustomer(customerId, this.saveClient.nit, this.saveClient.nombres)
+
           this.saveClient.nit = "";
           this.saveClient.nombres = "";
           this.saveClient.telefono = "";
@@ -771,13 +787,12 @@ export default defineComponent({
         (total, { cantidad, descuento }) => total + (descuento * cantidad), 0
       );
     },
-
-    updateValorProd(product, newValue) {
-      // Asegúrate de convertir el nuevo valor a un número
+    updateValorProd(index, newValue) {
       const newPrice = parseFloat(newValue);
 
       if (!isNaN(newPrice)) {
-        // Ahora, calcula y actualiza los totales nuevamente
+        this.productArray[index].valorprod = newPrice;
+
         this.recalcularPropiedadesComputadas();
       }
     },
