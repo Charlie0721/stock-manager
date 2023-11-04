@@ -275,8 +275,8 @@ export default defineComponent({
     async getIdalmacen() {
       this.idalmacen = this.SelectIdalmacen;
       localStorage.setItem("idAlmacen", JSON.stringify(this.idalmacen));
-      localStorage.setItem("idCustomer", JSON.stringify(this.idvendedor));
-      localStorage.setItem("idEmployee", JSON.stringify(this.idtercero));
+      localStorage.setItem("idCustomer", JSON.stringify(this.idtercero));
+      localStorage.setItem("idEmployee", JSON.stringify(this.idvendedor));
       if (this.idalmacen === 0) {
         const alert = await alertController.create({
           cssClass: "my-custom-class",
