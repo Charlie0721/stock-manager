@@ -52,7 +52,12 @@
       </ion-button>
       <ion-popover trigger="nested-button" :dismiss-on-select="false">
         <ion-card>
-          <ion-searchbar animated debounce="500" placeholder="Buscar cliente" @ionChange="searchOneCustomer($event)"
+          <ion-searchbar animated debounce="500" placeholder="Buscar Nit" @ionChange="searchOneCustomer($event)"
+            @keypress.enter="searchCustomerItem()">
+          </ion-searchbar>
+        </ion-card>
+        <ion-card>
+          <ion-searchbar animated debounce="500" placeholder="Buscar Nombres" @ionChange="searchOneCustomerByName($event)"
             @keypress.enter="searchCustomerItem()">
           </ion-searchbar>
         </ion-card>
@@ -934,10 +939,24 @@ export default defineComponent({
         console.log(error);
       }
     },
+    async searchOneCustomerByName(event: any) {
+      try {
+        this.searhCustomer = event.detail.value;
+        this.nombres = this.searhCustomer.toUpperCase();
+
+        if (this.searhCustomer === "") {
+          return await this.getCustomers();
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
     async searchCustomerItem() {
       await this.getCustomers(this.nit);
     },
-
+    async searchCustomerNombres() {
+      await this.getCustomers(this.name);
+    },
     prevPageCustomer() {
       if (this.page > 1) {
         this.page--;
