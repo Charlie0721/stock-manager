@@ -333,7 +333,7 @@ export default defineComponent({
         const alert = await alertController.create({
           cssClass: "my-custom-class",
           header: "¡Información !",
-          subHeader: "Selecicone almacén, cliente y vendedor",
+          subHeader: "Seleccione almacén, cliente y vendedor",
           message: "Debe seleccionar almacén, cliente y vendedor predeterminados para generar pedidos",
           buttons: ["OK"],
         });
