@@ -33,10 +33,64 @@
               @input="saveClient.nombres = $event.target.value"></ion-input>
           </ion-item>
           <ion-item>
+            <ion-label position="floating">NOMBRE COMERCIAL:</ion-label>
+            <ion-input type="text" :value="saveClient.nomcomercial"
+              @input="saveClient.nomcomercial = $event.target.value"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">EMAIL:</ion-label>
+            <ion-input type="text" :value="saveClient.email"
+              @input="saveClient.email = $event.target.value"></ion-input>
+          </ion-item>
+          <ion-item>
             <ion-label position="floating">DIRECCION:</ion-label>
             <ion-input type="text" :value="saveClient.direccion"
               @input="saveClient.direccion = $event.target.value"></ion-input>
           </ion-item>
+          <ion-item>
+            <ion-label>PAIS</ion-label>
+            <ion-select :value="countryId" @ionChange="countryId = $event.target.value">
+              <ion-select-option :value="country.idpais" v-for="country in countries" :key="country.idpais">
+                {{ country.nompais }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+          <ion-item>
+            <ion-label>DEPARTAMENTO</ion-label>
+            <ion-select :value="departmentId" @ionChange="departmentId = $event.target.value">
+              <ion-select-option :value="department.iddepto" v-for="department in departmens" :key="department.iddepto">
+                {{ department.nomdepartamento }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+          <ion-item>
+            <ion-label>MUNICIPIO</ion-label>
+            <ion-select :value="municipalityId" @ionChange="municipalityId = $event.target.value">
+              <ion-select-option :value="municipality.idmunicipio" v-for="municipality in municipalities"
+                :key="municipality.idmunicipio">
+                {{ municipality.nommunicipio }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+          <ion-item>
+            <ion-label>BARRIO</ion-label>
+            <ion-select :value="neighborhoodId" @ionChange="neighborhoodId = $event.target.value">
+              <ion-select-option :value="neighborhood.idbarrio" v-for="neighborhood in neighborhoods"
+                :key="neighborhood.idpais">
+                {{ neighborhood.nombarrio }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-card> <ion-item>
+              <ion-label position="floating">Nombre Barrio:</ion-label>
+              <ion-input type="text" :value="newNeighborhood.nombarrio"
+                @input="newNeighborhood.nombarrio = $event.target.value"></ion-input>
+            </ion-item>
+            <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="createNeighborhoods()"><ion-icon
+                :icon="i.peopleCircleOutline"></ion-icon> Crear Barrio
+            </ion-button>
+          </ion-card>
           <ion-item>
             <ion-label position="floating">TELEFONO:</ion-label>
             <ion-input type="text" :value="saveClient.telefono"
@@ -266,7 +320,7 @@ import {
   SupportedFormat,
 } from "@capacitor-community/barcode-scanner";
 import { ItradeOrderDetail, ItradeOrderHeader } from "@/interfaces/traderOrder.interface";
-import { IcreateClient } from "@/interfaces/createClient.interface";
+import { IcreateClient, INeighborhoodsInterface } from "@/interfaces/createClient.interface";
 import {
   IonPage,
   IonHeader,
@@ -289,6 +343,8 @@ import {
   IonText,
   IonCardTitle,
   IonInput,
+  IonSelectOption,
+  IonSelect,
 } from "@ionic/vue";
 
 export default defineComponent({
@@ -314,10 +370,16 @@ export default defineComponent({
     IonText,
     IonCardTitle,
     IonInput,
+    IonSelectOption,
+    IonSelect,
   },
   data() {
     return {
       i: allIcons,
+      countryId: 0 as number,
+      departmentId: 0 as number,
+      municipalityId: 0 as number,
+      neighborhoodId: 0 as number,
       SelectIdalmacen: 0 as number,
       allWarehouses: [] as any,
       idalmacen: "" as string,
@@ -367,11 +429,20 @@ export default defineComponent({
       finalPrice: 0 as number,
       discount: 0 as number,
       discountPercentage: 0 as number,
+      countries: [] as any,
+      municipalities: [] as any,
+      departmens: [] as any,
+      neighborhoods: [] as any,
+      newNeighborhood: {} as INeighborhoodsInterface
     };
   },
   mounted() {
     this.getEmployee();
     this.getDate();
+    this.getCountries();
+    this.getDepartments();
+    this.getMunicipalities();
+    this.getNeighborhoods();
   },
   methods: {
     fabToggled(e: any) {
@@ -382,6 +453,24 @@ export default defineComponent({
     },
     newOrder() {
       location.reload();
+    },
+    async getNeighborhoods() {
+      const responseNeighborhoods = await TradeOrders.getAllNeighborhoods();
+      this.neighborhoods = responseNeighborhoods.data
+    },
+    async getMunicipalities() {
+      const responseMunicipalities = await TradeOrders.getAllMunicipalities()
+      this.municipalities = responseMunicipalities.data
+    },
+    async getDepartments() {
+
+      const responseDepartments = await TradeOrders.getAlldepartments()
+      this.departmens = responseDepartments.data
+    },
+    async getCountries() {
+      const responseCountries = await TradeOrders.getAllCountries()
+      this.countries = responseCountries.data;
+
     },
     async startScan() {
       try {
@@ -493,22 +582,54 @@ export default defineComponent({
         return false;
       }
     },
+    async createNeighborhoods() {
+
+      if (this.municipalityId === 0) {
+        const alert = await alertController.create({
+          cssClass: "my-custom-class",
+          header: "Error !!! ",
+          message: `Debe seleccionar el municipio`,
+          buttons: ["ACEPTAR"],
+        });
+        await alert.present();
+        return false;
+      }
+      this.newNeighborhood.idmunicipio = this.municipalityId
+      this.newNeighborhood.codzona = 0
+      let name = this.newNeighborhood.nombarrio.toUpperCase();
+      this.newNeighborhood.nombarrio = name;
+      const newNeighborhood = await TradeOrders.createNeighborhoods(this.newNeighborhood)
+      this.neighborhoodId = newNeighborhood.data.insertId
+      setTimeout(()=>{
+        this.getNeighborhoods()
+        console.log(this.neighborhoodId);
+      },1500)
+      this.newNeighborhood.nombarrio = '';
+    },
+
     async createClient() {
       try {
         let nit = this.saveClient.nit;
         this.saveClient.nit = nit;
         let name = this.saveClient.nombres;
         let phone = this.saveClient.telefono;
+        let tradename=this.saveClient.nomcomercial;
+        let email=this.saveClient.email;
         this.saveClient.telefono = phone;
         this.saveClient.nombres = name.toUpperCase();
+        this.saveClient.nomcomercial=tradename.toUpperCase() || "";
         let address = this.saveClient.direccion;
         this.saveClient.direccion = address.toUpperCase();
+        this.saveClient.email = email;
         this.saveClient.cliente = 1;
         this.saveClient.tipopersona = 1;
         this.saveClient.idregimen = 2;
         this.saveClient.tipofactura = 1;
         this.saveClient.TipoId = 13;
-        this.saveClient.idpais = 1;
+        this.saveClient.idpais = this.countryId;
+        this.saveClient.iddepto = this.departmentIdId;
+        this.saveClient.idmunicipio = this.municipalityId;
+        this.saveClient.idbarrio = this.neighborhoodId;
 
         if (nit === "") {
           const alert = await alertController.create({
