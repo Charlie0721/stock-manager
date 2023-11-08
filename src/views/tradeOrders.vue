@@ -39,13 +39,17 @@
           </ion-item>
           <ion-item>
             <ion-label position="floating">EMAIL:</ion-label>
-            <ion-input type="text" :value="saveClient.email"
-              @input="saveClient.email = $event.target.value"></ion-input>
+            <ion-input type="text" :value="saveClient.email" @input="saveClient.email = $event.target.value"></ion-input>
           </ion-item>
           <ion-item>
             <ion-label position="floating">DIRECCION:</ion-label>
             <ion-input type="text" :value="saveClient.direccion"
               @input="saveClient.direccion = $event.target.value"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">TELEFONO:</ion-label>
+            <ion-input type="text" :value="saveClient.telefono"
+              @input="saveClient.telefono = $event.target.value"></ion-input>
           </ion-item>
           <ion-item>
             <ion-label>PAIS</ion-label>
@@ -54,9 +58,7 @@
                 {{ country.nompais }}
               </ion-select-option>
             </ion-select>
-          </ion-item>
-          <ion-item>
-            <ion-label>DEPARTAMENTO</ion-label>
+            <ion-label>DEPTO</ion-label>
             <ion-select :value="departmentId" @ionChange="departmentId = $event.target.value">
               <ion-select-option :value="department.iddepto" v-for="department in departmens" :key="department.iddepto">
                 {{ department.nomdepartamento }}
@@ -71,8 +73,6 @@
                 {{ municipality.nommunicipio }}
               </ion-select-option>
             </ion-select>
-          </ion-item>
-          <ion-item>
             <ion-label>BARRIO</ion-label>
             <ion-select :value="neighborhoodId" @ionChange="neighborhoodId = $event.target.value">
               <ion-select-option :value="neighborhood.idbarrio" v-for="neighborhood in neighborhoods"
@@ -81,7 +81,6 @@
               </ion-select-option>
             </ion-select>
           </ion-item>
-
           <ion-card> <ion-item>
               <ion-label position="floating">Nombre Barrio:</ion-label>
               <ion-input type="text" :value="newNeighborhood.nombarrio"
@@ -91,11 +90,6 @@
                 :icon="i.peopleCircleOutline"></ion-icon> Crear Barrio
             </ion-button>
           </ion-card>
-          <ion-item>
-            <ion-label position="floating">TELEFONO:</ion-label>
-            <ion-input type="text" :value="saveClient.telefono"
-              @input="saveClient.telefono = $event.target.value"></ion-input>
-          </ion-item>
           <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="createClient()"><ion-icon
               :icon="i.saveSharp"></ion-icon> GUARDAR
             CLIENTE</ion-button>
@@ -600,10 +594,10 @@ export default defineComponent({
       this.newNeighborhood.nombarrio = name;
       const newNeighborhood = await TradeOrders.createNeighborhoods(this.newNeighborhood)
       this.neighborhoodId = newNeighborhood.data.insertId
-      setTimeout(()=>{
+      setTimeout(() => {
         this.getNeighborhoods()
         console.log(this.neighborhoodId);
-      },1500)
+      }, 1500)
       this.newNeighborhood.nombarrio = '';
     },
 
@@ -613,11 +607,11 @@ export default defineComponent({
         this.saveClient.nit = nit;
         let name = this.saveClient.nombres;
         let phone = this.saveClient.telefono;
-        let tradename=this.saveClient.nomcomercial;
-        let email=this.saveClient.email;
+        let tradename = this.saveClient.nomcomercial;
+        let email = this.saveClient.email;
         this.saveClient.telefono = phone;
         this.saveClient.nombres = name.toUpperCase();
-        this.saveClient.nomcomercial=tradename.toUpperCase() || "";
+        this.saveClient.nomcomercial = tradename ? tradename.toUpperCase() : "";
         let address = this.saveClient.direccion;
         this.saveClient.direccion = address.toUpperCase();
         this.saveClient.email = email;
@@ -627,7 +621,7 @@ export default defineComponent({
         this.saveClient.tipofactura = 1;
         this.saveClient.TipoId = 13;
         this.saveClient.idpais = this.countryId;
-        this.saveClient.iddepto = this.departmentIdId;
+        this.saveClient.iddepto = this.departmentId;
         this.saveClient.idmunicipio = this.municipalityId;
         this.saveClient.idbarrio = this.neighborhoodId;
 
