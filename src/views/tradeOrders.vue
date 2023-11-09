@@ -370,9 +370,9 @@ export default defineComponent({
   data() {
     return {
       i: allIcons,
-      countryId: 0 as number,
-      departmentId: 0 as number,
-      municipalityId: 0 as number,
+      countryId: 0 as number | undefined,
+      departmentId: 0 as number | undefined,
+      municipalityId: 0 as number | undefined,
       neighborhoodId: 0 as number,
       SelectIdalmacen: 0 as number,
       allWarehouses: [] as any,
@@ -620,9 +620,9 @@ export default defineComponent({
         this.saveClient.idregimen = 2;
         this.saveClient.tipofactura = 1;
         this.saveClient.TipoId = 13;
-        this.saveClient.idpais = this.countryId;
-        this.saveClient.iddepto = this.departmentId;
-        this.saveClient.idmunicipio = this.municipalityId;
+        this.saveClient.idpais = this.countryId || 1;
+        this.saveClient.iddepto = this.departmentId || 1;
+        this.saveClient.idmunicipio = this.municipalityId || 151;
         this.saveClient.idbarrio = this.neighborhoodId;
 
         if (nit === "") {
