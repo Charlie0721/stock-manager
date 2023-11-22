@@ -260,13 +260,7 @@
             <ion-list v-for="product in products" :key="product.idproduct">
               <ion-item>
                 <ion-label>{{ product.codigo }} | {{ product.descripcion }}
-                </ion-label>
-              </ion-item>
-              <ion-item>
-                <ion-label> Cantidad:{{ product.cantidad }} </ion-label>
-              </ion-item>
-              <ion-item>
-                <ion-label>
+                  <ion-label> Cantidad:{{ product.cantidad }} </ion-label>
                   <ion-button color="mycolor" @click="selectPrice(product.precioventa)"> $
                     {{
                       new Intl.NumberFormat("de-DE").format(product.precioventa)
@@ -281,23 +275,21 @@
                     {{
                       new Intl.NumberFormat("de-DE").format(product.precioespecial2)
                     }} </ion-button>
+                  <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="
+                  selectProduct(
+                    product.idproducto,
+                    product.descripcion,
+                    product.ultcosto,
+                    product.codiva,
+                    product.baseValue,
+                    product.taxValue,
+                    product.porcentaje,
+                  )
+                    ">Agregar<ion-icon :icon="i.checkmarkCircleOutline"></ion-icon>
+                  </ion-button>
                 </ion-label>
+
               </ion-item>
-
-
-              <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="
-              selectProduct(
-                product.idproducto,
-                product.descripcion,
-                product.ultcosto,
-                product.codiva,
-                product.baseValue,
-                product.taxValue,
-                product.porcentaje,
-              )
-                ">Agregar<ion-icon :icon="i.checkmarkCircleOutline"></ion-icon>
-              </ion-button>
-
             </ion-list>
           </ion-content>
         </ion-modal>
