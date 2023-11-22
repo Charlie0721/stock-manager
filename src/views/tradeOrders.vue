@@ -123,12 +123,13 @@
                 <ion-item>
                   <ion-label> NIT: {{ customer.nit }}</ion-label>
                 </ion-item>
-                <ion-item> {{ customer.nombres }} </ion-item>
+                <ion-item> {{ customer.nombres }} {{ customer.apellidos }}</ion-item>
                 <ion-button color="mycolor" @click="
                   selectCustomer(
                     customer.idtercero,
                     customer.nit,
-                    customer.nombres
+                    customer.nombres,
+                    customer.apellidos
                   )
                   ">Seleccionar</ion-button>
               </ion-list>
@@ -419,7 +420,8 @@ export default defineComponent({
       municipalities: [] as any,
       departmens: [] as any,
       neighborhoods: [] as any,
-      newNeighborhood: {} as INeighborhoodsInterface
+      newNeighborhood: {} as INeighborhoodsInterface,
+      lastname: "" as string
     };
   },
   mounted() {
@@ -569,17 +571,6 @@ export default defineComponent({
       }
     },
     async createNeighborhoods() {
-
-      if (this.municipalityId === 0) {
-        const alert = await alertController.create({
-          cssClass: "my-custom-class",
-          header: "Error !!! ",
-          message: `Debe seleccionar el municipio`,
-          buttons: ["ACEPTAR"],
-        });
-        await alert.present();
-        return false;
-      }
       this.newNeighborhood.idmunicipio = this.municipalityId
       this.newNeighborhood.codzona = 0
       let name = this.newNeighborhood.nombarrio.toUpperCase();
@@ -600,9 +591,10 @@ export default defineComponent({
         let name = this.saveClient.nombres;
         let phone = this.saveClient.telefono;
         let tradename = this.saveClient.nomcomercial;
-        let email = this.saveClient.email;
+        let email = this.saveClient.email ? this.saveClient.email: "";
         this.saveClient.telefono = phone;
         this.saveClient.nombres = name.toUpperCase();
+        this.saveClient.apellidos = this.lastname ? this.lastname : ""
         this.saveClient.nomcomercial = tradename ? tradename.toUpperCase() : "";
         let address = this.saveClient.direccion;
         this.saveClient.direccion = address.toUpperCase();
@@ -612,10 +604,10 @@ export default defineComponent({
         this.saveClient.idregimen = 2;
         this.saveClient.tipofactura = 1;
         this.saveClient.TipoId = 13;
-        this.saveClient.idpais = this.countryId || 1;
-        this.saveClient.iddepto = this.departmentId || 1;
-        this.saveClient.idmunicipio = this.municipalityId || 151;
-        this.saveClient.idbarrio = this.neighborhoodId;
+        this.saveClient.idpais = this.countryId ? this.countryId : 1;
+        this.saveClient.iddepto = this.departmentId ? this.departmentId : 1;
+        this.saveClient.idmunicipio = this.municipalityId ? this.municipalityId : 151;
+        this.saveClient.idbarrio = this.neighborhoodId ? this.neighborhood : 1;
 
         if (nit === "") {
           const alert = await alertController.create({
@@ -676,7 +668,7 @@ export default defineComponent({
           }
 
           let customerId = newClient.data.data[0].insertId
-          this.selectCustomer(customerId, this.saveClient.nit, this.saveClient.nombres)
+          this.selectCustomer(customerId, this.saveClient.nit, this.saveClient.nombres, this.saveClient.apellidos)
 
           this.saveClient.nit = "";
           this.saveClient.nombres = "";
