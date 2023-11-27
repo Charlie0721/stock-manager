@@ -719,7 +719,7 @@ export default defineComponent({
           await alert.present();
           return false;
         } else {
-          await this.getNumbers(this.idalmacen);
+       
           if (this.idtercero === 0) {
             let idCustom = localStorage.getItem("idCustomer");
             this.idtercero = JSON.parse(idCustom);
@@ -736,45 +736,50 @@ export default defineComponent({
           } else {
             this.saveTradeOrder.idvendedor = this.idvendedor;
           }
-          this.saveTradeOrder.numero = this.finalNumber;
-          this.saveTradeOrder.fecha = this.date;
-          this.saveTradeOrder.subtotal = this.subtotal;
-          this.saveTradeOrder.valortotal = this.total;
-          this.saveTradeOrder.valimpuesto = this.valimpuesto;
-          this.saveTradeOrder.valiva = this.valimpuesto;
-          this.saveTradeOrder.valdescuentos = this.valdescuentos;
-          this.saveTradeOrder.valretenciones = 0;
-          this.saveTradeOrder.idalmacen = this.idalmacen;
-          this.saveTradeOrder.estado = 3;
-          this.saveTradeOrder.idsoftware = 2;
-          this.saveTradeOrder.detalle = "Pedido desde app movil";
-          this.saveTradeOrder.fechacrea = this.date;
-          this.saveTradeOrder.hora = this.currentTime;
-          this.saveTradeOrder.plazo = this.plazo;
-          const idTrade = await TradeOrders.getIdTradeOrder();
-          this.idTradeOrder = idTrade.data.length + 1;
-          const finalProduct = this.productArray;
-          finalProduct.forEach((product) => {
-            const newProducts = finalProduct.find(
-              (item) => item.idproducto === product.idproducto
-            );
-            newProducts.idpedido = this.idTradeOrder;
-          });
+          setTimeout(async()=>{
+            const number= await this.getNumbers(this.idalmacen);
+            this.saveTradeOrder.numero = number;
+            this.saveTradeOrder.fecha = this.date;
+            this.saveTradeOrder.subtotal = this.subtotal;
+            this.saveTradeOrder.valortotal = this.total;
+            this.saveTradeOrder.valimpuesto = this.valimpuesto;
+            this.saveTradeOrder.valiva = this.valimpuesto;
+            this.saveTradeOrder.valdescuentos = this.valdescuentos;
+            this.saveTradeOrder.valretenciones = 0;
+            this.saveTradeOrder.idalmacen = this.idalmacen;
+            this.saveTradeOrder.estado = 3;
+            this.saveTradeOrder.idsoftware = 2;
+            this.saveTradeOrder.detalle = "Pedido desde app movil";
+            this.saveTradeOrder.fechacrea = this.date;
+            this.saveTradeOrder.hora = this.currentTime;
+            this.saveTradeOrder.plazo = this.plazo;
+            const idTrade = await TradeOrders.getIdTradeOrder();
+            this.idTradeOrder = idTrade.data.length + 1;
+            const finalProduct = this.productArray;
+            finalProduct.forEach((product) => {
+              const newProducts = finalProduct.find(
+                (item) => item.idproducto === product.idproducto
+              );
+              newProducts.idpedido = this.idTradeOrder;
+            });  
+            this.saveTradeOrder.detpedidos = finalProduct;
+          },500)
 
-          this.saveTradeOrder.detpedidos = finalProduct;
-          const saveOrder1 = await TradeOrders.saveOrder(this.saveTradeOrder);
-          const alert = await alertController.create({
-            cssClass: "my-custom-class",
-            header: "CONFIRMACION !!!",
-            subHeader: `PEDIDO GENERADO `,
-            message: `SE HA GENERADO EL PEDIDO COMERCIAL `,
-            buttons: ["ACEPTAR"],
-          });
-          await alert.present();
-          console.log(saveOrder1);
+          setTimeout(async ()=>{
+            const saveOrder1 = await TradeOrders.saveOrder(this.saveTradeOrder);
+            const alert = await alertController.create({
+              cssClass: "my-custom-class",
+              header: "CONFIRMACION !!!",
+              subHeader: `PEDIDO GENERADO `,
+              message: `SE HA GENERADO EL PEDIDO COMERCIAL `,
+              buttons: ["ACEPTAR"],
+            });
+            await alert.present();
+            console.log(saveOrder1);
+            this.viewOrder(this.idalmacen, this.finalNumber);
+          },1000);
         }
 
-        this.viewOrder(this.idalmacen, this.finalNumber);
       } catch (error) {
         console.log(error);
         const alert = await alertController.create({
@@ -1080,7 +1085,7 @@ export default defineComponent({
       }
     },
 
-    async getNumbers(id: number) {
+    async getNumbers(id: number):Promise<number>  {
       try {
         id = this.idalmacen;
         if (id === 0) {
@@ -1103,6 +1108,7 @@ export default defineComponent({
             buttons: ["ACEPTAR"],
           });
           await alert.present();
+          return this.finalNumber
         }
       } catch (error) {
         console.log(error);
