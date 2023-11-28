@@ -18,36 +18,26 @@
       <ion-button id="open-modal1" expand="block" color="mycolor" class="btn-edit-product">
         <ion-icon :icon="i.personAddOutline"></ion-icon>Crear
         Cliente</ion-button>
-      <ion-modal ref="modal" trigger="open-modal1" :initial-breakpoint="0.25" :breakpoints="[0, 0.25, 0.5, 0.75]">
+      <ion-modal ref="modal" trigger="open-modal1" :initial-breakpoint="0.25" :breakpoints="[0, 0.25, 0.5, 0.95]">
         <ion-content class="ion-padding">
           <div class="ion-text-center">
             <h4>Crear Cliente</h4>
           </div>
           <ion-item>
-            <ion-label position="floating">NIT:</ion-label>
+            <ion-label position="stacked">NIT:</ion-label>
             <ion-input type="text" :value="saveClient.nit" @input="saveClient.nit = $event.target.value"></ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-label position="floating">NOMBRES:</ion-label>
+            <ion-label position="stacked">NOMBRES:</ion-label>
             <ion-input type="text" :value="saveClient.nombres"
               @input="saveClient.nombres = $event.target.value"></ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-label position="floating">NOMBRE COMERCIAL:</ion-label>
+            <ion-label position="stacked">NOMBRE COMERCIAL:</ion-label>
             <ion-input type="text" :value="saveClient.nomcomercial"
               @input="saveClient.nomcomercial = $event.target.value"></ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-label position="floating">EMAIL:</ion-label>
+            <ion-label position="stacked">EMAIL:</ion-label>
             <ion-input type="text" :value="saveClient.email" @input="saveClient.email = $event.target.value"></ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-label position="floating">DIRECCION:</ion-label>
+            <ion-label position="stacked">DIRECCION:</ion-label>
             <ion-input type="text" :value="saveClient.direccion"
               @input="saveClient.direccion = $event.target.value"></ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-label position="floating">TELEFONO:</ion-label>
+            <ion-label position="stacked">TELEFONO:</ion-label>
             <ion-input type="text" :value="saveClient.telefono"
               @input="saveClient.telefono = $event.target.value"></ion-input>
           </ion-item>
@@ -129,7 +119,6 @@
                     customer.idtercero,
                     customer.nit,
                     customer.nombres,
-                    customer.apellidos
                   )
                   ">Seleccionar</ion-button>
               </ion-list>
@@ -591,7 +580,7 @@ export default defineComponent({
         let name = this.saveClient.nombres;
         let phone = this.saveClient.telefono;
         let tradename = this.saveClient.nomcomercial;
-        let email = this.saveClient.email ? this.saveClient.email: "";
+        let email = this.saveClient.email ? this.saveClient.email : "";
         this.saveClient.telefono = phone;
         this.saveClient.nombres = name.toUpperCase();
         this.saveClient.apellidos = this.lastname ? this.lastname : ""
@@ -705,9 +694,37 @@ export default defineComponent({
         }
       }
     },
+    async getNumbers(id: number): Promise<number> {
+      try {
+        if (id === 0) {
+          const alert = await alertController.create({
+            cssClass: "my-custom-class",
+            header: "ATENCIÓN !!!",
+            subHeader: `NO PASA VALIDACIÓN `,
+            message: `DEBE SELECCIONAR ALMACÉN`,
+            buttons: ["ACEPTAR"],
+          });
+          await alert.present();
+        } else {
+          const consecutiveNumber = await TradeOrders.getNumber(id);
+          this.finalNumber = consecutiveNumber + 1;
+          const alert = await alertController.create({
+            cssClass: "my-custom-class",
+            header: "CONFIRMACIÓN !!!",
+            subHeader: `NÚMERO ENCONTRADO `,
+            message: `EL NÚMERO DE PEDIDO ES ${this.finalNumber}`,
+            buttons: ["ACEPTAR"],
+          });
+          await alert.present();
+          return this.finalNumber;
+        }
+      } catch (error) {
+        console.log(error);
+      }
+      return 0;
+    },
     async saveCompleteTradeOrder() {
       try {
-
         if (this.total === 0 || this.total < 0) {
           const alert = await alertController.create({
             cssClass: "my-custom-class",
@@ -719,16 +736,14 @@ export default defineComponent({
           await alert.present();
           return false;
         } else {
-       
           if (this.idtercero === 0) {
             let idCustom = localStorage.getItem("idCustomer");
             this.idtercero = JSON.parse(idCustom);
             this.saveTradeOrder.idtercero = this.idtercero;
-
           } else {
             this.saveTradeOrder.idtercero = this.idtercero;
-
           }
+
           if (this.idvendedor === 0) {
             let idEmploy = localStorage.getItem("idEmployee");
             this.idvendedor = JSON.parse(idEmploy);
@@ -736,50 +751,52 @@ export default defineComponent({
           } else {
             this.saveTradeOrder.idvendedor = this.idvendedor;
           }
-          setTimeout(async()=>{
-            const number= await this.getNumbers(this.idalmacen);
-            this.saveTradeOrder.numero = number;
-            this.saveTradeOrder.fecha = this.date;
-            this.saveTradeOrder.subtotal = this.subtotal;
-            this.saveTradeOrder.valortotal = this.total;
-            this.saveTradeOrder.valimpuesto = this.valimpuesto;
-            this.saveTradeOrder.valiva = this.valimpuesto;
-            this.saveTradeOrder.valdescuentos = this.valdescuentos;
-            this.saveTradeOrder.valretenciones = 0;
-            this.saveTradeOrder.idalmacen = this.idalmacen;
-            this.saveTradeOrder.estado = 3;
-            this.saveTradeOrder.idsoftware = 2;
-            this.saveTradeOrder.detalle = "Pedido desde app movil";
-            this.saveTradeOrder.fechacrea = this.date;
-            this.saveTradeOrder.hora = this.currentTime;
-            this.saveTradeOrder.plazo = this.plazo;
-            const idTrade = await TradeOrders.getIdTradeOrder();
-            this.idTradeOrder = idTrade.data.length + 1;
-            const finalProduct = this.productArray;
-            finalProduct.forEach((product) => {
-              const newProducts = finalProduct.find(
-                (item) => item.idproducto === product.idproducto
-              );
-              newProducts.idpedido = this.idTradeOrder;
-            });  
-            this.saveTradeOrder.detpedidos = finalProduct;
-          },500)
 
-          setTimeout(async ()=>{
-            const saveOrder1 = await TradeOrders.saveOrder(this.saveTradeOrder);
+          const number = await this.getNumbers(this.idalmacen);
+          this.saveTradeOrder.numero = number;
+          this.saveTradeOrder.fecha = this.date;
+          this.saveTradeOrder.subtotal = this.subtotal;
+          this.saveTradeOrder.valortotal = this.total;
+          this.saveTradeOrder.valimpuesto = this.valimpuesto;
+          this.saveTradeOrder.valiva = this.valimpuesto; 
+          this.saveTradeOrder.valdescuentos = this.valdescuentos;
+          this.saveTradeOrder.valretenciones = 0;
+          this.saveTradeOrder.idalmacen = this.idalmacen;
+          this.saveTradeOrder.estado = 3;
+          this.saveTradeOrder.idsoftware = 2;
+          this.saveTradeOrder.detalle = "Pedido desde app movil";
+          this.saveTradeOrder.fechacrea = this.date;
+          this.saveTradeOrder.hora = this.currentTime;
+          this.saveTradeOrder.plazo = this.plazo;
+
+          const finalProduct = this.productArray.map((product) => ({
+            ...product,
+            idpedido: this.idTradeOrder,
+          }));
+
+          this.saveTradeOrder.detpedidos = finalProduct;
+
+
+          const saveOrder1 = await TradeOrders.saveOrder(this.saveTradeOrder);
+         
+          if (saveOrder1.id) {
+            const idpedido = saveOrder1.id;
+            this.idTradeOrder = idpedido;
+            this.viewOrder(this.idalmacen, this.finalNumber);
+          } else {
+            const errorMessage = saveOrder1.message || 'Error desconocido';
+            console.error(errorMessage);
+
             const alert = await alertController.create({
               cssClass: "my-custom-class",
-              header: "CONFIRMACION !!!",
-              subHeader: `PEDIDO GENERADO `,
-              message: `SE HA GENERADO EL PEDIDO COMERCIAL `,
+              header: "ERROR !!!",
+              subHeader: `Error al generar el pedido`,
+              message: errorMessage,
               buttons: ["ACEPTAR"],
             });
             await alert.present();
-            console.log(saveOrder1);
-            this.viewOrder(this.idalmacen, this.finalNumber);
-          },1000);
+          }
         }
-
       } catch (error) {
         console.log(error);
         const alert = await alertController.create({
@@ -791,7 +808,8 @@ export default defineComponent({
         });
         await alert.present();
       }
-    },
+    }
+    ,
     deleteProduct(id: number) {
       try {
         const productIndex = this.productArray.findIndex((p) => p.idproducto === id);
@@ -1085,35 +1103,7 @@ export default defineComponent({
       }
     },
 
-    async getNumbers(id: number):Promise<number>  {
-      try {
-        id = this.idalmacen;
-        if (id === 0) {
-          const alert = await alertController.create({
-            cssClass: "my-custom-class",
-            header: "ATENCIÓN !!!",
-            subHeader: `NO PASA VALIDACIÓN `,
-            message: `DEBE SELECCIONAR ALMACEN`,
-            buttons: ["ACEPTAR"],
-          });
-          await alert.present();
-        } else {
-          const consecutiveNumber = await TradeOrders.getNumber(id);
-          this.finalNumber = consecutiveNumber.data.length + 1;
-          const alert = await alertController.create({
-            cssClass: "my-custom-class",
-            header: "CONFIRMACIÓN !!!",
-            subHeader: `NÚMERO ENCONTRADO `,
-            message: `EL NÚMERO DE PEDIDO ES ${this.finalNumber}`,
-            buttons: ["ACEPTAR"],
-          });
-          await alert.present();
-          return this.finalNumber
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    },
+
   },
   computed: {
     subtotal() {
