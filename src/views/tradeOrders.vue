@@ -18,7 +18,7 @@
       <ion-button id="open-modal1" expand="block" color="mycolor" class="btn-edit-product">
         <ion-icon :icon="i.personAddOutline"></ion-icon>Crear
         Cliente</ion-button>
-      <ion-modal ref="modal" trigger="open-modal1" :initial-breakpoint="0.25" :breakpoints="[0, 0.25, 0.5, 0.95]">
+      <ion-modal ref="modal" trigger="open-modal1" :initial-breakpoint="0.25" :breakpoints="[0, 0.25, 0.7, 0.97]">
         <ion-content class="ion-padding">
           <div class="ion-text-center">
             <h4>Crear Cliente</h4>
@@ -157,6 +157,9 @@
           </ion-card-content>
         </ion-card>
       </ion-text>
+      <ion-item>
+        <ion-label position="stacked">Observación:</ion-label>
+        <ion-input type="text" :value="detalle" @input="detalle = $event.target.value"></ion-input></ion-item>
 
       <ion-card v-for="(product, index) in productArray" :key="product.idproducto">
         <ion-card-header>
@@ -758,13 +761,13 @@ export default defineComponent({
           this.saveTradeOrder.subtotal = this.subtotal;
           this.saveTradeOrder.valortotal = this.total;
           this.saveTradeOrder.valimpuesto = this.valimpuesto;
-          this.saveTradeOrder.valiva = this.valimpuesto; 
+          this.saveTradeOrder.valiva = this.valimpuesto;
           this.saveTradeOrder.valdescuentos = this.valdescuentos;
           this.saveTradeOrder.valretenciones = 0;
           this.saveTradeOrder.idalmacen = this.idalmacen;
           this.saveTradeOrder.estado = 3;
           this.saveTradeOrder.idsoftware = 2;
-          this.saveTradeOrder.detalle = "Pedido desde app movil";
+          this.saveTradeOrder.detalle = this.detalle ? this.detalle : "Pedido desde app movil";
           this.saveTradeOrder.fechacrea = this.date;
           this.saveTradeOrder.hora = this.currentTime;
           this.saveTradeOrder.plazo = this.plazo;
@@ -778,7 +781,7 @@ export default defineComponent({
 
 
           const saveOrder1 = await TradeOrders.saveOrder(this.saveTradeOrder);
-         
+
           if (saveOrder1.id) {
             const idpedido = saveOrder1.id;
             this.idTradeOrder = idpedido;
