@@ -33,7 +33,8 @@
             <ion-input type="text" :value="saveClient.nomcomercial"
               @input="saveClient.nomcomercial = $event.target.value"></ion-input>
             <ion-label position="stacked">EMAIL:</ion-label>
-            <ion-input type="text" :value="saveClient.email" @input="saveClient.email = $event.target.value"></ion-input>
+            <ion-input type="text" :value="saveClient.email"
+              @input="saveClient.email = $event.target.value"></ion-input>
             <ion-label position="stacked">DIRECCION:</ion-label>
             <ion-input type="text" :value="saveClient.direccion"
               @input="saveClient.direccion = $event.target.value"></ion-input>
@@ -95,8 +96,8 @@
           </ion-searchbar>
         </ion-card>
         <ion-card>
-          <ion-searchbar animated debounce="500" placeholder="Buscar Nombres" @ionChange="searchOneCustomerByName($event)"
-            @keypress.enter="searchCustomerItem()">
+          <ion-searchbar animated debounce="500" placeholder="Buscar Nombres"
+            @ionChange="searchOneCustomerByName($event)" @keypress.enter="searchCustomerItem()">
           </ion-searchbar>
         </ion-card>
         <ion-content>
@@ -115,12 +116,12 @@
                 </ion-item>
                 <ion-item> {{ customer.nombres }} {{ customer.apellidos }}</ion-item>
                 <ion-button color="mycolor" @click="
-                  selectCustomer(
-                    customer.idtercero,
-                    customer.nit,
-                    customer.nombres,
-                  )
-                  ">Seleccionar</ion-button>
+        selectCustomer(
+          customer.idtercero,
+          customer.nit,
+          customer.nombres,
+        )
+        ">Seleccionar</ion-button>
               </ion-list>
             </ion-card-content>
           </ion-card>
@@ -136,12 +137,12 @@
           <ion-list>
             <ion-label>
               <ion-list background-hover="92949c" v-for="employee in employees" :key="employee.idtercero" @click="
-                selectEmployee(
-                  employee.idtercero,
-                  employee.nit,
-                  employee.nombres
-                )
-                ">
+        selectEmployee(
+          employee.idtercero,
+          employee.nit,
+          employee.nombres
+        )
+        ">
                 <ion-item :button="true" :detail="false">
                   NIT: {{ employee.nit }}. {{ employee.nombres }}
                 </ion-item></ion-list></ion-label>
@@ -185,10 +186,10 @@
         <ion-card-content>
           <h5 text="dark">Cantidad: {{ product.cantidad }}</h5>
           <h5 text="dark">Base: {{ new Intl.NumberFormat("de-DE").format(base = (product.valorprod - product.ivaprod) *
-            product.cantidad) }}
+        product.cantidad) }}
           </h5>
           <h5 text="dark" v-if="product.ivaprod > 0">IVA: {{ new
-            Intl.NumberFormat("de-DE").format(taxValue = (product.valorprod - product.base) * product.cantidad) }}
+        Intl.NumberFormat("de-DE").format(taxValue = (product.valorprod - product.base) * product.cantidad) }}
           </h5>
 
           <ion-label position="floating">% Descuento :</ion-label>
@@ -256,32 +257,39 @@
                   <ion-label> Cantidad:{{ product.cantidad }} </ion-label>
                   <ion-button color="mycolor" @click="selectPrice(product.precioventa)"> $
                     {{
-                      new Intl.NumberFormat("de-DE").format(product.precioventa)
-                    }} </ion-button>
+        new Intl.NumberFormat("de-DE").format(product.precioventa)
+      }} </ion-button>
                   <ion-button color="mycolor" @click="selectPrice(product.precioespecial1)"
                     v-if="product.precioespecial1 > 0"> $
                     {{
-                      new Intl.NumberFormat("de-DE").format(product.precioespecial1)
-                    }} </ion-button>
+        new Intl.NumberFormat("de-DE").format(product.precioespecial1)
+      }} </ion-button>
                   <ion-button color="mycolor" @click="selectPrice(product.precioespecial2)"
                     v-if="product.precioespecial2 > 0"> $
                     {{
-                      new Intl.NumberFormat("de-DE").format(product.precioespecial2)
-                    }} </ion-button>
-                  <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="
-                  selectProduct(
-                    product.idproducto,
-                    product.descripcion,
-                    product.ultcosto,
-                    product.codiva,
-                    product.baseValue,
-                    product.taxValue,
-                    product.porcentaje,
-                  )
-                    ">Agregar<ion-icon :icon="i.checkmarkCircleOutline"></ion-icon>
+        new Intl.NumberFormat("de-DE").format(product.precioespecial2)
+      }}
                   </ion-button>
-                </ion-label>
 
+                  <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="
+      selectProduct(
+        product.idproducto,
+        product.descripcion,
+        product.ultcosto,
+        product.codiva,
+        product.baseValue,
+        product.taxValue,
+        product.porcentaje,
+      )
+        ">
+                    Agregar<ion-icon :icon="i.checkmarkCircleOutline"></ion-icon>
+                  </ion-button>
+                  <div style="overflow-x: auto; white-space: nowrap;">
+                    <ion-button v-for="precio in product.preciosPorVolumen" :key="precio.cantidad" color="mycolor">
+                      ${{ new Intl.NumberFormat("de-DE").format(precio.precio) }} ({{ precio.cantidad }} unidades)
+                    </ion-button>
+                  </div>
+                </ion-label>
               </ion-item>
             </ion-list>
           </ion-content>
@@ -987,6 +995,7 @@ export default defineComponent({
           this.barcode
         );
         this.products = response.data.newProducts;
+
       } catch (error) {
         console.log(error);
         const alert = await alertController.create({
