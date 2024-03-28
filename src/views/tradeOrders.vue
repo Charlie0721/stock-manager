@@ -238,6 +238,8 @@
           Productos</ion-button>
         <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="saveCompleteTradeOrder()"><ion-icon
             :icon="i.saveSharp"></ion-icon> Grabar Pedido</ion-button>
+        <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="goToMoneyCollections"><ion-icon
+            :icon="i.cashOutline"></ion-icon> Recaudos</ion-button>
         <ion-modal ref="modal" trigger="open-modal" :initial-breakpoint="0.25" :breakpoints="[0, 0.25, 0.5, 0.75]">
           <ion-content class="ion-padding custom-modal-content">
             <ion-searchbar @click="$refs.modal.$el.setCurrentBreakpoint(0.75)" placeholder="Buscar Producto"
@@ -1113,6 +1115,9 @@ export default defineComponent({
       } catch (error) {
         console.log(error);
       }
+    },
+    goToMoneyCollections() {
+      this.$router.push("/money-collections");
     },
 
 

@@ -124,6 +124,11 @@ const routes: Array<RouteRecordRaw> = [
     name: 'signinUser',
     component: () => import('@/views/users/Signin.vue')
   },
+  {
+    path: '/money-collections',
+    name: 'MoneyCOllections',
+    component: () => import('@/views/MoneyCollections.vue')
+  },
 
 ]
 
