@@ -4,4 +4,7 @@ export class MoneyCollectionsService {
   async create(moneyCollectionsInterface: MoneyCollectionsInterface) {
     return await axios.post(`/money-collections`, moneyCollectionsInterface);
   }
+  async findOne(moneyCollectionId:number){
+    return await axios.get(`/money-collections/${moneyCollectionId}`);
+  }
 }

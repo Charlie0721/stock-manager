@@ -59,7 +59,7 @@ import {
 import { MoneyCollectionsService } from "@/services/money-collections.service";
 import { MoneyCollectionsInterface } from "@/interfaces/money-collections.interface";
 import { ref } from "vue";
-
+import router from "../router/index";
 const moneyCollectionService = new MoneyCollectionsService();
 
 const data = ref<MoneyCollectionsInterface>({
@@ -69,17 +69,44 @@ const data = ref<MoneyCollectionsInterface>({
 
 const create = async () => {
   try {
+    if (data.value.Valor === 0 || data.value.Valor === null) {
+      const alert = await alertController.create({
+        cssClass: "my-custom-class",
+        header: "ATENCIÓN !!!!",
+        message: `El valor del recaudo debe ser mayor a 0 `,
+        buttons: ["OK"],
+      });
+      data.value.Descripcion = "";
+      return await alert.present();
+    }
+    if (data.value.Descripcion === "" || data.value.Descripcion === null) {
+      const alert = await alertController.create({
+        cssClass: "my-custom-class",
+        header: "ATENCIÓN !!!!",
+        message: `Debe ingresar una descripción con el detalle de la transacción `,
+        buttons: ["OK"],
+      });
+      data.value.Valor = 0;
+      return await alert.present();
+    }
+
     const response = await moneyCollectionService.create(data.value);
+    const idRecaudo = response.data.response[0].IdRecaudo;
+    const value = response.data.response[0].Valor;
     const alert = await alertController.create({
       cssClass: "my-custom-class",
       header: "CONFIRMACION !!!!",
-      message: `Se ha generado el recaudo número ${response.data.response[0].IdRecaudo}  por valor de  $${response.data.response[0].Valor} `,
+      message: `Se ha generado el recaudo número ${idRecaudo}  por valor de  $ ${value} `,
       buttons: ["OK"],
     });
     await alert.present();
+    goToDetail(idRecaudo);
   } catch (error) {
     console.log(error);
   }
+};
+const goToDetail = (moneyCollectionId: number) => {
+  router.push(`/money-collections/${moneyCollectionId}`);
 };
 </script>
 

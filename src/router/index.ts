@@ -126,8 +126,13 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/money-collections',
-    name: 'MoneyCOllections',
+    name: 'MoneyCollections',
     component: () => import('@/views/MoneyCollections.vue')
+  },
+  {
+    path: '/money-collections/:IdRecaudo',
+    name: 'MoneyCollectionsData',
+    component: () => import('@/views/ViewMoneyCollections.vue')
   },
 
 ]
