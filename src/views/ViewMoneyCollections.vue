@@ -14,7 +14,9 @@
               <ion-item>
                 <ion-label class="box">
                   <h2 class="letter-color">Detalle:</h2>
-                  <h3 class="letter-color" style="white-space: pre-wrap;">{{ description }}</h3>
+                  <h3 class="letter-color" style="white-space: pre-wrap">
+                    {{ description }}
+                  </h3>
                 </ion-label>
               </ion-item>
               <ion-item>
@@ -32,6 +34,16 @@
           <h5 class="letter-color">software: https://conexionpos.com/</h5>
         </div>
       </div>
+      <br />
+      <br />
+
+      <ion-button
+        color="mycolor"
+        class="btn-edit-product"
+        expand="full"
+        @click="txtGenerator()"
+        >Generar TXT
+      </ion-button>
     </ion-content>
     <ion-footer collapse="fade">
       <ion-toolbar>
@@ -62,6 +74,7 @@ import {
 } from "@ionic/vue";
 import { reactive, ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
+import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
 const moneyCollectionService = new MoneyCollectionsService();
 const route = useRoute();
 const data = reactive([]);
@@ -103,9 +116,70 @@ const formatDate = (dateString: string): string => {
     return "Fecha no disponible";
   }
 };
+
+const txtGenerator = () => {
+  let num = number.value;
+  const newFile = "recaudo numero " + num + ".txt";
+  const directory = Directory.Documents;
+  let stringData = `
+    Nit: ${nit.value}-${digito.value}
+    Fecha: ${date.value}
+    Recaudo Nro: ${number.value}
+    Teléfono: ${phone.value}
+    Direccion: ${address.value}
+
+    ---------------------------------------
+    Detalle: 
+    ${description.value}
+    ---------------------------------------
+    Valor: $${new Intl.NumberFormat("de-DE").format(value.value)}
+    ---------------------------------------
+    Software: https://conexionpos.com/
+    `;
+  console.log(stringData);
+  Filesystem.writeFile({
+    path: `${directory}/${newFile}`,
+    data: stringData,
+    encoding: Encoding.UTF8,
+    directory,
+    recursive: true,
+  })
+    .then(async () => {
+      const alert = await alertController.create({
+        cssClass: "my-custom-class",
+        header: "Atencion !!!",
+        subHeader: `OK `,
+        message: "Archivo generado con el nombre " + newFile,
+        buttons: ["ACEPTAR"],
+      });
+      await alert.present();
+      console.log("Archivo TXT generado correctamente");
+    })
+    .catch(async (error) => {
+      console.error("Ocurrió un error al generar el archivo TXT:", error);
+      const alert = await alertController.create({
+        cssClass: "my-custom-class",
+        header: "Atencion !!!",
+        subHeader: `Error ${error}`,
+        message: error,
+        buttons: ["ACEPTAR"],
+      });
+      await alert.present();
+    });
+};
 </script>
 
 <style scoped>
+ion-list {
+  margin-top: 10px;
+  border-top: 1px solid #ccc;
+}
+
+/* Estilos para los elementos de la lista de productos */
+ion-item {
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
 .letter-color {
   color: #82230d;
   text-shadow: 1px 1px #fff;
@@ -129,6 +203,19 @@ ion-card-content {
 ion-card {
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
 }
+ion-button {
+  background-color: var(--ion-color-mycolor);
+  color: #fff;
+  /* Cambiar el color del texto para que sea visible en el fondo corporativo */
+  font-weight: bold;
+  /* Hacer el texto más audaz */
+  border-radius: 10px;
+  /* Añadir esquinas redondeadas */
+}
+ion-button:last-child {
+  margin-bottom: 20px;
+}
+
 ion-footer a {
   color: #fff;
   text-decoration: none;

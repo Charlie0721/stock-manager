@@ -338,4 +338,5 @@ ion-button {
   /* Hacer el texto más audaz */
   border-radius: 10px;
   /* Añadir esquinas redondeadas */
-}</style>
+}
+</style>
