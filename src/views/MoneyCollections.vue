@@ -25,6 +25,7 @@
           <ion-input type="email" :value="data.eMail" @input="data.eMail = $event.target.value"></ion-input>
         </ion-item>
         <ion-button color="mycolor" class="btn-edit-product" expand="block" @click="create">Agregar</ion-button>
+        <ion-button color="mycolor" class="btn-edit-product" expand="block" @click="goToOrders">Volver</ion-button>
       </ion-card>
     </ion-content>
   </ion-page>
@@ -109,6 +110,9 @@ const create = async () => {
 const goToDetail = (moneyCollectionId: number) => {
   router.push(`/money-collections/${moneyCollectionId}`);
 };
+const goToOrders = () => {
+  router.push('/trade-orders')
+}
 </script>
 
 <style scoped>
