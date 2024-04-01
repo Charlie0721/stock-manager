@@ -184,7 +184,10 @@
         </ion-card-header>
 
         <ion-card-content>
-          <h5 text="dark">Cantidad: {{ product.cantidad }}</h5>
+          <h5 text="dark">Cantidad:
+          </h5>
+          <ion-input type="number" v-model="product.cantidad"
+            @input="updateAmount(product, $event.target.value)"></ion-input>
           <h5 text="dark">Base: {{ new Intl.NumberFormat("de-DE").format(base = (product.valorprod - product.ivaprod) *
         product.cantidad) }}
           </h5>
@@ -238,8 +241,8 @@
           Productos</ion-button>
         <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="saveCompleteTradeOrder()"><ion-icon
             :icon="i.saveSharp"></ion-icon> Grabar Pedido</ion-button>
-        <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="goToMoneyCollections"><ion-icon
-            :icon="i.cashOutline"></ion-icon> Recaudos</ion-button>
+        <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="goToMoneyCollections()"><ion-icon
+            :icon="i.cashSharp"></ion-icon> Recaudos</ion-button>
         <ion-modal ref="modal" trigger="open-modal" :initial-breakpoint="0.25" :breakpoints="[0, 0.25, 0.5, 0.75]">
           <ion-content class="ion-padding custom-modal-content">
             <ion-searchbar @click="$refs.modal.$el.setCurrentBreakpoint(0.75)" placeholder="Buscar Producto"
@@ -286,11 +289,11 @@
         ">
                     Agregar<ion-icon :icon="i.checkmarkCircleOutline"></ion-icon>
                   </ion-button>
-                  <div style="overflow-x: auto; white-space: nowrap;">
+                  <!-- <div style="overflow-x: auto; white-space: nowrap;">
                     <ion-button v-for="precio in product.preciosPorVolumen" :key="precio.cantidad" color="mycolor">
                       ${{ new Intl.NumberFormat("de-DE").format(precio.precio) }} ({{ precio.cantidad }} unidades)
                     </ion-button>
-                  </div>
+                  </div> -->
                 </ion-label>
               </ion-item>
             </ion-list>
@@ -335,6 +338,7 @@ import {
   IonSelectOption,
   IonSelect,
 } from "@ionic/vue";
+import router from "@/router";
 
 export default defineComponent({
   name: "Tab1Page",
@@ -1116,10 +1120,16 @@ export default defineComponent({
         console.log(error);
       }
     },
-    goToMoneyCollections() {
-      this.$router.push("/money-collections");
+    updateAmount(product, newValue) {
+      const newQuantity = parseInt(newValue);
+      if (!isNaN(newQuantity) && newQuantity > 0) {
+        product.cantidad = newQuantity;
+        this.recalcularDescuentos();
+      }
     },
-
+    goToMoneyCollections() {
+      router.push(`/money-collections`)
+    }
 
   },
   computed: {

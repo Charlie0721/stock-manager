@@ -125,24 +125,94 @@ const formatDate = (dateString: string): string => {
 
 const txtGenerator = () => {
   let num = number.value;
-  const newFile = "recaudo numero " + num + ".txt";
+  // const newFile = "recaudo numero " + num + ".txt";
+  // const directory = Directory.Documents;
+  // let stringData = `
+  //   Nit: ${nit.value}-${digito.value}
+  //   Fecha: ${date.value}
+  //   Recaudo Nro: ${number.value}
+  //   Telefono: ${phone.value}
+  //   Direccion: ${address.value}
+
+  //           COMPROBANTE DE RECAUDO CXC
+  //   ---------------------------------------
+  //   Detalle: 
+  //   ${description.value}
+  //   ---------------------------------------
+  //   Valor Recaudado:
+  //   $${new Intl.NumberFormat("de-DE").format(value.value)}
+  //   ---------------------------------------
+  //   Email: ${email.value}
+  //   ---------------------------------------
+  
+  //   Software: https://conexionpos.com/
+  //   `;
+  const newFile = "recaudo_numero_" + num + ".html";
   const directory = Directory.Documents;
   let stringData = `
-    Nit: ${nit.value}-${digito.value}
-    Fecha: ${date.value}
-    Recaudo Nro: ${number.value}
-    Teléfono: ${phone.value}
-    Direccion: ${address.value}
-
-    ---------------------------------------
-    Detalle: 
-    ${description.value}
-    ---------------------------------------
-    Valor: $${new Intl.NumberFormat("de-DE").format(value.value)}
-    ---------------------------------------
-    Email: ${email.value}
-    ---------------------------------------
-    Software: https://conexionpos.com/
+    <html>
+    <head>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+        }
+        .header {
+          font-size: 20px;
+          font-weight: bold;
+          margin-bottom: 20px;
+        }
+        .section {
+          margin-bottom: 15px;
+        }
+        .section-title {
+          font-weight: bold;
+        }
+        .section-content {
+          margin-left: 20px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        COMPROBANTE DE RECAUDO CXC
+      </div>
+      <div class="section">
+        <div class="section-title">Nit:</div>
+        <div class="section-content">${nit.value}-${digito.value}</div>
+      </div>
+      <div class="section">
+        <div class="section-title">Fecha:</div>
+        <div class="section-content">${date.value}</div>
+      </div>
+      <div class="section">
+        <div class="section-title">Recaudo Nro:</div>
+        <div class="section-content">${number.value}</div>
+      </div>
+      <div class="section">
+        <div class="section-title">Telefono:</div>
+        <div class="section-content">${phone.value}</div>
+      </div>
+      <div class="section">
+        <div class="section-title">Direccion:</div>
+        <div class="section-content">${address.value}</div>
+      </div>
+      <div class="section">
+        <div class="section-title">Detalle:</div>
+        <div class="section-content">${description.value}</div>
+      </div>
+      <div class="section">
+        <div class="section-title">Valor Recaudado:</div>
+        <div class="section-content">$${new Intl.NumberFormat("de-DE").format(value.value)}</div>
+      </div>
+      <div class="section">
+        <div class="section-title">Email:</div>
+        <div class="section-content">${email.value}</div>
+      </div>
+      <div class="section">
+        Software: <a href="https://conexionpos.com/">https://conexionpos.com/</a>
+      </div>
+    </body>
+    </html>
     `;
   console.log(stringData);
   Filesystem.writeFile({
