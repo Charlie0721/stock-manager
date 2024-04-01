@@ -8,6 +8,7 @@
             <h5 class="letter-color">Direccion: {{ address }}</h5>
             <h5 class="letter-color">Telefono: {{ phone }}</h5>
             <h5 class="letter-color">Número de recaudo: {{ number }}</h5>
+            <h5 class="letter-color">Fecha: {{ date }}</h5>
           </ion-card-header>
           <ion-card-content>
             <ion-list>
@@ -27,6 +28,14 @@
                   </h2>
                 </ion-label>
               </ion-item>
+              <ion-item>
+                <ion-label class="box">
+                  <h2 class="letter-color">Email:</h2>
+                  <h2 class="letter-color">
+                    {{ email }}
+                  </h2>
+                </ion-label>
+              </ion-item>
             </ion-list>
           </ion-card-content>
         </ion-card>
@@ -37,12 +46,7 @@
       <br />
       <br />
 
-      <ion-button
-        color="mycolor"
-        class="btn-edit-product"
-        expand="full"
-        @click="txtGenerator()"
-        >Generar TXT
+      <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="txtGenerator()">Generar TXT
       </ion-button>
     </ion-content>
     <ion-footer collapse="fade">
@@ -86,6 +90,7 @@ const number = ref<number>();
 const value = ref<number>();
 const description = ref<number>();
 const date = ref<string>();
+const email = ref<string>();
 
 onMounted(async () => {
   await findOne();
@@ -103,6 +108,7 @@ const findOne = async () => {
     value.value = responseData.data.response.Valor;
     description.value = responseData.data.response.Descripcion;
     date.value = formatDate(responseData.data.response.Fecha_Tramite);
+    email.value = responseData.data.response.eMail;
   } catch (error) {
     console.log(error);
   }
@@ -133,6 +139,8 @@ const txtGenerator = () => {
     ${description.value}
     ---------------------------------------
     Valor: $${new Intl.NumberFormat("de-DE").format(value.value)}
+    ---------------------------------------
+    Email: ${email.value}
     ---------------------------------------
     Software: https://conexionpos.com/
     `;
@@ -180,10 +188,12 @@ ion-item {
   padding: 10px;
   border-bottom: 1px solid #ccc;
 }
+
 .letter-color {
   color: #82230d;
   text-shadow: 1px 1px #fff;
 }
+
 ion-card-header {
   color: #fff;
   text-align: center;
@@ -200,9 +210,11 @@ ion-card-header h5 {
 ion-card-content {
   padding: 10px;
 }
+
 ion-card {
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
 }
+
 ion-button {
   background-color: var(--ion-color-mycolor);
   color: #fff;
@@ -212,6 +224,7 @@ ion-button {
   border-radius: 10px;
   /* Añadir esquinas redondeadas */
 }
+
 ion-button:last-child {
   margin-bottom: 20px;
 }
