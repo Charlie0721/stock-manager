@@ -9,9 +9,23 @@
             <h5 class="letter-color">Telefono: {{ phone }}</h5>
             <h5 class="letter-color">Número de recaudo: {{ number }}</h5>
             <h5 class="letter-color">Fecha: {{ date }}</h5>
+            <h5 class="letter-color">Encargado: {{ sellerName }}</h5>
+            <h5 class="letter-color">Identificación: {{ sellerNit }}</h5>
           </ion-card-header>
           <ion-card-content>
             <ion-list>
+              <ion-item>
+                <ion-label class="box">
+                  <h2 class="letter-color">Cliente:</h2>
+                  <h3 class="letter-color" style="white-space: pre-wrap">
+                    {{ customerName }}
+                    <h2 class="letter-color">Nit:</h2>
+                    <h3 class="letter-color" style="white-space: pre-wrap">
+                      {{ customerNit }}
+                    </h3>
+                  </h3>
+                </ion-label>
+              </ion-item>
               <ion-item>
                 <ion-label class="box">
                   <h2 class="letter-color">Detalle:</h2>
@@ -91,7 +105,10 @@ const value = ref<number>();
 const description = ref<number>();
 const date = ref<string>();
 const email = ref<string>();
-
+const customerName = ref<string>("");
+const sellerName = ref<string>("");
+const customerNit = ref<string>("");
+const sellerNit = ref<string>("");
 onMounted(async () => {
   await findOne();
 });
@@ -109,6 +126,10 @@ const findOne = async () => {
     description.value = responseData.data.response.Descripcion;
     date.value = formatDate(responseData.data.response.Fecha_Tramite);
     email.value = responseData.data.response.eMail;
+    customerName.value = responseData.data.response.cliente;
+    customerNit.value = responseData.data.response.nit_cliente;
+    sellerName.value = responseData.data.response.encargado_cobro;
+    sellerNit.value = responseData.data.response.identificacion;
   } catch (error) {
     console.log(error);
   }
@@ -125,28 +146,6 @@ const formatDate = (dateString: string): string => {
 
 const txtGenerator = () => {
   let num = number.value;
-  // const newFile = "recaudo numero " + num + ".txt";
-  // const directory = Directory.Documents;
-  // let stringData = `
-  //   Nit: ${nit.value}-${digito.value}
-  //   Fecha: ${date.value}
-  //   Recaudo Nro: ${number.value}
-  //   Telefono: ${phone.value}
-  //   Direccion: ${address.value}
-
-  //           COMPROBANTE DE RECAUDO CXC
-  //   ---------------------------------------
-  //   Detalle: 
-  //   ${description.value}
-  //   ---------------------------------------
-  //   Valor Recaudado:
-  //   $${new Intl.NumberFormat("de-DE").format(value.value)}
-  //   ---------------------------------------
-  //   Email: ${email.value}
-  //   ---------------------------------------
-  
-  //   Software: https://conexionpos.com/
-  //   `;
   const newFile = "recaudo_numero_" + num + ".html";
   const directory = Directory.Documents;
   let stringData = `
@@ -197,8 +196,18 @@ const txtGenerator = () => {
         <div class="section-content">${address.value}</div>
       </div>
       <div class="section">
+        <div class="section-title">Encargado Cobro:</div>
+        <div class="section-content">${sellerName.value}</div>
+        <div class="section-content">${sellerNit.value}</div>
+      </div>
+      <div class="section">
         <div class="section-title">Detalle:</div>
         <div class="section-content">${description.value}</div>
+      </div>
+      <div class="section">
+        <div class="section-title">Cliente:</div>
+        <div class="section-content">${customerName.value}</div>
+        <div class="section-content">${customerNit.value}</div>
       </div>
       <div class="section">
         <div class="section-title">Valor Recaudado:</div>
