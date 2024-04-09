@@ -233,18 +233,6 @@ const create = async () => {
       data.value.Valor = 0;
       return await alert.present();
     }
-    if (data.value.eMail === '') {
-
-      const alert = await alertController.create({
-        cssClass: "my-custom-class",
-        header: "ATENCIÓN !!!!",
-        message: `Debe ingresar una dirección de correo eléctronico `,
-        buttons: ["OK"],
-      });
-      data.value.Valor = 0;
-      data.value.Descripcion = '';
-      return await alert.present();
-    }
     if (data.value.IdCliente === 0 || data.value.IdCliente === null) {
 
       const alert = await alertController.create({

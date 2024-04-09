@@ -3,5 +3,5 @@ export interface MoneyCollectionsInterface {
   IdCliente: number;
   Valor: number;
   Descripcion: string;
-  eMail:string
+  eMail?: string | undefined;
 }
