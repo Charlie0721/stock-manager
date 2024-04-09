@@ -154,20 +154,23 @@ const txtGenerator = () => {
       <style>
         body {
           font-family: Arial, sans-serif;
+          font-size: 12px; 
         }
         .header {
-          font-size: 20px;
+          font-size: 16px; 
           font-weight: bold;
-          margin-bottom: 20px;
+          margin-bottom: 10px; 
+          text-align: center; 
         }
         .section {
-          margin-bottom: 15px;
+          margin-bottom: 5px; 
         }
         .section-title {
+          font-size: 14px; 
           font-weight: bold;
         }
         .section-content {
-          margin-left: 20px;
+          margin-left: 10px; 
         }
       </style>
     </head>
@@ -254,6 +257,7 @@ const txtGenerator = () => {
       await alert.present();
     });
 };
+
 </script>
 
 <style scoped>
