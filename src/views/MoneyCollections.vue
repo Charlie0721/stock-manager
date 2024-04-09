@@ -66,18 +66,37 @@
           <ion-label position="floating">Email</ion-label>
           <ion-input type="email" :value="data.eMail" @input="data.eMail = $event.target.value"></ion-input>
         </ion-item>
-        <ion-text color="medium" v-if="customerName">
-          <ion-card>
-            <ion-card-content>
-              <h3>
-                CLIENTE: {{ customerNit }} {{ customerName }}
-              </h3>
-            </ion-card-content>
-          </ion-card>
-        </ion-text>
+
         <ion-button color="mycolor" class="btn-edit-product" expand="block" @click="create">Agregar</ion-button>
         <ion-button color="mycolor" class="btn-edit-product" expand="block" @click="goToOrders">Volver</ion-button>
+        <ion-button color="mycolor" class="btn-edit-product" expand="block" @click="newMoneyCollection()"> Nuevo recaudo
+        </ion-button>
       </ion-card>
+
+      <ion-text color="medium" v-if="customerName">
+        <ion-card>
+          <ion-card-content>
+            <ion-card-title>Datos de recaudo</ion-card-title>
+            <h3>
+              Cliente: {{ customerName }}
+            </h3>
+            <h3>
+              nit: {{ customerNit }}
+            </h3>
+            <h3>
+              Valor:$ {{ new Intl.NumberFormat("de-DE").format(data.Valor) }}
+            </h3>
+            <h3>
+              Desacripción: {{ data.Descripcion }}
+            </h3>
+            <h3>
+              email: {{ data.eMail }}
+            </h3>
+          </ion-card-content>
+        </ion-card>
+      </ion-text>
+
+
     </ion-content>
   </ion-page>
 </template>
@@ -125,7 +144,6 @@ const selectCustomer = (id: number, nit: string, nombres: string): void => {
   idtercero.value = id;
   customerName.value = nombres;
   customerNit.value = nit;
-  console.log(idtercero.value);
 
 }
 
@@ -260,6 +278,9 @@ const goToDetail = (moneyCollectionId: number) => {
 };
 const goToOrders = () => {
   router.push('/trade-orders')
+}
+const newMoneyCollection = () => {
+  location.reload();
 }
 
 watch(idtercero, (newValue) => {
