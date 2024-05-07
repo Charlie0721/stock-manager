@@ -212,7 +212,7 @@ const data = ref<MoneyCollectionsInterface>({
 
 const create = async () => {
   try {
-
+    
     if (data.value.Valor === 0 || data.value.Valor === null) {
       const alert = await alertController.create({
         cssClass: "my-custom-class",
