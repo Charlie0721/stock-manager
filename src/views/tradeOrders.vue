@@ -784,6 +784,7 @@ export default defineComponent({
           this.saveTradeOrder.idsoftware = 2;
           this.saveTradeOrder.detalle = this.detalle ? this.detalle : "Pedido desde app movil";
           this.saveTradeOrder.fechacrea = this.date;
+          this.saveTradeOrder.fechavenc=this.date;
           this.saveTradeOrder.hora = this.currentTime;
           this.saveTradeOrder.plazo = this.plazo;
 
