@@ -247,7 +247,7 @@
           <ion-content class="ion-padding custom-modal-content">
             <ion-searchbar @click="$refs.modal.$el.setCurrentBreakpoint(0.75)" placeholder="Buscar Producto"
               @ionChange="searchOneProduct($event)" @keypress.enter="searchItem()"></ion-searchbar>
-            <ion-input type="text" :value="searchByBarcode" @input="searchByBarcode = $event.target.value"
+            <ion-input type="search" :value="searchByBarcode" @input="searchByBarcode = $event.target.value"
               placeholder="Código de barras" @keypress.enter="searchByBarcodeItem()" :clear-input="true"></ion-input>
             <ion-button color="mycolor" expand="full" class="btn-edit-product" @click="startScan()">
               Buscar Código barras</ion-button>
