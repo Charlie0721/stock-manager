@@ -87,10 +87,24 @@
               Valor:$ {{ new Intl.NumberFormat("de-DE").format(data.Valor) }}
             </h3>
             <h3>
-              Desacripción: {{ data.Descripcion }}
+              Descripción: {{ data.Descripcion }}
             </h3>
             <h3>
               email: {{ data.eMail }}
+            </h3>
+            <ion-card-title>Cuentas por Cobrar</ion-card-title>
+            <h3 v-for="account in pendingPortfolio.accountsReceivable" :key="account.numero">
+              
+              Factura: {{ account.numero }} <br>
+              Cartera:${{ new Intl.NumberFormat("de-DE").format(account.valcuota) }} <br>
+              Abono:${{ new Intl.NumberFormat("de-DE").format(account.credito) }} <br>
+              ----------------------------------------------
+            </h3>
+            ------------------------------------------------
+            <h3 v-for="item in pendingPortfolio.portfolio" :key="item.numero">
+              Cartera :$ {{ new Intl.NumberFormat("de-DE").format(item.totalPortfolio) }} <br>
+              Abonos:$ {{ new Intl.NumberFormat("de-DE").format(item.balance) }} <br>
+              Total cartera:$ {{ new Intl.NumberFormat("de-DE").format(item.quotaValue) }} <br>
             </h3>
           </ion-card-content>
         </ion-card>
@@ -140,10 +154,23 @@ let nombres = ref<string>("");
 let nit = ref<string>("");
 let searhCustomer = ref<string>("");
 let customers = reactive<any>([]);
-const selectCustomer = (id: number, nit: string, nombres: string): void => {
+  let pendingPortfolio = reactive({
+  accountsReceivable: [],
+  portfolio: []
+});
+
+const selectCustomer = async (id: number, nit: string, nombres: string) => {
   idtercero.value = id;
   customerName.value = nombres;
   customerNit.value = nit;
+
+  const response = await moneyCollectionService.checkAccountsReceivableByCustomer(id);
+
+  const portfolioArray = [];
+  portfolioArray.push(response.data.response.portfolio);
+
+  pendingPortfolio.accountsReceivable = response.data.response.accountsReceivable;
+  pendingPortfolio.portfolio = portfolioArray;
 
 }
 
@@ -212,7 +239,7 @@ const data = ref<MoneyCollectionsInterface>({
 
 const create = async () => {
   try {
-    
+
     if (data.value.Valor === 0 || data.value.Valor === null) {
       const alert = await alertController.create({
         cssClass: "my-custom-class",
