@@ -168,6 +168,9 @@
             <h4 class="letter-color">
               {{ index + 1 }}. {{ product.descripcion }}
             </h4>
+            <h5 class="letter-color" v-if="product.barcode !== null && product.barcode !== ''">
+              Barcode: {{ product.barcode }}
+            </h5>
           </ion-card-title>
 
           <ion-card-subtitle>
@@ -286,16 +289,12 @@
                       product.baseValue,
                       product.taxValue,
                       product.porcentaje,
+                      product.barcode
                     )
                     ">
                     Agregar<ion-icon :icon="i.checkmarkCircleOutline"></ion-icon>
                   </ion-button>
-                  <!-- <div style="overflow-x: auto; white-space: nowrap;">
-                    <ion-button v-for="precio in product.preciosPorVolumen" :key="precio.cantidad" color="mycolor">
-                      ${{ new Intl.NumberFormat("de-DE").format(precio.precio) }} ({{ precio.cantidad }} unidades)
-                    </ion-button>
-                  </div> -->
-                </ion-label>
+               </ion-label>
               </ion-item>
             </ion-list>
           </ion-content>
@@ -877,7 +876,8 @@ export default defineComponent({
       codiva: string,
       baseValue: number,
       taxValue: number,
-      porcentaje: number
+      porcentaje: number,
+      barcode:string
     ) {
       try {
         this.selectPrice(this.finalPrice)
@@ -904,7 +904,8 @@ export default defineComponent({
           porcdesc: 0,
           base: baseValue,
           ivaprod: taxValue,
-          porciva: porcentaje
+          porciva: porcentaje,
+          barcode
         };
         this.productArray.push(product);
         this.searchByBarcode = "";
