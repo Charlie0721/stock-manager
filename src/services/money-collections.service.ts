@@ -9,6 +9,6 @@ export class MoneyCollectionsService {
   }
 
   async checkAccountsReceivableByCustomer(customerId: number) {
-    return await axios.get(`/money-collections/${customerId}`);
+    return await axios.get(`/money-collections/customer/${customerId}`);
   }
 }
