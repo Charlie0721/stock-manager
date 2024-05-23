@@ -15,6 +15,16 @@
           </h4>
         </ion-card-title>
         <ion-card-subtitle>
+          <ion-list>
+            <ion-item>
+              <ion-select placeholder="Seleccionar Almacén" @ionChange="SelectOrigin = $event.target.value"
+                :value="SelectOrigin">
+                <ion-select-option :value="warehouse.idalmacen" v-for="warehouse in allWarehouses"
+                  :key="warehouse.idalmacen">{{ warehouse.nomalmacen }}</ion-select-option>
+              </ion-select>
+            </ion-item>
+
+          </ion-list>
           <ion-item>
             <ion-label position="floating">Codigo de Barras</ion-label>
             <ion-input type="text" :value="barcode" @input="barcodeScan.barcode = $event.target.value"></ion-input>
@@ -38,10 +48,12 @@
           </ion-item>
         </ion-card-subtitle>
       </ion-card>
-      <ion-list v-for="collector in dataCollector" :key="collector.collector">
-        <ion-item>
-          <ion-label>{{ collector.barcode }}{{ collector.coma
-          }}{{ collector.amount }}</ion-label>
+      <ion-list>
+        <ion-item v-for="(collector, index) in dataCollector" :key="index">
+          <ion-label>{{ collector.barcode }}{{ collector.coma }}{{ collector.amount }}</ion-label>
+          <ion-input type="number" v-model.number="collector.amount"></ion-input>
+          <ion-button @click="editProduct(index)">Editar</ion-button>
+          <ion-button color="danger" @click="removeProduct(index)">Eliminar</ion-button>
         </ion-item>
       </ion-list>
       <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="writeFile()"><ion-icon
@@ -82,9 +94,10 @@ import {
   IonLabel,
   IonInput,
   IonIcon,
-  IonList,
+  IonList, IonSelect, IonSelectOption
 } from "@ionic/vue";
 import { ISearchByBarcodeToCollector } from "../interfaces/barcode.interface";
+import { TransfersToApp } from "@/services/transfers";
 export default defineComponent({
   name: "Tab2Page",
   components: {
@@ -101,7 +114,7 @@ export default defineComponent({
     IonItem,
     IonLabel,
     IonInput,
-    IonIcon,
+    IonIcon, IonSelect, IonSelectOption,
   },
   data() {
     return {
@@ -112,7 +125,13 @@ export default defineComponent({
       dataCollector: [] as any,
       barcode: "" as string,
       coma: "," as string,
+      editIndex: -1 as number,
+      allWarehouses: [] as any,
+      SelectOrigin: 0 as number,
     };
+  },
+  mounted() {
+    this.getWarehouses()
   },
   methods: {
     newOrder() {
@@ -120,6 +139,14 @@ export default defineComponent({
     },
     goToCollectorTransfer() {
       this.$router.push("/data-collector/transfers");
+    },
+    async getWarehouses() {
+      try {
+        const responseWarehouses = await TransfersToApp.getWarehouses();
+        this.allWarehouses = responseWarehouses.data;
+      } catch (error) {
+        console.log(error);
+      }
     },
 
     returnProducts() {
@@ -278,17 +305,28 @@ export default defineComponent({
           this.barcode = "";
           this.amount = 1;
         }
+
       } catch (error) {
         console.log(error);
       }
     },
 
+    editProduct(index: number) {
+      this.barcodeScan.barcode = this.dataCollector[index].barcode;
+      this.amount = this.dataCollector[index].amount;
+      this.editIndex = index;
+    },
+    removeProduct(index: number) {
+      this.dataCollector.splice(index, 1);
+    },
+
     async writeFile() {
       try {
         let data = this.dataCollector;
+        let warehouseId= this.SelectOrigin
         if (data.length > 0) {
-          const createFile = await BarcodeCollectorSearch.generateTxtFile(data);
-          console.log(createFile);
+          const createFile = await BarcodeCollectorSearch.generateTxtFile(warehouseId,data);
+          console.log(createFile.data.message);
           const alert = await alertController.create({
             cssClass: "my-custom-class",
             header: "CONFIRMACIÓN !!!",
