@@ -27,7 +27,8 @@
           </ion-list>
           <ion-item>
             <ion-label position="floating">Codigo de Barras</ion-label>
-            <ion-input type="text" :value="barcode" @input="barcodeScan.barcode = $event.target.value"></ion-input>
+            <ion-input type="search" :value="barcode" @input="barcodeScan.barcode = $event.target.value"
+              @keypress.enter="searchProduct()"></ion-input>
             <ion-label position="floating">Cantidad</ion-label>
             <ion-input type="number" :value="amount" @input="amount = $event.target.value"></ion-input>
           </ion-item>
@@ -269,17 +270,15 @@ export default defineComponent({
     async searchProduct() {
       try {
         this.barcode = this.barcodeScan.barcode;
-        let amount = this.amount;
-        if (
-          this.barcode === "" ||
-          this.barcode === "" ||
-          this.barcode === undefined
-        ) {
+
+        this.amount = 1;
+
+        if (!this.barcode) {
           const alert = await alertController.create({
             cssClass: "my-custom-class",
             header: "ATENCIÓN !!!",
             subHeader: `NO PASA VALIDACIÓN `,
-            message: `DEBE INGRESAR CODIGO DE BARRAS !!`,
+            message: `DEBE INGRESAR CÓDIGO DE BARRAS !!`,
             buttons: ["ACEPTAR"],
           });
           await alert.present();
@@ -290,22 +289,34 @@ export default defineComponent({
           );
           this.descriptions = response.data;
 
-          const finalData = [
-            {
+          if (this.descriptions.length === 0) {
+            const alert = await alertController.create({
+              cssClass: "my-custom-class",
+              header: "ATENCIÓN !!!",
+              subHeader: `PRODUCTO NO ENCONTRADO`,
+              message: `NO EXISTE PRODUCTO CON EL CÓDIGO DE BARRAS ${this.barcode} !!`,
+              buttons: ["ACEPTAR"],
+            });
+            await alert.present();
+            return false;
+          }
+
+          const existingItem = this.dataCollector.find(
+            (collector: any) => collector.barcode === this.barcode
+          );
+
+          if (existingItem) {
+            existingItem.amount += this.amount;
+          } else {
+            this.dataCollector.push({
               barcode: this.barcode,
               coma: this.coma,
-              amount: amount,
-            },
-          ];
-          const finalDataCollector = JSON.stringify(finalData);
-          const finalDataParsed = JSON.parse(finalDataCollector);
-          finalDataParsed.forEach((collector: any) => {
-            this.dataCollector.push(collector);
-          });
-          this.barcode = "";
-          this.amount = 1;
-        }
+              amount: this.amount,
+            });
+          }
 
+          this.barcode = "";
+        }
       } catch (error) {
         console.log(error);
       }
@@ -323,9 +334,22 @@ export default defineComponent({
     async writeFile() {
       try {
         let data = this.dataCollector;
-        let warehouseId= this.SelectOrigin
+        let warehouseId = this.SelectOrigin
+        console.log(warehouseId)
+        if (warehouseId === 0) {
+
+          const alert = await alertController.create({
+            cssClass: "my-custom-class",
+            header: "ATENCION !!!",
+            subHeader: `NO PASA VALIDACIÓN `,
+            message: `DEBE SELECCIONAR ALMACÉN`,
+            buttons: ["ACEPTAR"],
+          });
+          await alert.present();
+          return false;
+        }
         if (data.length > 0) {
-          const createFile = await BarcodeCollectorSearch.generateTxtFile(warehouseId,data);
+          const createFile = await BarcodeCollectorSearch.generateTxtFile(warehouseId, data);
           console.log(createFile.data.message);
           const alert = await alertController.create({
             cssClass: "my-custom-class",
@@ -336,7 +360,9 @@ export default defineComponent({
           });
           await alert.present();
           return false;
-        } else {
+        }
+
+        else {
           const alert = await alertController.create({
             cssClass: "my-custom-class",
             header: "ATENCION !!!",
