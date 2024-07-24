@@ -89,7 +89,7 @@
       <ion-button id="nested-button" color="mycolor" class="btn-edit-product" expand="full"
         @click="getCustomers()"><ion-icon :icon="i.peopleCircleOutline"></ion-icon> Seleccionar Cliente
       </ion-button>
-      <ion-popover trigger="nested-button" :dismiss-on-select="false" >
+      <ion-popover trigger="nested-button" :dismiss-on-select="false">
         <ion-card>
           <ion-searchbar animated debounce="500" placeholder="Buscar Nit" @ionChange="searchOneCustomer($event)"
             @keypress.enter="searchCustomerItem()">
@@ -294,7 +294,7 @@
                     ">
                     Agregar<ion-icon :icon="i.checkmarkCircleOutline"></ion-icon>
                   </ion-button>
-               </ion-label>
+                </ion-label>
               </ion-item>
             </ion-list>
           </ion-content>
@@ -339,7 +339,8 @@ import {
   IonSelect,
 } from "@ionic/vue";
 import router from "@/router";
-
+import { StockManagerParamsService } from "@/services/stock_manager_params.service";
+const stockManagerParamsService = new StockManagerParamsService();
 export default defineComponent({
   name: "Tab1Page",
   components: {
@@ -742,6 +743,9 @@ export default defineComponent({
     },
     async saveCompleteTradeOrder() {
       try {
+        let uuid = localStorage.getItem("uuid");
+        const responseParams = await stockManagerParamsService.findOne(uuid);
+
         if (this.total === 0 || this.total < 0) {
           const alert = await alertController.create({
             cssClass: "my-custom-class",
@@ -754,16 +758,14 @@ export default defineComponent({
           return false;
         } else {
           if (this.idtercero === 0) {
-            let idCustom = localStorage.getItem("idCustomer");
-            this.idtercero = JSON.parse(idCustom);
+            this.idtercero = responseParams.data.Id_Cliente
             this.saveTradeOrder.idtercero = this.idtercero;
           } else {
             this.saveTradeOrder.idtercero = this.idtercero;
           }
 
           if (this.idvendedor === 0) {
-            let idEmploy = localStorage.getItem("idEmployee");
-            this.idvendedor = JSON.parse(idEmploy);
+            this.idvendedor = responseParams.data.Id_Vendedor
             this.saveTradeOrder.idvendedor = this.idvendedor;
           } else {
             this.saveTradeOrder.idvendedor = this.idvendedor;
@@ -783,7 +785,7 @@ export default defineComponent({
           this.saveTradeOrder.idsoftware = 2;
           this.saveTradeOrder.detalle = this.detalle ? this.detalle : "Pedido desde app movil";
           this.saveTradeOrder.fechacrea = this.date;
-          this.saveTradeOrder.fechavenc=this.date;
+          this.saveTradeOrder.fechavenc = this.date;
           this.saveTradeOrder.hora = this.currentTime;
           this.saveTradeOrder.plazo = this.plazo;
 
@@ -877,7 +879,7 @@ export default defineComponent({
       baseValue: number,
       taxValue: number,
       porcentaje: number,
-      barcode:string
+      barcode: string
     ) {
       try {
         this.selectPrice(this.finalPrice)
@@ -994,8 +996,13 @@ export default defineComponent({
     },
     async getProducts() {
       try {
-        let idAlm = localStorage.getItem("idAlmacen");
-        this.idalmacen = JSON.parse(idAlm);
+
+        let uuid = localStorage.getItem("uuid");
+        const responseParams = await stockManagerParamsService.findOne(uuid);
+        this.idalmacen = responseParams.data.Id_Almacen
+
+        console.log(this.idalmacen);
+
         const response = await TradeOrders.getProducts(
           this.idalmacen,
           this.limit,
@@ -1070,7 +1077,7 @@ export default defineComponent({
       this.customerName = nombres;
       this.customerNit = nit;
     },
-   
+
     async searchOneCustomer(event: any) {
       try {
         this.searhCustomer = event.detail.value;

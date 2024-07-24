@@ -92,7 +92,7 @@
           </ion-card>
         </ion-fab-list>
       </ion-fab>
-      
+
     </ion-content>
     <ion-content>
       <ion-card class="login-card">
@@ -100,12 +100,12 @@
         <p v-if="this.customerName !== ''">CLIENTE: {{ this.customerName }}</p>
         <p v-if="this.employeeName !== ''">VENDEDOR: {{ this.employeeName }}</p>
       </ion-card>
-      <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="getIdalmacen()"> Aceptar</ion-button>
+      <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="getIdalmacen()"> Grabar</ion-button>
     </ion-content>
   </ion-page>
 </template>
-  
-  
+
+
 <script lang="ts">
 import { defineComponent } from "vue";
 import * as allIcons from "ionicons/icons";
@@ -135,7 +135,10 @@ import {
   IonCardSubtitle,
   IonCardTitle,
 } from "@ionic/vue";
-
+import { StockManagerParamsService } from "@/services/stock_manager_params.service";
+import { IStockManagerParams } from "@/interfaces/stock_manager_params.interface";
+import router from "@/router";
+const stockManagerParamsService = new StockManagerParamsService()
 export default defineComponent({
   name: "Tab1Page",
   components: {
@@ -181,13 +184,16 @@ export default defineComponent({
       nombres: "" as string,
       nit: "" as string,
       customerName: "" as string,
+      stockManagerParams: {} as IStockManagerParams
 
     };
   },
   mounted() {
     this.getEmployee();
     this.getWarehouses();
-    this.sendIdToOrders();
+    let uuid = localStorage.getItem("uuid");
+    this.getParamsData(uuid)
+    //  this.sendIdToOrders();
   },
 
   methods: {
@@ -268,15 +274,42 @@ export default defineComponent({
       this.employees = employees.data.employee;
     },
     selectEmployee(id: number, nit: string, nombres: string) {
+
+
       this.idvendedor = id;
       this.employeeName = nombres;
       this.employeeNit = nit;
     },
+
+    fabToggled(e: any) {
+      e.stopPropagation();
+    },
+
+    async getParamsData() {
+      let uuid = localStorage.getItem("uuid");
+      const responseParams = await stockManagerParamsService.findOne(uuid);
+      
+      if (responseParams.data.status === 404) {
+
+        const alert = await alertController.create({
+          cssClass: "my-custom-class",
+          header: "Atención !",
+          subHeader: "Seleccione almacén, cliente y vendedor",
+          message: "Guardar la configuración de la aplcación",
+          buttons: ["OK"],
+        });
+        await alert.present();
+        return
+      } else if (responseParams.status === 200) {
+        this.$router.push("/tabs/tab1");
+      }
+    },
     async getIdalmacen() {
       this.idalmacen = this.SelectIdalmacen;
-      localStorage.setItem("idAlmacen", JSON.stringify(this.idalmacen));
-      localStorage.setItem("idCustomer", JSON.stringify(this.idtercero));
-      localStorage.setItem("idEmployee", JSON.stringify(this.idvendedor));
+
+      this.idtercero
+      this.idvendedor
+
       if (this.idalmacen === 0) {
         const alert = await alertController.create({
           cssClass: "my-custom-class",
@@ -311,35 +344,49 @@ export default defineComponent({
         await alert.present();
         return
       }
-      this.$router.push("/login");
 
+      await this.saveParams(this.idvendedor, this.idtercero, this.idalmacen);
     },
-    fabToggled(e: any) {
-      e.stopPropagation();
-    },
-    async sendIdToOrders() {
-      if (localStorage.getItem("idAlmacen")) {
-        const id = localStorage.getItem("idAlmacen");
-        if (typeof id == "string") {
-          let idAlm = JSON.parse(id);
-          console.table({
-            id: idAlm
-          })
+
+    async saveParams(sellerId: number, customerId: number, warehouseId: number,) {
+
+      try {
+
+        let uuid = localStorage.getItem("uuid");
+        this.stockManagerParams.Id_Vendedor = sellerId;
+        this.stockManagerParams.Id_Cliente = customerId;
+        this.stockManagerParams.Id_Almacen = warehouseId;
+
+        const responseSaveParams = await stockManagerParamsService.create(uuid, this.stockManagerParams)
+
+
+        if (responseSaveParams.status == 201) {
+          const alert = await alertController.create({
+            cssClass: "my-custom-class",
+            header: "¡Confirmación !",
+            subHeader: "Aprobado !!",
+            message: "Configuración guardada satisfactoriamente !",
+            buttons: ["OK"],
+          });
+          await alert.present();
+
+
+          this.$router.push("/tabs/tab1");
         }
 
-        this.$router.push("/login");
-      } else {
-        this.$router.push("/warehouse-for-orders");
+
+      } catch (error) {
         const alert = await alertController.create({
           cssClass: "my-custom-class",
-          header: "¡Información !",
+          header: "Error !",
           subHeader: "Seleccione almacén, cliente y vendedor",
-          message: "Debe seleccionar almacén, cliente y vendedor predeterminados para generar pedidos",
+          message: `Error: ${error}`,
           buttons: ["OK"],
         });
         await alert.present();
       }
-    },
+
+    }
   },
 });
 </script>
@@ -351,10 +398,12 @@ export default defineComponent({
 ion-button {
   background-color: var(--ion-color-mycolor);
 }
+
 ion-card.login-card {
-    border-radius: 10px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
+
 .edit-image1 {
   width: 5%;
   max-height: 5%;

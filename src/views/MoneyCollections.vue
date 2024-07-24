@@ -94,7 +94,7 @@
             </h3>
             <ion-card-title>Cuentas por Cobrar</ion-card-title>
             <h3 v-for="account in pendingPortfolio.accountsReceivable" :key="account.numero">
-              
+
               Factura: {{ account.numero }} <br>
               Cartera:${{ new Intl.NumberFormat("de-DE").format(account.valcuota) }} <br>
               Abono:${{ new Intl.NumberFormat("de-DE").format(account.credito) }} <br>
@@ -139,12 +139,12 @@ import {
 } from "@ionic/vue";
 import { MoneyCollectionsService } from "@/services/money-collections.service";
 import { MoneyCollectionsInterface } from "@/interfaces/money-collections.interface";
-import { reactive, ref, watch } from "vue";
+import { onMounted, reactive, ref, watch } from "vue";
 import router from "../router/index";
 import { TradeOrders } from "../services/tradeOrder";
+import { StockManagerParamsService } from "@/services/stock_manager_params.service";
 const moneyCollectionService = new MoneyCollectionsService();
-let idEmploy = localStorage.getItem("idEmployee");
-
+const stockManagerParamsService = new StockManagerParamsService();
 let idtercero = ref<number>(0);
 let customerName = ref<string>("");
 let customerNit = ref<string>("");
@@ -154,10 +154,19 @@ let nombres = ref<string>("");
 let nit = ref<string>("");
 let searhCustomer = ref<string>("");
 let customers = reactive<any>([]);
-  let pendingPortfolio = reactive({
+let pendingPortfolio = reactive({
   accountsReceivable: [],
   portfolio: []
 });
+let sellerId = ref<number>(0);
+let uuid = localStorage.getItem("uuid");
+
+onMounted(async () => {
+  sellerId.value = await getParams();
+  data.value.IdVendedor = sellerId.value;
+});
+
+
 
 const selectCustomer = async (id: number, nit: string, nombres: string) => {
   idtercero.value = id;
@@ -165,6 +174,15 @@ const selectCustomer = async (id: number, nit: string, nombres: string) => {
   customerNit.value = nit;
 
   const response = await moneyCollectionService.checkAccountsReceivableByCustomer(id);
+  if (response.data.response.status === 404) {
+    const alert = await alertController.create({
+      cssClass: "my-custom-class",
+      header: `Atención`,
+      message: `Cliente ${customerName.value} no registra cartera !`,
+      buttons: ["OK"],
+    });
+    return await alert.present();
+  }
 
   const portfolioArray = [];
   portfolioArray.push(response.data.response.portfolio);
@@ -229,8 +247,14 @@ const nextPageCustomer = () => {
   getCustomers();
 }
 
+const getParams = async (): Promise<number> => {
+  const response = await stockManagerParamsService.findOne(uuid)
+  let sellerId = response.data.Id_Vendedor
+  return sellerId
+}
+
 const data = ref<MoneyCollectionsInterface>({
-  IdVendedor: JSON.parse(idEmploy),
+  IdVendedor: sellerId.value,
   IdCliente: idtercero.value,
   Valor: 0,
   Descripcion: "",

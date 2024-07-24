@@ -16,7 +16,8 @@
 
                     <ion-item class="input-item">
                         <ion-label position="floating" class="ion-text-center">Email:</ion-label>
-                        <ion-input type="text" :value="user.email" @input="user.email = $event.target.value"></ion-input>
+                        <ion-input type="text" :value="user.email"
+                            @input="user.email = $event.target.value"></ion-input>
                     </ion-item>
                     <ion-item class="input-item">
                         <ion-label position="floating" class="ion-text-center">Password:</ion-label>
@@ -60,6 +61,9 @@ import {
 } from "@ionic/vue";
 import { LoginInterface } from "@/interfaces/conexion-user.interface";
 import { UserService } from '../../services/user.service'
+import { StockManagerParamsService } from "@/services/stock_manager_params.service";
+const stockManagerParamsService = new StockManagerParamsService();
+
 export default defineComponent({
 
     name: "Login-User",
@@ -122,11 +126,10 @@ export default defineComponent({
                     localStorage.setItem("email", responseUser.data.email);
                     this.user.email = '';
                     this.user.password = '';
-                   if (responseUser.data.userType === 'ADMINISTRADOR') {
-                        this.$router.push("/tabs/tab1");
-                    } else if (responseUser.data.userType === 'CAJERO') {
-                        this.$router.push("/trade-orders");
-                    }
+
+                    let uuid = localStorage.getItem("uuid");
+                    await this.getParameters(uuid);
+
                 }
 
             } catch (error) {
@@ -142,6 +145,34 @@ export default defineComponent({
                 return
             }
 
+        },
+
+        async getParameters(uuid: string) {
+            try {
+
+                const response = await stockManagerParamsService.findOne(uuid);
+
+                if (response.data.status === 404) {
+                    this.$router.push("/warehouse-for-orders");
+                } else if (response.status === 200) {
+                    let userType = localStorage.getItem("userType");
+                    if (userType === 'ADMINISTRADOR') {
+                        this.$router.push("/tabs/tab1");
+                    } else if (userType === 'CAJERO') {
+                        this.$router.push("/trade-orders");
+                    }
+                }
+
+            } catch (error) {
+                const alert = await alertController.create({
+                    cssClass: "my-custom-class",
+                    header: `¡Atencion ! `,
+                    message: `${error}`,
+                    buttons: ["ACEPTAR"],
+                });
+                await alert.present();
+                return
+            }
         }
 
     }

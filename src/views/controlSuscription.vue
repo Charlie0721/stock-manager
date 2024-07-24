@@ -78,7 +78,8 @@ export default defineComponent({
         await alert.present();
       }
       if (this.message === "continua con la suscripción") {
-        this.$router.push("/warehouse-for-orders");
+        //this.$router.push("/warehouse-for-orders");
+        this.$router.push("/login");
       }
     },
     newOrder() {
