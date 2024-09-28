@@ -659,7 +659,7 @@ export default defineComponent({
       detalle: "" as string,
       plazo: 0 as number,
       searchByBarcode: "" as string,
-      limit: 2 as number,
+      limit: 1 as number,
       page: 1 as number,
       offset: 0 as number,
       codigo: "" as string,
@@ -1005,6 +1005,7 @@ export default defineComponent({
       try {
         let uuid = localStorage.getItem("uuid");
         const responseParams = await stockManagerParamsService.findOne(uuid);
+        this.idalmacen = responseParams.data.Id_Almacen;
 
         if (this.total === 0 || this.total < 0) {
           const alert = await alertController.create({
@@ -1029,6 +1030,12 @@ export default defineComponent({
             this.saveTradeOrder.idvendedor = this.idvendedor;
           } else {
             this.saveTradeOrder.idvendedor = this.idvendedor;
+          }
+          if (this.almacen === 0) {
+            this.idalmacen = responseParams.data.Id_Almacen;
+            this.saveTradeOrder.idalmacen = this.idalmacen;
+          } else {
+            this.saveTradeOrder.idalmacen = this.idalmacen;
           }
 
           const number = await this.getNumbers(this.idalmacen);
@@ -1063,7 +1070,7 @@ export default defineComponent({
           if (saveOrder1.id) {
             const idpedido = saveOrder1.id;
             this.idTradeOrder = idpedido;
-            localStorage.removeItem('currentOrder');
+            localStorage.removeItem("currentOrder");
             this.viewOrder(this.idalmacen, this.finalNumber);
           } else {
             const errorMessage = saveOrder1.message || "Error desconocido";
@@ -1145,7 +1152,7 @@ export default defineComponent({
       // Guarda el objeto completo del pedido en el localStorage
       localStorage.setItem("currentOrder", JSON.stringify(this.saveTradeOrder));
 
-      console.log("Pedido guardado automáticamente en localStorage");
+      
     },
     loadOrderFromLocalStorage(): void {
       const savedOrder = localStorage.getItem("currentOrder");
@@ -1288,8 +1295,6 @@ export default defineComponent({
         let uuid = localStorage.getItem("uuid");
         const responseParams = await stockManagerParamsService.findOne(uuid);
         this.idalmacen = responseParams.data.Id_Almacen;
-
-        console.log(this.idalmacen);
 
         const response = await TradeOrders.getProducts(
           this.idalmacen,
