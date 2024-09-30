@@ -1151,8 +1151,6 @@ export default defineComponent({
 
       // Guarda el objeto completo del pedido en el localStorage
       localStorage.setItem("currentOrder", JSON.stringify(this.saveTradeOrder));
-
-      
     },
     loadOrderFromLocalStorage(): void {
       const savedOrder = localStorage.getItem("currentOrder");
@@ -1288,7 +1286,7 @@ export default defineComponent({
       setTimeout(async () => {
         this.barcode = "";
         await this.getProducts();
-      }, 10000);
+      }, 40000);
     },
     async getProducts() {
       try {
@@ -1430,8 +1428,26 @@ export default defineComponent({
         this.recalcularDescuentos();
       }
     },
-    goToMoneyCollections() {
-      router.push(`/money-collections`);
+    async goToMoneyCollections() {
+      const alert = await alertController.create({
+        header: "Está seguro de ir a Recaudos ?",
+        cssClass: "custom-alert",
+        buttons: [
+          {
+            text: "No",
+            cssClass: "alert-button-cancel",
+          },
+          {
+            text: "SI",
+            cssClass: "alert-button-confirm",
+            handler: () => {
+              router.push(`/money-collections`);
+            },
+          },
+        ],
+      });
+
+      await alert.present();
     },
   },
   computed: {
