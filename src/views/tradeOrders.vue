@@ -21,8 +21,65 @@
           </ion-button>
         </ion-title>
       </ion-toolbar>
+
+      <ion-button
+        color="mycolor"
+        class="btn-edit-product"
+        expand="full"
+        @click="saveCompleteTradeOrder()"
+        ><ion-icon :icon="i.saveSharp"></ion-icon> Grabar Pedido</ion-button
+      >
+      <ion-button
+        color="mycolor"
+        class="btn-edit-product"
+        expand="full"
+        @click="goToMoneyCollections()"
+        ><ion-icon :icon="i.cashSharp"></ion-icon> Recaudos</ion-button
+      >
+      <ion-card v-if="subtotal > 0">
+        <ion-card-content>
+          <ion-text color="dark" v-if="subtotal > 0">
+            <h3>
+              SUBTOTAL: $
+              {{ new Intl.NumberFormat("de-DE").format(subtotal) }}
+            </h3>
+          </ion-text>
+          <ion-text color="dark" v-if="valdescuentos > 0">
+            <h3>
+              DESCUENTOS: $
+              {{ new Intl.NumberFormat("de-DE").format(valdescuentos) }}
+            </h3>
+          </ion-text>
+          <ion-text color="dark" v-if="valimpuesto > 0">
+            <h3>
+              IVA: $
+              {{ new Intl.NumberFormat("de-DE").format(valimpuesto) }}
+            </h3>
+          </ion-text>
+          <ion-text color="dark" v-if="total > 0">
+            <h1>
+              TOTAL: $
+              {{ new Intl.NumberFormat("de-DE").format(total) }}
+            </h1>
+          </ion-text>
+        </ion-card-content>
+      </ion-card>
     </ion-header>
+
     <ion-content :fullscreen="true">
+      <ion-fab vertical="top" horizontal="start" slot="fixed">
+        <ion-fab-button
+          >Productos
+          <ion-icon :icon="i.menuOutline"></ion-icon>
+          <ion-label class="fab-label"></ion-label>
+        </ion-fab-button>
+        <ion-fab-list side="center">
+          <ion-fab-button @click="getProducts()">
+            <ion-icon :icon="i.searchCircleSharp"></ion-icon>
+          </ion-fab-button>
+        </ion-fab-list>
+      </ion-fab>
+
       <ion-button
         id="open-modal1"
         expand="block"
@@ -380,36 +437,9 @@
           }}
         </ion-card-content>
       </ion-card>
-      <ion-card>
-        <ion-card-content>
-          <ion-text color="dark" v-if="subtotal > 0">
-            <h3>
-              SUBTOTAL: $
-              {{ new Intl.NumberFormat("de-DE").format(subtotal) }}
-            </h3>
-          </ion-text>
-          <ion-text color="dark" v-if="valdescuentos > 0">
-            <h3>
-              DESCUENTOS: $
-              {{ new Intl.NumberFormat("de-DE").format(valdescuentos) }}
-            </h3>
-          </ion-text>
-          <ion-text color="dark" v-if="valimpuesto > 0">
-            <h3>
-              IVA: $
-              {{ new Intl.NumberFormat("de-DE").format(valimpuesto) }}
-            </h3>
-          </ion-text>
-          <ion-text color="dark" v-if="total > 0">
-            <h1>
-              TOTAL: $
-              {{ new Intl.NumberFormat("de-DE").format(total) }}
-            </h1>
-          </ion-text>
-        </ion-card-content>
-      </ion-card>
+   
       <ion-content class="ion-padding">
-        <ion-button
+        <!-- <ion-button
           id="open-modal"
           expand="block"
           color="mycolor"
@@ -418,21 +448,8 @@
         >
           <ion-icon :icon="i.searchCircleSharp"></ion-icon>Seleccionar
           Productos</ion-button
-        >
-        <ion-button
-          color="mycolor"
-          class="btn-edit-product"
-          expand="full"
-          @click="saveCompleteTradeOrder()"
-          ><ion-icon :icon="i.saveSharp"></ion-icon> Grabar Pedido</ion-button
-        >
-        <ion-button
-          color="mycolor"
-          class="btn-edit-product"
-          expand="full"
-          @click="goToMoneyCollections()"
-          ><ion-icon :icon="i.cashSharp"></ion-icon> Recaudos</ion-button
-        >
+        > -->
+
         <ion-modal
           ref="modal"
           trigger="open-modal"
@@ -587,6 +604,9 @@ import {
   IonInput,
   IonSelectOption,
   IonSelect,
+  IonFab,
+  IonFabList,
+  IonFabButton,
 } from "@ionic/vue";
 import router from "@/router";
 import { StockManagerParamsService } from "@/services/stock_manager_params.service";
@@ -616,6 +636,9 @@ export default defineComponent({
     IonInput,
     IonSelectOption,
     IonSelect,
+    IonFab,
+    IonFabList,
+    IonFabButton,
   },
   data() {
     return {
@@ -1290,6 +1313,7 @@ export default defineComponent({
     },
     async getProducts() {
       try {
+        this.$refs.modal.$el.present();
         let uuid = localStorage.getItem("uuid");
         const responseParams = await stockManagerParamsService.findOne(uuid);
         this.idalmacen = responseParams.data.Id_Almacen;
@@ -1573,5 +1597,8 @@ h4 {
 .custom-modal-content {
   --overflow: auto;
   --overflow-scroll-behavior: smooth;
+}
+ion-fab {
+  z-index: 999;
 }
 </style>
