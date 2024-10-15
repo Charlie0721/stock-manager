@@ -1,10 +1,6 @@
 <template>
   <ion-page>
 
-    <ion-fab vertical="botton" horizontal="start" slot="fixed">
-      <ion-fab-button color="mycolor" @click="getProducts()">Items<ion-icon :icon="i.searchCircleSharp"></ion-icon>
-      </ion-fab-button>
-    </ion-fab>
     <ion-header>
 
       <ion-button color="mycolor" expand="block" class="btn-edit-product" @click="checkSales">Consultar ventas del Día
@@ -27,6 +23,13 @@
           <ion-col size="6">
             <ion-button color="mycolor" expand="block" @click="goToMoneyCollections()">
               <ion-icon :icon="i.cashSharp"></ion-icon> Recaudos
+            </ion-button>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col size="12">
+            <ion-button color="mycolor" expand="block" @click="getProducts()">
+              <ion-icon :icon="i.searchCircleSharp"></ion-icon>buscar producto
             </ion-button>
           </ion-col>
         </ion-row>
@@ -1345,8 +1348,9 @@ export default defineComponent({
 </script>
 <style scoped>
 .text-custom-botones {
-  padding-left: 100px !important;
-  padding-right: 100px !important;
+  padding-left: 20px !important;
+  /* Reduce padding lateral */
+  padding-right: 20px !important;
 }
 
 .edit-image {
@@ -1367,10 +1371,11 @@ export default defineComponent({
 
 ion-button {
   background-color: var(--ion-color-mycolor);
-  border-radius: 30px;
+  border-radius: 20px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   font-weight: bold;
-
+  font-size: 0.9rem;
+  height: 28px;
 }
 
 ion-button:hover {
