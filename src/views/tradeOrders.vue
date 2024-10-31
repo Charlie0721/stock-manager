@@ -341,7 +341,9 @@
             <span> página {{ page }} </span>
             <ion-list v-for="product in products" :key="product.idproduct">
               <ion-item>
-                <ion-label>{{ product.codigo }} | {{ product.descripcion }}
+                <ion-label>
+                  <h5 class="ion-text-wrap">{{ product.descripcion }}</h5>
+                  <ion-label>Cod. Interno: {{ product.codigo }} </ion-label>
                   <ion-label> Cantidad:{{ product.cantidad }} </ion-label>
                   <ion-label>Cod.Barras:{{ product.barcode }} </ion-label>
                   <ion-button color="mycolor" @click="selectPrice(product.precioventa)">
@@ -1476,4 +1478,9 @@ ion-item {
   margin-left: 10px;
   /* Asegura que haya espacio alrededor */
 }
+ion-label h5 {
+  white-space: normal; /* Permite que el texto se ajuste a múltiples líneas */
+  word-wrap: break-word; /* Permite que el texto se ajuste y rompa palabras si es necesario */
+}
+
 </style>

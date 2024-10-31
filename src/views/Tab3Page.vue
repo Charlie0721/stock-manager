@@ -127,7 +127,9 @@
             <span> página {{ page }} </span>
             <ion-list v-for="product in products" :key="product.idproduct">
               <ion-item>
-                <ion-label>{{ product.codigo }} | {{ product.descripcion }}
+                <ion-label>
+                  <h5 class="ion-text-wrap">{{ product.descripcion }}</h5>
+                  <ion-label>Cod. Interno: {{ product.codigo }} </ion-label>
                 </ion-label>
               </ion-item>
               <ion-item>
@@ -251,7 +253,7 @@ export default defineComponent({
       idMovement: 0 as number,
       salida: 0 as number,
       searchByBarcode: "" as string,
-      limit: 2 as number,
+      limit: 1 as number,
       page: 1 as number,
       offset: 0 as number,
       codigo: "" as string,
@@ -758,5 +760,12 @@ ion-button.button-in-item {
 .custom-modal-content {
   --overflow: auto;
   --overflow-scroll-behavior: smooth;
+}
+
+ion-label h5 {
+  white-space: normal;
+  /* Permite que el texto se ajuste a múltiples líneas */
+  word-wrap: break-word;
+  /* Permite que el texto se ajuste y rompa palabras si es necesario */
 }
 </style>

@@ -82,7 +82,7 @@
           </ion-card-content>
         </ion-card>
 
-        <ion-button id="open-modal" expand="block" color="mycolor" class="btn-edit-product" @click="getProducts()">
+        <ion-button id="open-modal" expand="block" color="mycolor" class="btn-edit-product" @click="getProducts(SelectOrigin)">
           <ion-icon :icon="i.searchCircleSharp"></ion-icon>Seleccionar
           Productos</ion-button>
         <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="sendTransfer()"><ion-icon
@@ -108,7 +108,7 @@
             <span> página {{ page }} </span>
             <ion-list v-for="product in products" :key="product.idproduct">
               <ion-item>
-                <ion-label>{{ product.descripcion }}
+                <ion-label>   <h5 class="ion-text-wrap">{{ product.descripcion }}</h5>
                 </ion-label>
               </ion-item>
               <ion-item>
@@ -220,7 +220,7 @@ export default defineComponent({
       SelectDestination: 0 as number,
       products: [] as any,
       searchByBarcode: "" as string,
-      limit: 2 as number,
+      limit: 1 as number,
       page: 1 as number,
       offset: 0 as number,
       codigo: "" as string,
@@ -635,5 +635,9 @@ ion-button {
 .custom-modal-content {
   --overflow: auto;
   --overflow-scroll-behavior: smooth;
+}
+ion-label h5 {
+  white-space: normal; /* Permite que el texto se ajuste a múltiples líneas */
+  word-wrap: break-word; /* Permite que el texto se ajuste y rompa palabras si es necesario */
 }
 </style>
