@@ -839,14 +839,7 @@ export default defineComponent({
         } else {
           const consecutiveNumber = await TradeOrders.getNumber(id);
           this.finalNumber = consecutiveNumber + 1;
-          const alert = await alertController.create({
-            cssClass: "my-custom-class",
-            header: "CONFIRMACIÓN !!!",
-            subHeader: `NÚMERO ENCONTRADO `,
-            message: `EL NÚMERO DE PEDIDO ES ${this.finalNumber}`,
-            buttons: ["ACEPTAR"],
-          });
-          await alert.present();
+
           return this.finalNumber;
         }
       } catch (error) {
@@ -860,7 +853,7 @@ export default defineComponent({
         const responseParams = await stockManagerParamsService.findOne(uuid);
         this.idalmacen = responseParams.data.Id_Almacen;
 
-        if (this.total === 0 || this.total < 0) {
+        if (this.total <= 0) {
           const alert = await alertController.create({
             cssClass: "my-custom-class",
             header: "ATENCION !!!",
@@ -919,7 +912,14 @@ export default defineComponent({
           this.saveTradeOrder.detpedidos = finalProduct;
 
           const saveOrder1 = await TradeOrders.saveOrder(this.saveTradeOrder);
-
+          const alert = await alertController.create({
+            cssClass: "my-custom-class",
+            header: "CONFIRMACIÓN !!!",
+            subHeader: `PEDIDO CONFIRMADO ! `,
+            message: `EL NÚMERO DE PEDIDO ES ${this.finalNumber}`,
+            buttons: ["ACEPTAR"],
+          });
+          await alert.present();
           if (saveOrder1.id) {
             const idpedido = saveOrder1.id;
             this.idTradeOrder = idpedido;
@@ -940,15 +940,29 @@ export default defineComponent({
           }
         }
       } catch (error) {
-        console.log(error);
-        const alert = await alertController.create({
-          cssClass: "my-custom-class",
-          header: "ERROR !!!",
-          subHeader: `${error} `,
-          message: `${error.message} `,
-          buttons: ["ACEPTAR"],
-        });
-        await alert.present();
+
+        if (error.response.status === 400) {
+          const alert = await alertController.create({
+            cssClass: "my-custom-class",
+            header: "ATENCIÓN ERROR DE INVENTARIO!!!",
+            subHeader: `Codigo de estado: ${error.response.status} ${error.response.statusText} `,
+            message: `${error.response.data.message} `,
+            buttons: ["ACEPTAR"],
+          });
+          await alert.present();
+          return false
+        } else {
+
+          const alert = await alertController.create({
+            cssClass: "my-custom-class",
+            header: "ERROR !!!",
+            subHeader: `${error} `,
+            message: `${error.message} `,
+            buttons: ["ACEPTAR"],
+          });
+          await alert.present();
+          return false
+        }
       }
     },
     deleteProduct(id: number) {
@@ -1478,9 +1492,11 @@ ion-item {
   margin-left: 10px;
   /* Asegura que haya espacio alrededor */
 }
-ion-label h5 {
-  white-space: normal; /* Permite que el texto se ajuste a múltiples líneas */
-  word-wrap: break-word; /* Permite que el texto se ajuste y rompa palabras si es necesario */
-}
 
+ion-label h5 {
+  white-space: normal;
+  /* Permite que el texto se ajuste a múltiples líneas */
+  word-wrap: break-word;
+  /* Permite que el texto se ajuste y rompa palabras si es necesario */
+}
 </style>
