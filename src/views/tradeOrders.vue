@@ -305,8 +305,8 @@
 
             <h6 text="dark" style="margin: 0 10px;">% Descuento </h6>
 
-            <ion-input type="number" :value="product.porcdesc"
-              @input="product.porcdesc = $event.target.value"><ion-button color="mycolor" class="btn-edit-product"
+            <ion-input type="number" :value="product.porcdesc" @input="product.porcdesc = $event.target.value"
+              :readonly="!editDiscount"><ion-button color="mycolor" class="btn-edit-product"
                 @click="updateDiscount(product, product.porcdesc)"
                 v-if="product.porcdesc > 0">%</ion-button></ion-input>
           </div>
@@ -314,9 +314,9 @@
           <div style="display: flex; align-items: center;">
 
             <h6 text="dark" style="margin: 0 10px;">V. Unitario $:</h6>
-            <!-- <ion-label position="floating">V. Unitario $:</ion-label> -->
+
             <ion-input type="number" :value="computedValorProd(product)"
-              @input="updateValorProd(index, $event.target.value)"></ion-input>
+              @input="updateValorProd(index, $event.target.value)" :readonly="!editPrice"></ion-input>
 
             Total: ${{
               new Intl.NumberFormat("de-DE").format(computedTotal(product))
@@ -532,6 +532,8 @@ export default defineComponent({
       neighborhoods: [] as any,
       newNeighborhood: {} as INeighborhoodsInterface,
       lastname: "" as string,
+      editPrice: false as boolean,
+      editDiscount: false as boolean,
     };
   },
   mounted() {
@@ -542,6 +544,7 @@ export default defineComponent({
     this.getMunicipalities();
     this.getNeighborhoods();
     this.loadOrderFromLocalStorage();
+    this.loadParams();
   },
   methods: {
     fabToggled(e: any) {
@@ -847,12 +850,17 @@ export default defineComponent({
       }
       return 0;
     },
+    async loadParams() {
+      let uuid = localStorage.getItem("uuid");
+      const responseParams = await stockManagerParamsService.findOne(uuid);
+      this.idvendedor = responseParams.data.Id_Vendedor;
+      this.idtercero = responseParams.data.Id_Cliente;
+      this.idalmacen = responseParams.data.Id_Almacen;
+      this.editPrice = responseParams.data.Edita_Precio;
+      this.editDiscount = responseParams.data.Edita_Descuento;
+    },
     async saveCompleteTradeOrder() {
       try {
-        let uuid = localStorage.getItem("uuid");
-        const responseParams = await stockManagerParamsService.findOne(uuid);
-        this.idalmacen = responseParams.data.Id_Almacen;
-
         if (this.total <= 0) {
           const alert = await alertController.create({
             cssClass: "my-custom-class",
@@ -865,20 +873,17 @@ export default defineComponent({
           return false;
         } else {
           if (this.idtercero === 0) {
-            this.idtercero = responseParams.data.Id_Cliente;
             this.saveTradeOrder.idtercero = this.idtercero;
           } else {
             this.saveTradeOrder.idtercero = this.idtercero;
           }
 
           if (this.idvendedor === 0) {
-            this.idvendedor = responseParams.data.Id_Vendedor;
             this.saveTradeOrder.idvendedor = this.idvendedor;
           } else {
             this.saveTradeOrder.idvendedor = this.idvendedor;
           }
           if (this.almacen === 0) {
-            this.idalmacen = responseParams.data.Id_Almacen;
             this.saveTradeOrder.idalmacen = this.idalmacen;
           } else {
             this.saveTradeOrder.idalmacen = this.idalmacen;
@@ -894,7 +899,7 @@ export default defineComponent({
           this.saveTradeOrder.valdescuentos = this.valdescuentos;
           this.saveTradeOrder.valretenciones = 0;
           this.saveTradeOrder.idalmacen = this.idalmacen;
-          this.saveTradeOrder.estado = 0;
+          this.saveTradeOrder.estado = 3;
           this.saveTradeOrder.idsoftware = 2;
           this.saveTradeOrder.detalle = this.detalle
             ? this.detalle

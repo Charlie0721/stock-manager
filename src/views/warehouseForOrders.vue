@@ -77,7 +77,7 @@
         </ion-fab-button>
         <ion-fab-list side="top" @click="fabToggled($event)">
           <ion-card>
-            <ion-card-header>Seleccionar Almacén</ion-card-header>
+            <ion-card-header>Seleccionar Parámetros</ion-card-header>
             <ion-card-content>
               <ion-item>
                 <ion-label>Almacen</ion-label>
@@ -88,6 +88,21 @@
                   </ion-select-option>
                 </ion-select>
               </ion-item>
+              <ion-item>
+                <ion-label>Editar Precios</ion-label>
+                <ion-select :value="editPrice" @ionChange="editPrice = $event.target.value === 'true'">
+                  <ion-select-option :value="true">SI</ion-select-option>
+                  <ion-select-option :value="false">NO</ion-select-option>
+                </ion-select>
+              </ion-item>
+              <ion-item>
+                <ion-label>Editar Descuentos</ion-label>
+                <ion-select :value="editDiscount" @ionChange="editDiscount = $event.target.value === 'true'">
+                  <ion-select-option :value="true">SI</ion-select-option>
+                  <ion-select-option :value="false">NO</ion-select-option>
+                </ion-select>
+              </ion-item>
+
             </ion-card-content>
           </ion-card>
         </ion-fab-list>
@@ -184,7 +199,9 @@ export default defineComponent({
       nombres: "" as string,
       nit: "" as string,
       customerName: "" as string,
-      stockManagerParams: {} as IStockManagerParams
+      stockManagerParams: {} as IStockManagerParams,
+      editPrice: true as boolean,
+      editDiscount: true as boolean
 
     };
   },
@@ -288,7 +305,7 @@ export default defineComponent({
     async getParamsData() {
       let uuid = localStorage.getItem("uuid");
       const responseParams = await stockManagerParamsService.findOne(uuid);
-      
+
       if (responseParams.data.status === 404) {
 
         const alert = await alertController.create({
@@ -356,6 +373,8 @@ export default defineComponent({
         this.stockManagerParams.Id_Vendedor = sellerId;
         this.stockManagerParams.Id_Cliente = customerId;
         this.stockManagerParams.Id_Almacen = warehouseId;
+        this.stockManagerParams.Edita_Precio = Boolean(this.editPrice);
+        this.stockManagerParams.Edita_Descuento = Boolean(this.editDiscount);
 
         const responseSaveParams = await stockManagerParamsService.create(uuid, this.stockManagerParams)
 
