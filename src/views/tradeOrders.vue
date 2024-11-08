@@ -1164,7 +1164,7 @@ export default defineComponent({
       setTimeout(async () => {
         this.barcode = "";
         await this.getProducts();
-      }, 10000);
+      }, 13000);
     },
     async getProducts() {
       try {
