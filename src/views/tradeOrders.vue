@@ -332,10 +332,10 @@
               @ionChange="searchOneProduct($event)" @keypress.enter="searchItem()"></ion-searchbar>
             <ion-input type="search" :value="searchByBarcode" @input="searchByBarcode = $event.target.value"
               placeholder="Código de barras" @keypress.enter="searchByBarcodeItem()" :clear-input="true"></ion-input>
-            <ion-button color="mycolor" expand="full" class="btn-edit-product" @click="startScan()">
+            <!-- <ion-button color="mycolor" expand="full" class="btn-edit-product" @click="startScan()">
               Buscar Código barras</ion-button>
             <ion-button color="mycolor" expand="full" class="btn-edit-product" @click="stopScan()">
-              Detener busqueda</ion-button>
+              Detener busqueda</ion-button> -->
             <ion-button color="mycolor" @click="prevPage()" v-if="page > 1">Anterior</ion-button>
             <ion-button color="mycolor" @click="nextPage()">Siguiente</ion-button>
             <span> página {{ page }} </span>

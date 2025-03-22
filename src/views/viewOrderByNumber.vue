@@ -56,8 +56,8 @@
         <br />
         <br />
       </div>
-      <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="pdfGenerator()"><ion-icon
-          :icon="i.printOutline"></ion-icon>Generar TXT
+      <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="printHtml()"><ion-icon
+          :icon="i.printOutline"></ion-icon>Imprimir
       </ion-button>
     </ion-content>
     <ion-footer collapse="fade">
@@ -145,78 +145,176 @@ export default defineComponent({
   },
   methods: {
 
-    async pdfGenerator() {
+    //     async pdfGenerator() {
+    //       const dataProducts = [];
+    //       const archivoNuevo = "pedido numero " + this.order[0].numero + ".txt";
+    //       this.order.forEach((product: any) => {
+    //         const products = [
+    //           {
+    //             Descripcion: product.descripcion,
+    //             Vr_Unit: new Intl.NumberFormat("de-DE").format(product.valorprod),
+    //             Cantidad: product.cantidad,
+    //             Vr_Total: new Intl.NumberFormat("de-DE").format(
+    //               product.valorprod * product.cantidad
+    //             ),
+    //           },
+    //         ];
+    //         dataProducts.push(products);
+    //       });
+    //       const directory = Directory.Documents;
+
+    //       const dataStringProducts = JSON.stringify(dataProducts, null, 1).replace(
+    //         /\n/g,
+    //         "\n"
+    //       );
+
+    //       const cleanStr = dataStringProducts.replace(/[[\]{},"]/g, "");
+
+    //       let stringDataOne = `
+    //         Almacen: ${this.order[0].nomalmacen}
+    //         Fecha: ${this.order[0].fecha} Hora:${this.order[0].hora}      
+    //         Pedido Nro: ${this.order[0].numero}
+    //         Datos del Cliente
+    //         ${this.order[0].nombres}
+    //         Nit/CC:${this.order[0].nit}
+
+    //         ${cleanStr}
+
+    //         Total:$${new Intl.NumberFormat("de-DE").format(
+    //         this.order[0].valortotal
+    //       )}
+    // Software: https://conexionpos.com/
+    //         `;
+    //       console.log(stringDataOne);
+
+    //       Filesystem.writeFile({
+    //         path: `${directory}/${archivoNuevo}`,
+    //         data: stringDataOne,
+    //         encoding: Encoding.UTF8,
+    //         directory,
+    //         recursive: true,
+    //       })
+    //         .then(async () => {
+    //           const alert = await alertController.create({
+    //             cssClass: "my-custom-class",
+    //             header: "Atencion !!!",
+    //             subHeader: `OK `,
+    //             message: "Archivo generado con el nombre " + archivoNuevo,
+    //             buttons: ["ACEPTAR"],
+    //           });
+    //           await alert.present();
+    //           console.log("Archivo TXT generado correctamente");
+    //         })
+    //         .catch(async (error) => {
+    //           console.error("Ocurrió un error al generar el archivo TXT:", error);
+    //           const alert = await alertController.create({
+    //             cssClass: "my-custom-class",
+    //             header: "Atencion !!!",
+    //             subHeader: `Error ${error}`,
+    //             message: error,
+    //             buttons: ["ACEPTAR"],
+    //           });
+    //           await alert.present();
+    //         });
+
+    //     },
+
+
+    async printHtml() {
       const dataProducts = [];
-      const archivoNuevo = "pedido numero " + this.order[0].numero + ".txt";
       this.order.forEach((product: any) => {
-        const products = [
-          {
-            Descripcion: product.descripcion,
-            Vr_Unit: new Intl.NumberFormat("de-DE").format(product.valorprod),
-            Cantidad: product.cantidad,
-            Vr_Total: new Intl.NumberFormat("de-DE").format(
-              product.valorprod * product.cantidad
-            ),
-          },
-        ];
+        const products = {
+          Descripcion: product.descripcion,
+          Vr_Unit: new Intl.NumberFormat("de-DE").format(product.valorprod),
+          Cantidad: product.cantidad,
+          Vr_Total: new Intl.NumberFormat("de-DE").format(
+            product.valorprod * product.cantidad
+          ),
+        };
         dataProducts.push(products);
       });
-      const directory = Directory.Documents;
 
-      const dataStringProducts = JSON.stringify(dataProducts, null, 1).replace(
-        /\n/g,
-        "\n"
-      );
+      let productList = '';
+      dataProducts.forEach((product: any) => {
+        productList += `
+      <div style="margin-bottom: 8px;">
+        <div style="font-weight: bold; font-size: 12px;">${product.Descripcion}</div>
+        <div style="display: flex; justify-content: space-between; font-size: 11px; gap:5px;">
+          <span>Vr Unit: $${product.Vr_Unit}   Cant: ${product.Cantidad}</span>   
+         
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 11px; gap:5px;">
+                <span>Vr Total: $${product.Vr_Total}</span>
+        </div>
+      </div>
+    `;
+      });
 
-      const cleanStr = dataStringProducts.replace(/[[\]{},"]/g, "");
+      let htmlContent = `
+    <html>
+      <head>
+        <title>Pedido</title>
+        <style>
+          body { 
+            font-family: Arial, sans-serif; 
+            width: 80mm; 
+            margin: 0 auto; 
+            padding: 5px; 
+            font-size: 10px; 
+          }
+          .header, .footer { 
+            text-align: center; 
+            margin-bottom: 5px; 
+          }
+          .header h2 { 
+            font-size: 12px; 
+            margin: 3px 0; 
+          }
+          .content { 
+            margin-bottom: 10px; 
+          }
+          .total { 
+            font-weight: bold; 
+            text-align: right; 
+            margin-top: 8px; 
+            font-size: 10px; 
+          }
+          .product-details { 
+            display: flex; 
+            justify-content: space-between; 
+            gap: 5px; 
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h2>${this.warehouseName}</h2>
+            <p>Fecha: ${this.date} Hora: ${this.hour}</p>
+            <p>Pedido Nro. ${this.numb}</p>
+            <p>${this.name} ${this.lastName}</p>
+            <p>Nit/CC: ${this.nit}</p>
+          </div>
+          <div class="content">
+            ${productList}
+            <div class="total">
+              <p>SUBTOTAL: $${new Intl.NumberFormat("de-DE").format(this.subtotal)}</p>
+              <p>IVA: $${new Intl.NumberFormat("de-DE").format(this.taxValue)}</p>
+              <p>TOTAL: $${new Intl.NumberFormat("de-DE").format(this.totalValue)}</p>
+            </div>
+          </div>
+          <div class="footer">
+            <p>Software: https://conexionpos.com/</p>
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
 
-      let stringDataOne = `
-        Almacen: ${this.order[0].nomalmacen}
-        Fecha: ${this.order[0].fecha} Hora:${this.order[0].hora}      
-        Pedido Nro: ${this.order[0].numero}
-        Datos del Cliente
-        ${this.order[0].nombres}
-        Nit/CC:${this.order[0].nit}
- 
-        ${cleanStr}
-                        
-        Total:$${new Intl.NumberFormat("de-DE").format(
-        this.order[0].valortotal
-      )}
-Software: https://conexionpos.com/
-        `;
-      console.log(stringDataOne);
-
-      Filesystem.writeFile({
-        path: `${directory}/${archivoNuevo}`,
-        data: stringDataOne,
-        encoding: Encoding.UTF8,
-        directory,
-        recursive: true,
-      })
-        .then(async () => {
-          const alert = await alertController.create({
-            cssClass: "my-custom-class",
-            header: "Atencion !!!",
-            subHeader: `OK `,
-            message: "Archivo generado con el nombre " + archivoNuevo,
-            buttons: ["ACEPTAR"],
-          });
-          await alert.present();
-          console.log("Archivo TXT generado correctamente");
-        })
-        .catch(async (error) => {
-          console.error("Ocurrió un error al generar el archivo TXT:", error);
-          const alert = await alertController.create({
-            cssClass: "my-custom-class",
-            header: "Atencion !!!",
-            subHeader: `Error ${error}`,
-            message: error,
-            buttons: ["ACEPTAR"],
-          });
-          await alert.present();
-        });
-
+      const newWindow = window.open();
+      newWindow.document.open();
+      newWindow.document.write(htmlContent);
+      newWindow.document.close();
     },
 
     async getOrderByNumber() {
