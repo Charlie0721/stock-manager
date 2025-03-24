@@ -56,8 +56,12 @@
         <br />
         <br />
       </div>
-      <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="printHtml()"><ion-icon
-          :icon="i.printOutline"></ion-icon>Imprimir
+      <ion-button
+        color="mycolor"
+        class="btn-edit-product"
+        expand="full"
+        @click="printPdf()"
+        ><ion-icon :icon="i.printOutline"></ion-icon>Generar PDF
       </ion-button>
     </ion-content>
     <ion-footer collapse="fade">
@@ -97,7 +101,7 @@ import {
 import { TradeOrders } from "../services/tradeOrder";
 import vueQr from "vue-qr/src/packages/vue-qr.vue";
 import { Filesystem, Directory, Encoding } from "@capacitor/filesystem";
-
+import { Capacitor } from "@capacitor/core";
 export default defineComponent({
   name: "viewOrder",
 
@@ -144,7 +148,6 @@ export default defineComponent({
     this.getOrderByNumber();
   },
   methods: {
-
     //     async pdfGenerator() {
     //       const dataProducts = [];
     //       const archivoNuevo = "pedido numero " + this.order[0].numero + ".txt";
@@ -172,7 +175,7 @@ export default defineComponent({
 
     //       let stringDataOne = `
     //         Almacen: ${this.order[0].nomalmacen}
-    //         Fecha: ${this.order[0].fecha} Hora:${this.order[0].hora}      
+    //         Fecha: ${this.order[0].fecha} Hora:${this.order[0].hora}
     //         Pedido Nro: ${this.order[0].numero}
     //         Datos del Cliente
     //         ${this.order[0].nombres}
@@ -219,102 +222,55 @@ export default defineComponent({
 
     //     },
 
+    async printPdf() {
+      this.idalm = this.$route.params.idalmacen.toString();
+      this.numb = this.$route.params.number.toString();
+      const response = await TradeOrders.printOrderToPdfByNumberAndWarehouse(
+        this.numb,
+        this.idalm
+      );
+      const blob = new Blob([response.data], { type: "application/pdf" });
+      if (Capacitor.isNativePlatform()) {
+        // 📱 MODO MÓVIL: Guardar y abrir el archivo
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          let base64Data = "";
 
-    async printHtml() {
-      const dataProducts = [];
-      this.order.forEach((product: any) => {
-        const products = {
-          Descripcion: product.descripcion,
-          Vr_Unit: new Intl.NumberFormat("de-DE").format(product.valorprod),
-          Cantidad: product.cantidad,
-          Vr_Total: new Intl.NumberFormat("de-DE").format(
-            product.valorprod * product.cantidad
-          ),
+          if (typeof reader.result === "string") {
+            base64Data = reader.result.split(",")[1]; // Extrae solo el Base64
+          } else {
+            console.error("Error al convertir el archivo a Base64");
+            return;
+          }
+
+          const fileName = `pedido_${this.numb}.pdf`;
+
+          // Guardar el archivo en el dispositivo
+          await Filesystem.writeFile({
+            path: fileName,
+            data: base64Data,
+            directory: Directory.Documents, // O Directory.Data para ocultarlo del usuario
+          });
+
+          // Abrir el archivo con la app del sistema
+          const fileUri = await Filesystem.getUri({
+            directory: Directory.Documents,
+            path: fileName,
+          });
+
+          window.open(fileUri.uri, "_system"); // Abrir con la aplicación predeterminada
         };
-        dataProducts.push(products);
-      });
-
-      let productList = '';
-      dataProducts.forEach((product: any) => {
-        productList += `
-      <div style="margin-bottom: 8px;">
-        <div style="font-weight: bold; font-size: 12px;">${product.Descripcion}</div>
-        <div style="display: flex; justify-content: space-between; font-size: 11px; gap:5px;">
-          <span>Vr Unit: $${product.Vr_Unit}   Cant: ${product.Cantidad}</span>   
-         
-        </div>
-        <div style="display: flex; justify-content: space-between; font-size: 11px; gap:5px;">
-                <span>Vr Total: $${product.Vr_Total}</span>
-        </div>
-      </div>
-    `;
-      });
-
-      let htmlContent = `
-    <html>
-      <head>
-        <title>Pedido</title>
-        <style>
-          body { 
-            font-family: Arial, sans-serif; 
-            width: 80mm; 
-            margin: 0 auto; 
-            padding: 5px; 
-            font-size: 10px; 
-          }
-          .header, .footer { 
-            text-align: center; 
-            margin-bottom: 5px; 
-          }
-          .header h2 { 
-            font-size: 12px; 
-            margin: 3px 0; 
-          }
-          .content { 
-            margin-bottom: 10px; 
-          }
-          .total { 
-            font-weight: bold; 
-            text-align: right; 
-            margin-top: 8px; 
-            font-size: 10px; 
-          }
-          .product-details { 
-            display: flex; 
-            justify-content: space-between; 
-            gap: 5px; 
-          }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h2>${this.warehouseName}</h2>
-            <p>Fecha: ${this.date} Hora: ${this.hour}</p>
-            <p>Pedido Nro. ${this.numb}</p>
-            <p>${this.name} ${this.lastName}</p>
-            <p>Nit/CC: ${this.nit}</p>
-          </div>
-          <div class="content">
-            ${productList}
-            <div class="total">
-              <p>SUBTOTAL: $${new Intl.NumberFormat("de-DE").format(this.subtotal)}</p>
-              <p>IVA: $${new Intl.NumberFormat("de-DE").format(this.taxValue)}</p>
-              <p>TOTAL: $${new Intl.NumberFormat("de-DE").format(this.totalValue)}</p>
-            </div>
-          </div>
-          <div class="footer">
-            <p>Software: https://conexionpos.com/</p>
-          </div>
-        </div>
-      </body>
-    </html>
-  `;
-
-      const newWindow = window.open();
-      newWindow.document.open();
-      newWindow.document.write(htmlContent);
-      newWindow.document.close();
+        reader.readAsDataURL(blob);
+      } else {
+        // 🌐 MODO WEB: Descargar el archivo
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `pedido_${this.numb}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
+      }
     },
 
     async getOrderByNumber() {
@@ -354,7 +310,6 @@ ion-button {
 }
 
 ion-card-header {
-
   color: #fff;
   text-align: center;
   padding: 10px;
