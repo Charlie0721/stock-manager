@@ -122,7 +122,7 @@ export default defineComponent({
     IonFooter,
     IonButton,
     IonIcon,
-  },
+    },
   data() {
     return {
       i: allIcons,
@@ -261,6 +261,13 @@ export default defineComponent({
           window.open(fileUri.uri, "_system"); // Abrir con la aplicación predeterminada
         };
         reader.readAsDataURL(blob);
+        const alert = await alertController.create({
+          cssClass: "my-custom-class",
+          header: "Confirmación !!! ",
+          message: `Pedido: ${this.numb}, descargado`,
+          buttons: ["ACEPTAR"],
+        });
+        await alert.present();
       } else {
         // 🌐 MODO WEB: Descargar el archivo
         const link = document.createElement("a");
@@ -270,6 +277,13 @@ export default defineComponent({
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(link.href);
+        const alert = await alertController.create({
+          cssClass: "my-custom-class",
+          header: "Confirmación !!! ",
+          message: `Pedido: ${this.numb}, descargado`,
+          buttons: ["ACEPTAR"],
+        });
+        await alert.present();
       }
     },
 
