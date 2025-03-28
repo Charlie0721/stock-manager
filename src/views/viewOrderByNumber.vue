@@ -122,7 +122,7 @@ export default defineComponent({
     IonFooter,
     IonButton,
     IonIcon,
-    },
+  },
   data() {
     return {
       i: allIcons,
@@ -231,13 +231,12 @@ export default defineComponent({
       );
       const blob = new Blob([response.data], { type: "application/pdf" });
       if (Capacitor.isNativePlatform()) {
-        // 📱 MODO MÓVIL: Guardar y abrir el archivo
         const reader = new FileReader();
         reader.onloadend = async () => {
           let base64Data = "";
 
           if (typeof reader.result === "string") {
-            base64Data = reader.result.split(",")[1]; // Extrae solo el Base64
+            base64Data = reader.result.split(",")[1];
           } else {
             console.error("Error al convertir el archivo a Base64");
             return;
@@ -249,22 +248,35 @@ export default defineComponent({
           await Filesystem.writeFile({
             path: fileName,
             data: base64Data,
-            directory: Directory.Documents, // O Directory.Data para ocultarlo del usuario
+            directory: Directory.Documents,
           });
 
-          // Abrir el archivo con la app del sistema
+          // ✅ Obtener la URI del archivo guardado
           const fileUri = await Filesystem.getUri({
             directory: Directory.Documents,
             path: fileName,
           });
+          if (Capacitor.getPlatform() === "android") {
+            const { App } = await import("@capacitor/app");
 
-          window.open(fileUri.uri, "_system"); // Abrir con la aplicación predeterminada
+            // Ejecutar un intent para abrir el PDF
+            (window as any).cordova?.plugins?.intentShim.startActivity(
+              {
+                action: "android.intent.action.VIEW",
+                url: fileUri.uri,
+                type: "application/pdf",
+              },
+              () => console.log("Archivo abierto correctamente"),
+              (err: any) => console.error("Error al abrir el archivo:", err)
+            );
+          }
         };
+
         reader.readAsDataURL(blob);
         const alert = await alertController.create({
           cssClass: "my-custom-class",
           header: "Confirmación !!! ",
-          message: `Pedido: ${this.numb}, descargado`,
+          message: `Pedido: ${this.numb}, descargado `,
           buttons: ["ACEPTAR"],
         });
         await alert.present();
