@@ -20,7 +20,8 @@
         color="mycolor"
         class="btn-edit-product"
         @click="newOrder()"
-        ><ion-icon :icon="i.arrowForwardOutline"></ion-icon> Continuar con la suscripción
+        ><ion-icon :icon="i.arrowForwardOutline"></ion-icon> Continuar con la
+        suscripción
       </ion-button>
     </ion-content>
   </ion-page>
@@ -65,21 +66,33 @@ export default defineComponent({
   },
   methods: {
     async sendMessage() {
-      const response = await ControlTime.controlTime();
-      this.message = response.data.message;
+      try {
+        const response = await ControlTime.controlTime();
 
-      if (this.message === "Ha finalizado la suscripción") {
+        this.message = response.data.message;
+
+        if (this.message === "Ha finalizado la suscripción") {
+          const alert = await alertController.create({
+            cssClass: "my-custom-class",
+            header: "Atención !!! ",
+            message: `Finalizo el tiempo de suscripción  a la aplicación... pongase en contacto con el departamento de soporte técnico de Conexion POS`,
+            buttons: ["ACEPTAR"],
+          });
+          await alert.present();
+        }
+        if (this.message === "continua con la suscripción") {
+          //this.$router.push("/warehouse-for-orders");
+          this.$router.push("/login");
+        }
+      } catch (error) {
+        console.log("Error al enviar el mensaje:", error);
         const alert = await alertController.create({
           cssClass: "my-custom-class",
-          header: "Atención !!! ",
-          message: `Finalizo el tiempo de suscripción  a la aplicación... pongase en contacto con el departamento de soporte técnico de Conexion POS`,
+          header: "Error",
+          message: error,
           buttons: ["ACEPTAR"],
         });
         await alert.present();
-      }
-      if (this.message === "continua con la suscripción") {
-        //this.$router.push("/warehouse-for-orders");
-        this.$router.push("/login");
       }
     },
     newOrder() {

@@ -6,6 +6,25 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
+      <ion-item>
+        <ion-label>Seleccionar IP del Almacén</ion-label>
+        <ion-select :value="selectedConnection" @ionChange="changeConnection">
+          <ion-select-option
+            v-for="conn in connections"
+            :key="conn"
+            :value="conn"
+          >
+            {{ conn }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-button
+        color="mycolor"
+        expand="full"
+        @click="confirmSelectedConnection"
+      >
+        Conectar {{ selectedConnection }}
+      </ion-button>
       <ion-card class="login-card">
         <ion-card-header>
           <ion-card-title>Ingresar IP del servidor </ion-card-title>
@@ -107,7 +126,7 @@
             ></ion-input>
           </ion-item>
           <ion-button color="mycolor" expand="full" @click="sendConnections()"
-            >Conectar</ion-button
+            >Grabar</ion-button
           >
         </ion-card-content>
       </ion-card>
@@ -133,10 +152,13 @@ import {
   IonButton,
   IonInput,
   IonItem,
-  
+  IonSelect,
+  IonSelectOption,
 } from "@ionic/vue";
 import { urlAPiI } from "@/interfaces/connectioApi.interface";
+import { GetUrlType } from "@/interfaces/get-url.type";
 import axios from "axios";
+
 export default defineComponent({
   name: "Tab1Page",
   components: {
@@ -154,14 +176,19 @@ export default defineComponent({
     IonButton,
     IonInput,
     IonItem,
+    IonSelect,
+    IonSelectOption,
   },
   data() {
     return {
       dataConnections: {} as urlAPiI,
+      connections: [] as any,
+      selectedConnection: "",
+      urls: [] as GetUrlType[],
     };
   },
-  mounted() {
-    this.getConnectionstoApi();
+  async mounted() {
+    await this.loadConnections();
   },
 
   methods: {
@@ -177,48 +204,110 @@ export default defineComponent({
       this.dataConnections.twoPoints = ":";
       this.dataConnections.port = "4000";
       const api1 = `${this.dataConnections.header}${iP1}${this.dataConnections.pointOne}${iP2}${this.dataConnections.pointTwo}${iP3}${this.dataConnections.pointThree}${iP4}${this.dataConnections.twoPoints}${this.dataConnections.port}`;
-      await axios
-        .post(`${api1}/connect-api`, this.dataConnections)
-        .then((data) => {
-          console.log(data.data);
+      let connections = JSON.parse(localStorage.getItem("connections") || "[]");
+      if (!connections.includes(api1)) {
+        connections.push(api1);
+        localStorage.setItem("connections", JSON.stringify(connections));
+      }
 
-          localStorage.setItem("connection", JSON.stringify(api1));
-
-          this.getConnectionstoApi();
-        })
-        .catch(async (err) =>{
-          const alert = await alertController.create({
-            cssClass: "my-custom-class",
-            header: "Error !!!",
-            subHeader: `${err}`,
-            message: `${err.message}`,
-            buttons: ["OK"],
-          });
-          await alert.present(); 
-          console.log(err)
-        } );
+      // await axios
+      //   .post(`${api1}/connect-api`, this.dataConnections)
+      //   .then((data) => {
+      //     localStorage.setItem("connection", JSON.stringify(api1));
+      //   })
+      //   .catch(async (err) => {
+      //     const alert = await alertController.create({
+      //       cssClass: "my-custom-class",
+      //       header: "Error !!!",
+      //       subHeader: `${err}`,
+      //       message: `${err.message}`,
+      //       buttons: ["OK"],
+      //     });
+      //     await alert.present();
+      //   });
+      this.reload();
     },
- async   getConnectionstoApi() {
+    async getConnectionstoApi() {
       if (localStorage.getItem("connection")) {
         const conn = localStorage.getItem("connection");
-      
-     
-        if (typeof conn == "string") {
-          let connection = JSON.parse(conn);
-          console.log(connection);
+        const connections = localStorage.getItem("connections");
+        if (!conn || !connections) {
+          const alert = await alertController.create({
+            cssClass: "my-custom-class",
+            header: "Atención !!!",
+            subHeader: "No hay conexión guardada !!!!",
+            message: "Ingrese la dirección IP del servidor !!!!",
+            buttons: ["OK"],
+          });
+          await alert.present();
         }
+
+        console.log("Selected Connection:", this.selectedConnection);
         this.$router.push("/control-suscription");
       } else {
         this.$router.push("/");
-             const alert = await alertController.create({
-            cssClass: "my-custom-class",
-            header: "Atención !!!",
-            subHeader: "No esta conectado !!!!",
-            message: "Ingrese la direccion IP del servidor !!!!",
-            buttons: ["OK"],
-          });
-          await alert.present(); 
+        const alert = await alertController.create({
+          cssClass: "my-custom-class",
+          header: "Atención !!!",
+          subHeader: "No esta conectado !!!!",
+          message: "Ingrese la direccion IP del servidor !!!!",
+          buttons: ["OK"],
+        });
+        await alert.present();
       }
+    },
+    async syncConnections() {
+      this.connections = JSON.parse(
+        localStorage.getItem("connections") || "[]"
+      );
+
+      if (this.connections.length > 0) {
+        this.selectedConnection = this.connections[0];
+        localStorage.setItem(
+          "connection",
+          JSON.stringify(this.selectedConnection)
+        );
+      } else {
+        this.selectedConnection = "";
+      }
+    },
+    async loadConnections() {
+      this.connections = JSON.parse(
+        localStorage.getItem("connections") || "[]"
+      );
+
+      if (this.connections.length > 0) {
+        this.selectedConnection = this.connections[0];
+        localStorage.setItem(
+          "connection",
+          JSON.stringify(this.selectedConnection)
+        );
+      } else {
+        this.selectedConnection = "";
+      }
+    },
+    changeConnection(event: CustomEvent) {
+      const selected = event.detail.value;
+      this.selectedConnection = selected;
+      localStorage.setItem("connection", JSON.stringify(selected));
+    },
+   async confirmSelectedConnection() {
+      if (this.selectedConnection) {
+        localStorage.setItem(
+          "connection",
+          JSON.stringify(this.selectedConnection)
+        );
+        const alert = await alertController.create({
+          header: "Conectado",
+          message: `Conectado a IP ${this.selectedConnection}`,
+          buttons: ["OK"],
+        });
+        await alert.present();
+        this.getConnectionstoApi();
+      }
+    },
+    reload() {
+      location.reload();
     },
   },
 });
@@ -233,14 +322,14 @@ ion-button {
   margin: 5px;
 }
 ion-card.login-card {
-    border: 2px solid var(--ion-color-mycolor);
-    /* Añade un borde de 2px sólido en el color mycolor */
-    border-radius: 10px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  border: 2px solid var(--ion-color-mycolor);
+  /* Añade un borde de 2px sólido en el color mycolor */
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 ion-card.login-card:focus-within {
-    border-color: var(--ion-color-mynewcolor);
-    /* Cambia el color del borde cuando la card se enfoca */
+  border-color: var(--ion-color-mynewcolor);
+  /* Cambia el color del borde cuando la card se enfoca */
 }
 </style>
