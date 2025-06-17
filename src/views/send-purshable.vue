@@ -237,22 +237,22 @@
               :clear-input="true"
               @keypress.enter="searchByBarcodeItem()"
             ></ion-input>
-            <ion-button
+            <!-- <ion-button
               color="mycolor"
               expand="full"
               class="btn-edit-product"
               @click="startScan()"
             >
               Buscar Código barras</ion-button
-            >
-            <ion-button
+            > -->
+            <!-- <ion-button
               color="mycolor"
               expand="full"
               class="btn-edit-product"
               @click="stopScan()"
             >
               Detener busqueda</ion-button
-            >
+            > -->
             <ion-button color="mycolor" @click="prevPage()" v-if="page > 1"
               >Anterior</ion-button
             >
@@ -748,6 +748,7 @@ export default defineComponent({
           this.savePurshable
         );
         console.log(savePurshaseToPos);
+        console.log(savePurshaseToPos.data.number);
 
         const alert = await alertController.create({
           cssClass: "my-custom-class",
