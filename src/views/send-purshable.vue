@@ -45,7 +45,7 @@
         Compra</ion-button> -->
       <ion-card>
         <ion-card-content>
-                  <ion-item>
+          <ion-item>
             <ion-label position="floating" class="letter-color"
               >Número de Documento:</ion-label
             >
@@ -150,7 +150,7 @@
               <ion-select v-model="porcentaje">
                 <ion-select-option
                   :value="taxe.porcentaje"
-                  v-for="taxe in this.taxes"
+                  v-for="taxe in taxes"
                   :key="taxe.codiva"
                 >
                   {{ taxe.porcentaje }}
@@ -252,15 +252,14 @@
             <span> página {{ page }} </span>
             <ion-list v-for="product in products" :key="product.idproduct">
               <ion-item>
-                <ion-label
-                  >{{ product.codigo }} | {{ product.descripcion }}
-                </ion-label>
-              </ion-item>
-              <ion-item>
                 <ion-label>
-                  $
-                  {{ new Intl.NumberFormat("de-DE").format(product.costo) }}
-
+                  <h5 class="ion-text-wrap">{{ product.descripcion }}</h5>
+                  <ion-label>Cod. Barras: {{ product.barcode }} </ion-label>
+                  <ion-label>Cod. Interno: {{ product.codigo }} </ion-label>
+                  <ion-label>
+                    Costo: $
+                    {{ new Intl.NumberFormat("de-DE").format(product.costo) }}
+                  </ion-label>
                   <ion-button
                     color="mycolor"
                     class="btn-edit-product"
@@ -274,7 +273,7 @@
                         product.codiva
                       )
                     "
-                    >Comprar<ion-icon
+                    >Agregar<ion-icon
                       :icon="i.checkmarkCircleOutline"
                     ></ion-icon>
                   </ion-button>
@@ -386,7 +385,7 @@ export default defineComponent({
       taxes: [] as any,
       porcentaje: 0 as number,
       searchByBarcode: "" as string,
-      limit: 2 as number,
+      limit: 1 as number,
       page: 1 as number,
       offset: 0 as number,
       codigo: "" as string,
@@ -532,15 +531,15 @@ export default defineComponent({
     newOrder() {
       location.reload();
     },
-    prevPage() {
+    async prevPage() {
       if (this.page > 1) {
         this.page--;
-        this.getProducts();
+        await this.getProducts();
       }
     },
-    nextPage() {
+    async nextPage() {
       this.page++;
-      this.getProducts();
+      await this.getProducts();
     },
     async getProducts() {
       try {
@@ -551,6 +550,7 @@ export default defineComponent({
           this.barcode
         );
         this.products = responseProducts.data.products;
+        
       } catch (error) {
         console.log(error);
       }
@@ -585,8 +585,8 @@ export default defineComponent({
       descripcion: string,
       precioventa: number,
       costo: number,
-      codiva: string
-    ) {
+      codiva: string,
+        ) {
       try {
         const localPorcentaje = this.porcentaje;
         const product = {

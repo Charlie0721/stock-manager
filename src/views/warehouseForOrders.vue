@@ -3,7 +3,10 @@
     <ion-header>
       <ion-toolbar>
         <ion-title>
-          <img class="edit-image1" src="../images/images_app/logo_header.png" />Seleccionar almacén
+          <img
+            class="edit-image1"
+            src="../images/images_app/logo_header.png"
+          />Seleccionar almacén
         </ion-title>
       </ion-toolbar>
     </ion-header>
@@ -15,107 +18,164 @@
           </ion-item>
         </ion-card-content>
       </ion-card>
-      <ion-button id="nested-button" color="mycolor" class="btn-edit-product" expand="full"
-        @click="getCustomers()"><ion-icon :icon="i.peopleCircleOutline"></ion-icon> Seleccionar Cliente
+      <ion-button
+        id="nested-button"
+        color="mycolor"
+        class="btn-edit-product"
+        expand="full"
+        @click="getCustomers()"
+        ><ion-icon :icon="i.peopleCircleOutline"></ion-icon> Seleccionar Cliente
       </ion-button>
       <ion-popover trigger="nested-button" :dismiss-on-select="false">
-        <ion-searchbar animated debounce="500" placeholder="Buscar cliente" @ionChange="searchOneCustomer($event)"
-          @keypress.enter="searchCustomerItem()">
+        <ion-searchbar
+          animated
+          debounce="500"
+          placeholder="Buscar cliente"
+          @ionChange="searchOneCustomer($event)"
+          @keypress.enter="searchCustomerItem()"
+        >
         </ion-searchbar>
         <ion-content>
           <ion-card>
             <ion-card-header>
-              <ion-button color="mycolor" @click="prevPageCustomer()" v-if="page > 1">Anterior</ion-button>
-              <ion-button color="mycolor" @click="nextPageCustomer()">Siguiente</ion-button>
+              <ion-button
+                color="mycolor"
+                @click="prevPageCustomer()"
+                v-if="page > 1"
+                >Anterior</ion-button
+              >
+              <ion-button color="mycolor" @click="nextPageCustomer()"
+                >Siguiente</ion-button
+              >
               <span> página {{ page }} </span>
               <ion-card-title>Seleccionar Cliente</ion-card-title>
               <ion-card-subtitle>Click sobre el cliente</ion-card-subtitle>
             </ion-card-header>
             <ion-card-content>
-              <ion-list background-hover="92949c" v-for="customer in customers" :key="customer.idtercero">
+              <ion-list
+                background-hover="92949c"
+                v-for="customer in customers"
+                :key="customer.idtercero"
+              >
                 <ion-item>
                   <ion-label> NIT: {{ customer.nit }}</ion-label>
                 </ion-item>
                 <ion-item> {{ customer.nombres }} </ion-item>
-                <ion-button color="mycolor" @click="
-                  selectCustomer(
-                    customer.idtercero,
-                    customer.nit,
-                    customer.nombres
-                  )
-                  ">Seleccionar</ion-button>
+                <ion-button
+                  color="mycolor"
+                  @click="
+                    selectCustomer(
+                      customer.idtercero,
+                      customer.nit,
+                      customer.nombres
+                    )
+                  "
+                  >Seleccionar</ion-button
+                >
               </ion-list>
             </ion-card-content>
           </ion-card>
         </ion-content>
       </ion-popover>
-      <ion-button id="nested-button1" expand="full" color="mycolor" class="btn-edit-product"><ion-icon
-          :icon="i.personCircleOutline"></ion-icon>Seleccionar Vendedor
+      <ion-button
+        id="nested-button1"
+        expand="full"
+        color="mycolor"
+        class="btn-edit-product"
+        ><ion-icon :icon="i.personCircleOutline"></ion-icon>Seleccionar Vendedor
       </ion-button>
       <ion-popover trigger="nested-button1" :dismiss-on-select="false">
-        <ion-searchbar animated debounce="500" placeholder="Buscar empleado" @ionChange="searchOneEmployee($event)">
+        <ion-searchbar
+          animated
+          debounce="500"
+          placeholder="Buscar empleado"
+          @ionChange="searchOneEmployee($event)"
+        >
         </ion-searchbar>
         <ion-content>
           <ion-list>
             <ion-label>
-              <ion-list background-hover="92949c" v-for="employee in employees" :key="employee.idtercero">
+              <ion-list
+                background-hover="92949c"
+                v-for="employee in employees"
+                :key="employee.idtercero"
+              >
                 <ion-item :button="true" :detail="false">
                   NIT: {{ employee.nit }}. {{ employee.nombres }}
-                </ion-item> <ion-button color="mycolor" @click="
-                  selectEmployee(
-                    employee.idtercero,
-                    employee.nit,
-                    employee.nombres
-                  )
-                  ">Seleccionar</ion-button></ion-list> </ion-label>
+                </ion-item>
+                <ion-button
+                  color="mycolor"
+                  @click="
+                    selectEmployee(
+                      employee.idtercero,
+                      employee.nit,
+                      employee.nombres
+                    )
+                  "
+                  >Seleccionar</ion-button
+                ></ion-list
+              >
+            </ion-label>
           </ion-list>
         </ion-content>
       </ion-popover>
-      <ion-fab id="remote_controller" horizontal="center" vertical="center">
-        <ion-fab-button color="danger">
-          <ion-icon :icon="i.add"></ion-icon>
-        </ion-fab-button>
-        <ion-fab-list side="top" @click="fabToggled($event)">
-          <ion-card>
-            <ion-card-header>Seleccionar Parámetros</ion-card-header>
-            <ion-card-content>
-              <ion-item>
-                <ion-label>Almacen</ion-label>
-                <ion-select :value="SelectIdalmacen" @ionChange="SelectIdalmacen = $event.target.value">
-                  <ion-select-option :value="warehouse.idalmacen" v-for="warehouse in allWarehouses"
-                    :key="warehouse.idalmacen">
-                    {{ warehouse.nomalmacen }}
-                  </ion-select-option>
-                </ion-select>
-              </ion-item>
-              <ion-item>
-                <ion-label>Editar Precios</ion-label>
-                <ion-select :value="editPrice" @ionChange="editPrice = $event.target.value === 'true'">
-                  <ion-select-option :value="true">SI</ion-select-option>
-                  <ion-select-option :value="false">NO</ion-select-option>
-                </ion-select>
-              </ion-item>
-              <ion-item>
-                <ion-label>Editar Descuentos</ion-label>
-                <ion-select :value="editDiscount" @ionChange="editDiscount = $event.target.value === 'true'">
-                  <ion-select-option :value="true">SI</ion-select-option>
-                  <ion-select-option :value="false">NO</ion-select-option>
-                </ion-select>
-              </ion-item>
-
-            </ion-card-content>
-          </ion-card>
-        </ion-fab-list>
-      </ion-fab>
-
+        <ion-card class="login-card">
+        <ion-card>
+          <p v-if="customerName !== ''">CLIENTE: {{ customerName }}</p>
+          <p v-if="employeeName !== ''">VENDEDOR: {{ employeeName }}</p>
+          <ion-card-header>Seleccionar Parámetros</ion-card-header>
+          <ion-card-content>
+            <ion-item>
+              <ion-label>Almacén</ion-label>
+              <ion-select
+                :value="SelectIdalmacen"
+                @ionChange="SelectIdalmacen = $event.target.value"
+              >
+                <ion-select-option
+                  :value="warehouse.idalmacen"
+                  v-for="warehouse in allWarehouses"
+                  :key="warehouse.idalmacen"
+                >
+                  {{ warehouse.nomalmacen }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+            <ion-item>
+              <ion-label>Editar Precios</ion-label>
+              <ion-select
+                :value="editPrice"
+                @ionChange="editPrice = $event.target.value === 'true'"
+              >
+                <ion-select-option :value="true">SI</ion-select-option>
+                <ion-select-option :value="false">NO</ion-select-option>
+              </ion-select>
+            </ion-item>
+            <ion-item>
+              <ion-label>Editar Descuentos</ion-label>
+              <ion-select
+                :value="editDiscount"
+                @ionChange="editDiscount = $event.target.value === 'true'"
+              >
+                <ion-select-option :value="true">SI</ion-select-option>
+                <ion-select-option :value="false">NO</ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-card-content>
+        </ion-card>
+      </ion-card>
     </ion-content>
     <ion-content>
       <ion-card class="login-card">
-
-        <p v-if="this.customerName !== ''">CLIENTE: {{ this.customerName }}</p>
-        <p v-if="this.employeeName !== ''">VENDEDOR: {{ this.employeeName }}</p>
+     
       </ion-card>
-      <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="getIdalmacen()"> Grabar</ion-button>
+      <ion-button
+        color="mycolor"
+        class="btn-edit-product"
+        expand="full"
+        @click="getIdalmacen()"
+      >
+        Grabar</ion-button
+      >
     </ion-content>
   </ion-page>
 </template>
@@ -140,10 +200,7 @@ import {
   IonItem,
   IonSelectOption,
   IonSelect,
-  IonFabButton,
   IonIcon,
-  IonFab,
-  IonFabList,
   IonPopover,
   IonSearchbar,
   IonList,
@@ -153,7 +210,7 @@ import {
 import { StockManagerParamsService } from "@/services/stock_manager_params.service";
 import { IStockManagerParams } from "@/interfaces/stock_manager_params.interface";
 import router from "@/router";
-const stockManagerParamsService = new StockManagerParamsService()
+const stockManagerParamsService = new StockManagerParamsService();
 export default defineComponent({
   name: "Tab1Page",
   components: {
@@ -170,16 +227,12 @@ export default defineComponent({
     IonItem,
     IonSelectOption,
     IonSelect,
-    IonFabButton,
     IonIcon,
-    IonFab,
-    IonFabList,
     IonPopover,
     IonSearchbar,
     IonList,
     IonCardSubtitle,
     IonCardTitle,
-
   },
   data() {
     return {
@@ -201,15 +254,14 @@ export default defineComponent({
       customerName: "" as string,
       stockManagerParams: {} as IStockManagerParams,
       editPrice: true as boolean,
-      editDiscount: true as boolean
-
+      editDiscount: true as boolean,
     };
   },
   mounted() {
     this.getEmployee();
     this.getWarehouses();
     let uuid = localStorage.getItem("uuid");
-    this.getParamsData(uuid)
+    this.getParamsData(uuid);
     //  this.sendIdToOrders();
   },
 
@@ -278,7 +330,7 @@ export default defineComponent({
           this.employees = this.employees.filter((employee: any) => {
             return (
               employee.nombres.toUpperCase().indexOf(this.searchEmployees) >
-              -1 || employee.nit.indexOf(this.searchEmployees) > -1
+                -1 || employee.nit.indexOf(this.searchEmployees) > -1
             );
           });
         }
@@ -291,8 +343,6 @@ export default defineComponent({
       this.employees = employees.data.employee;
     },
     selectEmployee(id: number, nit: string, nombres: string) {
-
-
       this.idvendedor = id;
       this.employeeName = nombres;
       this.employeeNit = nit;
@@ -307,7 +357,6 @@ export default defineComponent({
       const responseParams = await stockManagerParamsService.findOne(uuid);
 
       if (responseParams.data.status === 404) {
-
         const alert = await alertController.create({
           cssClass: "my-custom-class",
           header: "Atención !",
@@ -316,7 +365,7 @@ export default defineComponent({
           buttons: ["OK"],
         });
         await alert.present();
-        return
+        return;
       } else if (responseParams.status === 200) {
         this.$router.push("/tabs/tab1");
       }
@@ -324,19 +373,20 @@ export default defineComponent({
     async getIdalmacen() {
       this.idalmacen = this.SelectIdalmacen;
 
-      this.idtercero
-      this.idvendedor
+      this.idtercero;
+      this.idvendedor;
 
       if (this.idalmacen === 0) {
         const alert = await alertController.create({
           cssClass: "my-custom-class",
           header: "¡Atención !",
           subHeader: "Seleccione almacén !!",
-          message: "Debe seleccionar almacén predeterminado para generar pedidos",
+          message:
+            "Debe seleccionar almacén predeterminado para generar pedidos",
           buttons: ["OK"],
         });
         await alert.present();
-        return
+        return;
       }
 
       if (this.idvendedor === 0 || this.idvendedor === undefined) {
@@ -344,31 +394,35 @@ export default defineComponent({
           cssClass: "my-custom-class",
           header: "¡Atención !",
           subHeader: "Seleccione Vendedor !!",
-          message: "Debe seleccionar un vendedor predeterminado para generar pedidos",
+          message:
+            "Debe seleccionar un vendedor predeterminado para generar pedidos",
           buttons: ["OK"],
         });
         await alert.present();
-        return
+        return;
       }
       if (this.idtercero === 0 || this.idtercero === undefined) {
         const alert = await alertController.create({
           cssClass: "my-custom-class",
           header: "¡Atención !",
           subHeader: "Seleccione Cliente !!",
-          message: "Debe seleccionar un cliente predeterminado para generar pedidos",
+          message:
+            "Debe seleccionar un cliente predeterminado para generar pedidos",
           buttons: ["OK"],
         });
         await alert.present();
-        return
+        return;
       }
 
       await this.saveParams(this.idvendedor, this.idtercero, this.idalmacen);
     },
 
-    async saveParams(sellerId: number, customerId: number, warehouseId: number,) {
-
+    async saveParams(
+      sellerId: number,
+      customerId: number,
+      warehouseId: number
+    ) {
       try {
-
         let uuid = localStorage.getItem("uuid");
         this.stockManagerParams.Id_Vendedor = sellerId;
         this.stockManagerParams.Id_Cliente = customerId;
@@ -376,8 +430,10 @@ export default defineComponent({
         this.stockManagerParams.Edita_Precio = Boolean(this.editPrice);
         this.stockManagerParams.Edita_Descuento = Boolean(this.editDiscount);
 
-        const responseSaveParams = await stockManagerParamsService.create(uuid, this.stockManagerParams)
-
+        const responseSaveParams = await stockManagerParamsService.create(
+          uuid,
+          this.stockManagerParams
+        );
 
         if (responseSaveParams.status == 201) {
           const alert = await alertController.create({
@@ -389,11 +445,8 @@ export default defineComponent({
           });
           await alert.present();
 
-
           this.$router.push("/tabs/tab1");
         }
-
-
       } catch (error) {
         const alert = await alertController.create({
           cssClass: "my-custom-class",
@@ -404,8 +457,7 @@ export default defineComponent({
         });
         await alert.present();
       }
-
-    }
+    },
   },
 });
 </script>
