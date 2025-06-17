@@ -45,17 +45,7 @@
         Compra</ion-button> -->
       <ion-card>
         <ion-card-content>
-          <ion-item>
-            <ion-label position="floating" class="letter-color"
-              >Prefijo:</ion-label
-            >
-            <ion-input
-              type="text"
-              :value="prefijo"
-              @input="prefijo = $event.target.value"
-            ></ion-input>
-          </ion-item>
-          <ion-item>
+                  <ion-item>
             <ion-label position="floating" class="letter-color"
               >Número de Documento:</ion-label
             >
@@ -376,7 +366,6 @@ export default defineComponent({
       savePurshable: {} as IHeaderPurchases,
       SelectIdalmacen: 0 as number,
       allWarehouses: [] as any,
-      finalNumber: 0 as number,
       fechadocprov: "" as string,
       fecha: "" as string,
       suppliers: [] as any,
@@ -391,7 +380,6 @@ export default defineComponent({
       salePrice: 0 as number,
       cost: 0 as number,
       TotalProductCost: 0 as number,
-      prefijo: "" as string,
       docprovee: 0 as number,
       detail: "" as string,
       idPurshable: 0 as number,
@@ -691,7 +679,7 @@ export default defineComponent({
         console.log(error);
       }
     },
-     async savePurshaseToPos() {
+    async savePurshaseToPos() {
       if (this.SelectIdalmacen === 0) {
         const alert = await alertController.create({
           cssClass: "my-custom-class",
@@ -735,10 +723,8 @@ export default defineComponent({
       } else {
         this.savePurshable.idalmacen = this.SelectIdalmacen;
         this.savePurshable.docprovee = this.docprovee;
-      //  this.savePurshable.numero = this.finalNumber;
         this.savePurshable.fechadocprov = this.fechadocprov.replace(/-/gi, "");
         this.savePurshable.fecha = this.fecha.replace(/-/gi, "");
-        this.savePurshable.prefijo = this.prefijo;
         this.savePurshable.detalle = this.detail;
         this.savePurshable.detcompras = this.productArray;
         this.savePurshable.idpago = 1;
@@ -747,14 +733,11 @@ export default defineComponent({
         const savePurshaseToPos = await Purchases.setHeadertoPurchase(
           this.savePurshable
         );
-        console.log(savePurshaseToPos);
-        console.log(savePurshaseToPos.data.number);
-
         const alert = await alertController.create({
           cssClass: "my-custom-class",
           header: "CONFIRMACION !!!",
-          subHeader: `COMPRA ${this.finalNumber} GUARDADA SATISFACTORIAMENTE `,
-          message: `APROBAR LA COMPRA EN CONEXION POS CON EL NUMERO ${this.finalNumber}`,
+          subHeader: `COMPRA ${savePurshaseToPos.data.number} GUARDADA SATISFACTORIAMENTE `,
+          message: `APROBAR LA COMPRA EN CONEXION POS CON EL NUMERO ${savePurshaseToPos.data.number}`,
           buttons: ["ACEPTAR"],
         });
         await alert.present();
