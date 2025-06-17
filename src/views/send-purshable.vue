@@ -691,36 +691,7 @@ export default defineComponent({
         console.log(error);
       }
     },
-
-    // async getNumbers(id: number) {
-    //   try {
-    //     id = this.SelectIdalmacen;
-    //     if (id === 0) {
-    //       const alert = await alertController.create({
-    //         cssClass: "my-custom-class",
-    //         header: "ATENCIÓN !!!",
-    //         subHeader: `NO PASA VALIDACIÓN `,
-    //         message: `DEBE SELECCIONAR ALMACEN`,
-    //         buttons: ["ACEPTAR"],
-    //       });
-    //       await alert.present();
-    //     } else {
-    //       const consecutiveNumber = await Purchases.getNumberPurchase(id);
-    //       this.finalNumber = consecutiveNumber.data.length + 1;
-    //       const alert = await alertController.create({
-    //         cssClass: "my-custom-class",
-    //         header: "CONFIRMACIÓN !!!",
-    //         subHeader: `NÚMERO ENCONTRADO `,
-    //         message: `EL NÚMERO DE COMPRA ES ${this.finalNumber}`,
-    //         buttons: ["ACEPTAR"],
-    //       });
-    //       await alert.present();
-    //     }
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // },
-    async savePurshaseToPos() {
+     async savePurshaseToPos() {
       if (this.SelectIdalmacen === 0) {
         const alert = await alertController.create({
           cssClass: "my-custom-class",
@@ -764,7 +735,7 @@ export default defineComponent({
       } else {
         this.savePurshable.idalmacen = this.SelectIdalmacen;
         this.savePurshable.docprovee = this.docprovee;
-        this.savePurshable.numero = this.finalNumber;
+      //  this.savePurshable.numero = this.finalNumber;
         this.savePurshable.fechadocprov = this.fechadocprov.replace(/-/gi, "");
         this.savePurshable.fecha = this.fecha.replace(/-/gi, "");
         this.savePurshable.prefijo = this.prefijo;
