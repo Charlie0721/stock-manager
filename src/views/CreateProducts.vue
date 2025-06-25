@@ -63,10 +63,10 @@
           <ion-input type="text" :value="product.barcode" @input="product.barcode = $event.target.value">
           </ion-input>
         </ion-item>
-        <ion-button color="mycolor" expand="full" class="btn-edit-product" @click="startScan()">
+        <!-- <ion-button color="mycolor" expand="full" class="btn-edit-product" @click="startScan()">
           Escanear Codigo barras</ion-button>
         <ion-button color="mycolor" expand="full" class="btn-edit-product" @click="stopScan()">
-          Detener busqueda</ion-button>
+          Detener busqueda</ion-button> -->
         <ion-item>
           <ion-select placeholder="Unidad de medida" @ionChange="unitOfMeasureId = $event.target.value"
             :value="unitOfMeasureId">
