@@ -417,7 +417,8 @@ export default defineComponent({
       setTimeout(async () => {
         this.barcode = "";
         await this.getProducts();
-      }, 5000);
+      }, 20000);
+    
     },
     searchItem() {
       this.getProducts(this.descripcion);
@@ -644,7 +645,7 @@ export default defineComponent({
         console.log(error);
       }
     },
-      updateAmount(product, newValue) {
+    updateAmount(product, newValue) {
       const newQuantity = parseInt(newValue);
       if (!isNaN(newQuantity) && newQuantity > 0) {
         product.cantidad = newQuantity;
