@@ -176,6 +176,14 @@
               @click="deleteProduct(product.idproducto)"
               ><ion-icon :icon="i.trashOutline"></ion-icon>
             </ion-button>
+            <!-- Input para cantidad -->
+            <h6 text="dark" style="margin: 0 10px">Cantidad:</h6>
+            <ion-input
+              type="number"
+              v-model="product.cantidad"
+              @input="updateAmount(product, $event.target.value)"
+              style="width: 60px"
+            ></ion-input>
             <ion-item>
               <ion-label position="floating">Precio de venta</ion-label>
               <ion-input
@@ -186,7 +194,6 @@
             </ion-item>
           </ion-card-subtitle>
         </ion-card-header>
-        <h5 text="dark">Cantidad: {{ product.cantidad }}</h5>
       </ion-card>
       <ion-content class="ion-padding">
         <ion-button
@@ -550,7 +557,6 @@ export default defineComponent({
           this.barcode
         );
         this.products = responseProducts.data.products;
-        
       } catch (error) {
         console.log(error);
       }
@@ -585,8 +591,8 @@ export default defineComponent({
       descripcion: string,
       precioventa: number,
       costo: number,
-      codiva: string,
-        ) {
+      codiva: string
+    ) {
       try {
         const localPorcentaje = this.porcentaje;
         const product = {
@@ -636,6 +642,12 @@ export default defineComponent({
         });
       } catch (error) {
         console.log(error);
+      }
+    },
+      updateAmount(product, newValue) {
+      const newQuantity = parseInt(newValue);
+      if (!isNaN(newQuantity) && newQuantity > 0) {
+        product.cantidad = newQuantity;
       }
     },
     async searchSupplier(event: any) {
