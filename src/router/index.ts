@@ -123,6 +123,11 @@ const routes: Array<RouteRecordRaw> = [
     name: "MoneyCollectionsData",
     component: () => import("@/views/ViewMoneyCollections.vue"),
   },
+  {
+    path: "/paginate-orders/:idalmacen/:idvendedor",
+    name: "PaginateOrders",
+    component: () => import("@/views/PaginateOrders.vue"),
+  },
 ];
 
 const router = createRouter({

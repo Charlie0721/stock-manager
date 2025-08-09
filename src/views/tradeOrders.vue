@@ -1,27 +1,43 @@
 <template>
   <ion-page>
-
     <ion-header>
-
-      <ion-button color="mycolor" expand="block" class="btn-edit-product" @click="checkSales">Consultar ventas del Día
-      </ion-button>
+      <ion-button
+        color="mycolor"
+        expand="block"
+        class="btn-edit-product"
+        @click="checkSales"
+        >Consultar ventas del Día</ion-button
+      >
+      <ion-button
+        color="mycolor"
+        expand="block"
+        class="btn-edit-product"
+        @click="paginateOrders(this.idalmacen, this.idvendedor)"
+        >Pedidos por vendedor</ion-button
+      >
       <ion-toolbar>
         <ion-title>
           <img class="edit-image1" src="../images/images_app/logo_header.png" />
           Pedido Comercial
-
-
         </ion-title>
       </ion-toolbar>
       <ion-grid>
         <ion-row>
           <ion-col size="6">
-            <ion-button color="mycolor" expand="block" @click="saveCompleteTradeOrder()">
+            <ion-button
+              color="mycolor"
+              expand="block"
+              @click="saveCompleteTradeOrder()"
+            >
               <ion-icon :icon="i.saveSharp"></ion-icon> Pedido
             </ion-button>
           </ion-col>
           <ion-col size="6">
-            <ion-button color="mycolor" expand="block" @click="goToMoneyCollections()">
+            <ion-button
+              color="mycolor"
+              expand="block"
+              @click="goToMoneyCollections()"
+            >
               <ion-icon :icon="i.cashSharp"></ion-icon> Recaudos
             </ion-button>
           </ion-col>
@@ -35,33 +51,55 @@
         </ion-row>
         <ion-row>
           <ion-col size="6">
-            <ion-button id="nested-button" color="mycolor" class="btn-edit-product" expand="full"
-              @click="getCustomers()"><ion-icon :icon="i.peopleCircleOutline"></ion-icon> Cliente
+            <ion-button
+              id="nested-button"
+              color="mycolor"
+              class="btn-edit-product"
+              expand="full"
+              @click="getCustomers()"
+              ><ion-icon :icon="i.peopleCircleOutline"></ion-icon> Cliente
             </ion-button>
           </ion-col>
           <ion-col size="6">
-            <ion-button id="nested-button1" expand="full" color="mycolor" class="btn-edit-product"><ion-icon
-                :icon="i.personCircleOutline"></ion-icon>Vendedor
+            <ion-button
+              id="nested-button1"
+              expand="full"
+              color="mycolor"
+              class="btn-edit-product"
+              ><ion-icon :icon="i.personCircleOutline"></ion-icon>Vendedor
             </ion-button>
           </ion-col>
         </ion-row>
         <ion-row>
           <ion-col size="6">
-            <ion-button id="open-modal1" expand="block" color="mycolor" class="btn-edit-product">
+            <ion-button
+              id="open-modal1"
+              expand="block"
+              color="mycolor"
+              class="btn-edit-product"
+            >
               <ion-icon :icon="i.personAddOutline"></ion-icon>Crear
-              Cliente</ion-button>
+              Cliente</ion-button
+            >
           </ion-col>
           <ion-col size="6">
-            <ion-button color="mycolor" class="btn-edit-product" @click="newOrder()"><ion-icon
-                :icon="i.refreshCircleSharp"></ion-icon> Nuevo Pedido
+            <ion-button
+              color="mycolor"
+              class="btn-edit-product"
+              @click="newOrder()"
+              ><ion-icon :icon="i.refreshCircleSharp"></ion-icon> Nuevo Pedido
             </ion-button>
           </ion-col>
-
         </ion-row>
       </ion-grid>
       <ion-item>
         <ion-label position="stacked">Observación:</ion-label>
-        <ion-input type="text" :value="detalle" @input="detalle = $event.target.value"></ion-input></ion-item>
+        <ion-input
+          type="text"
+          :value="detalle"
+          @input="detalle = $event.target.value"
+        ></ion-input
+      ></ion-item>
       <ion-fab vertical="bottom" horizontal="end" v-if="subtotal > 0">
         <ion-fab-button color="mycolor">Total</ion-fab-button>
         <ion-fab-list side="start">
@@ -95,64 +133,109 @@
           </ion-card>
         </ion-fab-list>
       </ion-fab>
-
-
-
-
     </ion-header>
 
     <ion-content :fullscreen="true">
-
-      <ion-modal ref="modal" trigger="open-modal1" :initial-breakpoint="0.25" :breakpoints="[0, 0.25, 0.7, 0.97]">
+      <ion-modal
+        ref="modal"
+        trigger="open-modal1"
+        :initial-breakpoint="0.25"
+        :breakpoints="[0, 0.25, 0.7, 0.97]"
+      >
         <ion-content class="ion-padding">
           <div class="ion-text-center">
             <h4>Crear Cliente</h4>
           </div>
           <ion-item>
             <ion-label position="stacked">NIT:</ion-label>
-            <ion-input type="text" :value="saveClient.nit" @input="saveClient.nit = $event.target.value"></ion-input>
+            <ion-input
+              type="text"
+              :value="saveClient.nit"
+              @input="saveClient.nit = $event.target.value"
+            ></ion-input>
             <ion-label position="stacked">NOMBRES:</ion-label>
-            <ion-input type="text" :value="saveClient.nombres"
-              @input="saveClient.nombres = $event.target.value"></ion-input>
+            <ion-input
+              type="text"
+              :value="saveClient.nombres"
+              @input="saveClient.nombres = $event.target.value"
+            ></ion-input>
             <ion-label position="stacked">NOMBRE COMERCIAL:</ion-label>
-            <ion-input type="text" :value="saveClient.nomcomercial"
-              @input="saveClient.nomcomercial = $event.target.value"></ion-input>
+            <ion-input
+              type="text"
+              :value="saveClient.nomcomercial"
+              @input="saveClient.nomcomercial = $event.target.value"
+            ></ion-input>
             <ion-label position="stacked">EMAIL:</ion-label>
-            <ion-input type="text" :value="saveClient.email"
-              @input="saveClient.email = $event.target.value"></ion-input>
+            <ion-input
+              type="text"
+              :value="saveClient.email"
+              @input="saveClient.email = $event.target.value"
+            ></ion-input>
             <ion-label position="stacked">DIRECCION:</ion-label>
-            <ion-input type="text" :value="saveClient.direccion"
-              @input="saveClient.direccion = $event.target.value"></ion-input>
+            <ion-input
+              type="text"
+              :value="saveClient.direccion"
+              @input="saveClient.direccion = $event.target.value"
+            ></ion-input>
             <ion-label position="stacked">TELEFONO:</ion-label>
-            <ion-input type="text" :value="saveClient.telefono"
-              @input="saveClient.telefono = $event.target.value"></ion-input>
+            <ion-input
+              type="text"
+              :value="saveClient.telefono"
+              @input="saveClient.telefono = $event.target.value"
+            ></ion-input>
           </ion-item>
           <ion-item>
             <ion-label>PAIS</ion-label>
-            <ion-select :value="countryId" @ionChange="countryId = $event.target.value">
-              <ion-select-option :value="country.idpais" v-for="country in countries" :key="country.idpais">
+            <ion-select
+              :value="countryId"
+              @ionChange="countryId = $event.target.value"
+            >
+              <ion-select-option
+                :value="country.idpais"
+                v-for="country in countries"
+                :key="country.idpais"
+              >
                 {{ country.nompais }}
               </ion-select-option>
             </ion-select>
             <ion-label>DEPTO</ion-label>
-            <ion-select :value="departmentId" @ionChange="departmentId = $event.target.value">
-              <ion-select-option :value="department.iddepto" v-for="department in departmens" :key="department.iddepto">
+            <ion-select
+              :value="departmentId"
+              @ionChange="departmentId = $event.target.value"
+            >
+              <ion-select-option
+                :value="department.iddepto"
+                v-for="department in departmens"
+                :key="department.iddepto"
+              >
                 {{ department.nomdepartamento }}
               </ion-select-option>
             </ion-select>
           </ion-item>
           <ion-item>
             <ion-label>MUNICIPIO</ion-label>
-            <ion-select :value="municipalityId" @ionChange="municipalityId = $event.target.value">
-              <ion-select-option :value="municipality.idmunicipio" v-for="municipality in municipalities"
-                :key="municipality.idmunicipio">
+            <ion-select
+              :value="municipalityId"
+              @ionChange="municipalityId = $event.target.value"
+            >
+              <ion-select-option
+                :value="municipality.idmunicipio"
+                v-for="municipality in municipalities"
+                :key="municipality.idmunicipio"
+              >
                 {{ municipality.nommunicipio }}
               </ion-select-option>
             </ion-select>
             <ion-label>BARRIO</ion-label>
-            <ion-select :value="neighborhoodId" @ionChange="neighborhoodId = $event.target.value">
-              <ion-select-option :value="neighborhood.idbarrio" v-for="neighborhood in neighborhoods"
-                :key="neighborhood.idpais">
+            <ion-select
+              :value="neighborhoodId"
+              @ionChange="neighborhoodId = $event.target.value"
+            >
+              <ion-select-option
+                :value="neighborhood.idbarrio"
+                v-for="neighborhood in neighborhoods"
+                :key="neighborhood.idpais"
+              >
                 {{ neighborhood.nombarrio }}
               </ion-select-option>
             </ion-select>
@@ -160,53 +243,91 @@
           <ion-card>
             <ion-item>
               <ion-label position="floating">Nombre Barrio:</ion-label>
-              <ion-input type="text" :value="newNeighborhood.nombarrio"
-                @input="newNeighborhood.nombarrio = $event.target.value"></ion-input>
+              <ion-input
+                type="text"
+                :value="newNeighborhood.nombarrio"
+                @input="newNeighborhood.nombarrio = $event.target.value"
+              ></ion-input>
             </ion-item>
-            <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="createNeighborhoods()"><ion-icon
-                :icon="i.peopleCircleOutline"></ion-icon> Crear Barrio
+            <ion-button
+              color="mycolor"
+              class="btn-edit-product"
+              expand="full"
+              @click="createNeighborhoods()"
+              ><ion-icon :icon="i.peopleCircleOutline"></ion-icon> Crear Barrio
             </ion-button>
           </ion-card>
-          <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="createClient()"><ion-icon
-              :icon="i.saveSharp"></ion-icon> GUARDAR
-            CLIENTE</ion-button>
+          <ion-button
+            color="mycolor"
+            class="btn-edit-product"
+            expand="full"
+            @click="createClient()"
+            ><ion-icon :icon="i.saveSharp"></ion-icon> GUARDAR
+            CLIENTE</ion-button
+          >
         </ion-content>
       </ion-modal>
 
       <ion-popover trigger="nested-button" :dismiss-on-select="false">
         <ion-card>
-          <ion-searchbar animated debounce="500" placeholder="Buscar Nit" @ionChange="searchOneCustomer($event)"
-            @keypress.enter="searchCustomerItem()">
+          <ion-searchbar
+            animated
+            debounce="500"
+            placeholder="Buscar Nit"
+            @ionChange="searchOneCustomer($event)"
+            @keypress.enter="searchCustomerItem()"
+          >
           </ion-searchbar>
         </ion-card>
         <ion-card>
-          <ion-searchbar animated debounce="500" placeholder="Buscar Nombres"
-            @ionChange="searchOneCustomerByName($event)" @keypress.enter="searchCustomerItem()">
+          <ion-searchbar
+            animated
+            debounce="500"
+            placeholder="Buscar Nombres"
+            @ionChange="searchOneCustomerByName($event)"
+            @keypress.enter="searchCustomerItem()"
+          >
           </ion-searchbar>
         </ion-card>
         <ion-content>
           <ion-card>
             <ion-card-header>
-              <ion-button color="mycolor" @click="prevPageCustomer()" v-if="page > 1">Anterior</ion-button>
-              <ion-button color="mycolor" @click="nextPageCustomer()">Siguiente</ion-button>
+              <ion-button
+                color="mycolor"
+                @click="prevPageCustomer()"
+                v-if="page > 1"
+                >Anterior</ion-button
+              >
+              <ion-button color="mycolor" @click="nextPageCustomer()"
+                >Siguiente</ion-button
+              >
               <span> página {{ page }} </span>
               <ion-card-title>Seleccionar Cliente</ion-card-title>
               <ion-card-subtitle>Click sobre el cliente</ion-card-subtitle>
             </ion-card-header>
             <ion-card-content>
-              <ion-list background-hover="92949c" v-for="customer in customers" :key="customer.idtercero">
+              <ion-list
+                background-hover="92949c"
+                v-for="customer in customers"
+                :key="customer.idtercero"
+              >
                 <ion-item>
                   <ion-label> NIT: {{ customer.nit }}</ion-label>
                 </ion-item>
                 <ion-item>
-                  {{ customer.nombres }} {{ customer.apellidos }}</ion-item>
-                <ion-button color="mycolor" @click="
-                  selectCustomer(
-                    customer.idtercero,
-                    customer.nit,
-                    customer.nombres
-                  )
-                  ">Seleccionar</ion-button>
+                  {{ customer.nombres }} {{ customer.apellidos }}</ion-item
+                >
+                <ion-button
+                  color="mycolor"
+                  @click="
+                    selectCustomer(
+                      customer.idtercero,
+                      customer.nit,
+                      customer.nombres
+                    )
+                  "
+                  >Seleccionar</ion-button
+                >
               </ion-list>
             </ion-card-content>
           </ion-card>
@@ -214,21 +335,33 @@
       </ion-popover>
 
       <ion-popover trigger="nested-button1" :dismiss-on-select="false">
-        <ion-searchbar animated debounce="500" placeholder="Buscar empleado" @ionChange="searchOneEmployee($event)">
+        <ion-searchbar
+          animated
+          debounce="500"
+          placeholder="Buscar empleado"
+          @ionChange="searchOneEmployee($event)"
+        >
         </ion-searchbar>
         <ion-content>
           <ion-list>
             <ion-label>
-              <ion-list background-hover="92949c" v-for="employee in employees" :key="employee.idtercero" @click="
-                selectEmployee(
-                  employee.idtercero,
-                  employee.nit,
-                  employee.nombres
-                )
-                ">
+              <ion-list
+                background-hover="92949c"
+                v-for="employee in employees"
+                :key="employee.idtercero"
+                @click="
+                  selectEmployee(
+                    employee.idtercero,
+                    employee.nit,
+                    employee.nombres
+                  )
+                "
+              >
                 <ion-item :button="true" :detail="false">
                   NIT: {{ employee.nit }}. {{ employee.nombres }}
-                </ion-item></ion-list></ion-label>
+                </ion-item></ion-list
+              ></ion-label
+            >
           </ion-list>
         </ion-content>
       </ion-popover>
@@ -240,54 +373,76 @@
         </ion-card>
       </ion-text>
 
-
-      <ion-card v-for="(product, index) in productArray" :key="product.idproducto" class="compact-card">
+      <ion-card
+        v-for="(product, index) in productArray"
+        :key="product.idproducto"
+        class="compact-card"
+      >
         <ion-card-header>
           <ion-card-title>
             <h6 class="letter-color">
               {{ index + 1 }}. {{ product.descripcion }}
             </h6>
-            <h6 class="letter-color" v-if="product.barcode !== null && product.barcode !== ''">
+            <h6
+              class="letter-color"
+              v-if="product.barcode !== null && product.barcode !== ''"
+            >
               Barcode: {{ product.barcode }}
             </h6>
           </ion-card-title>
 
           <ion-card-subtitle>
-            <div style="display: flex; align-items: center;">
+            <div style="display: flex; align-items: center">
               <!-- Botón de agregar -->
-              <ion-button color="mycolor" class="btn-edit-product" @click="addAmount(product.idproducto)">
+              <ion-button
+                color="mycolor"
+                class="btn-edit-product"
+                @click="addAmount(product.idproducto)"
+              >
                 <ion-icon :icon="i.addSharp"></ion-icon>
               </ion-button>
 
               <!-- Botón de restar -->
-              <ion-button color="mycolor" class="btn-edit-product" @click="subtractAmount(product.idproducto)">
+              <ion-button
+                color="mycolor"
+                class="btn-edit-product"
+                @click="subtractAmount(product.idproducto)"
+              >
                 <ion-icon :icon="i.removeSharp"></ion-icon>
               </ion-button>
 
               <!-- Botón de eliminar -->
-              <ion-button color="mycolor" class="btn-edit-product" @click="deleteProduct(product.idproducto)">
+              <ion-button
+                color="mycolor"
+                class="btn-edit-product"
+                @click="deleteProduct(product.idproducto)"
+              >
                 <ion-icon :icon="i.trashOutline"></ion-icon>
               </ion-button>
 
               <!-- Input para cantidad -->
-              <h6 text="dark" style="margin: 0 10px;">Cantidad:</h6>
-              <ion-input type="number" v-model="product.cantidad" @input="updateAmount(product, $event.target.value)"
-                style="width: 60px;"></ion-input>
+              <h6 text="dark" style="margin: 0 10px">Cantidad:</h6>
+              <ion-input
+                type="number"
+                v-model="product.cantidad"
+                @input="updateAmount(product, $event.target.value)"
+                style="width: 60px"
+              ></ion-input>
             </div>
           </ion-card-subtitle>
-
-
         </ion-card-header>
 
         <ion-card-content>
-          <div style="display: flex; align-items: center;">
-
-            <h6 text="dark" style="margin: 0 10px;">Base $: {{
-              new Intl.NumberFormat("de-DE").format(
-                (base =
-                  (product.valorprod - product.ivaprod) * product.cantidad)
-              )
-            }}</h6>
+          <div style="display: flex; align-items: center">
+            <h6 text="dark" style="margin: 0 10px">
+              Base $:
+              {{
+                new Intl.NumberFormat("de-DE").format(
+                  (base =
+                    (product.valorprod - product.ivaprod) * product.cantidad)
+                )
+              }}
+            </h6>
 
             <h6 text="dark" v-if="product.ivaprod > 0">
               IVA:
@@ -300,23 +455,33 @@
             </h6>
           </div>
 
-          <div style="display: flex; align-items: center;">
+          <div style="display: flex; align-items: center">
+            <h6 text="dark" style="margin: 0 10px">% Descuento</h6>
 
-
-            <h6 text="dark" style="margin: 0 10px;">% Descuento </h6>
-
-            <ion-input type="number" :value="product.porcdesc" @input="product.porcdesc = $event.target.value"
-              :readonly="!editDiscount"><ion-button color="mycolor" class="btn-edit-product"
+            <ion-input
+              type="number"
+              :value="product.porcdesc"
+              @input="product.porcdesc = $event.target.value"
+              :readonly="!editDiscount"
+              ><ion-button
+                color="mycolor"
+                class="btn-edit-product"
                 @click="updateDiscount(product, product.porcdesc)"
-                v-if="product.porcdesc > 0">%</ion-button></ion-input>
+                v-if="product.porcdesc > 0"
+                >%</ion-button
+              ></ion-input
+            >
           </div>
 
-          <div style="display: flex; align-items: center;">
+          <div style="display: flex; align-items: center">
+            <h6 text="dark" style="margin: 0 10px">V. Unitario $:</h6>
 
-            <h6 text="dark" style="margin: 0 10px;">V. Unitario $:</h6>
-
-            <ion-input type="number" :value="computedValorProd(product)"
-              @input="updateValorProd(index, $event.target.value)" :readonly="!editPrice"></ion-input>
+            <ion-input
+              type="number"
+              :value="computedValorProd(product)"
+              @input="updateValorProd(index, $event.target.value)"
+              :readonly="!editPrice"
+            ></ion-input>
 
             Total: ${{
               new Intl.NumberFormat("de-DE").format(computedTotal(product))
@@ -326,18 +491,37 @@
       </ion-card>
 
       <ion-content class="ion-padding">
-        <ion-modal ref="modal" trigger="open-modal" :initial-breakpoint="0.25" :breakpoints="[0, 0.25, 0.5, 0.75]">
+        <ion-modal
+          ref="modal"
+          trigger="open-modal"
+          :initial-breakpoint="0.25"
+          :breakpoints="[0, 0.25, 0.5, 0.75]"
+        >
           <ion-content class="ion-padding custom-modal-content">
-            <ion-searchbar @click="$refs.modal.$el.setCurrentBreakpoint(0.75)" placeholder="Buscar Producto"
-              @ionChange="searchOneProduct($event)" @keypress.enter="searchItem()"></ion-searchbar>
-            <ion-input type="search" :value="searchByBarcode" @input="searchByBarcode = $event.target.value"
-              placeholder="Código de barras" @keypress.enter="searchByBarcodeItem()" :clear-input="true"></ion-input>
+            <ion-searchbar
+              @click="$refs.modal.$el.setCurrentBreakpoint(0.75)"
+              placeholder="Buscar Producto"
+              @ionChange="searchOneProduct($event)"
+              @keypress.enter="searchItem()"
+            ></ion-searchbar>
+            <ion-input
+              type="search"
+              :value="searchByBarcode"
+              @input="searchByBarcode = $event.target.value"
+              placeholder="Código de barras"
+              @keypress.enter="searchByBarcodeItem()"
+              :clear-input="true"
+            ></ion-input>
             <!-- <ion-button color="mycolor" expand="full" class="btn-edit-product" @click="startScan()">
               Buscar Código barras</ion-button>
             <ion-button color="mycolor" expand="full" class="btn-edit-product" @click="stopScan()">
               Detener busqueda</ion-button> -->
-            <ion-button color="mycolor" @click="prevPage()" v-if="page > 1">Anterior</ion-button>
-            <ion-button color="mycolor" @click="nextPage()">Siguiente</ion-button>
+            <ion-button color="mycolor" @click="prevPage()" v-if="page > 1"
+              >Anterior</ion-button
+            >
+            <ion-button color="mycolor" @click="nextPage()"
+              >Siguiente</ion-button
+            >
             <span> página {{ page }} </span>
             <ion-list v-for="product in products" :key="product.idproduct">
               <ion-item>
@@ -346,14 +530,20 @@
                   <ion-label>Cod. Interno: {{ product.codigo }} </ion-label>
                   <ion-label> Cantidad:{{ product.cantidad }} </ion-label>
                   <ion-label>Cod.Barras:{{ product.barcode }} </ion-label>
-                  <ion-button color="mycolor" @click="selectPrice(product.precioventa)">
+                  <ion-button
+                    color="mycolor"
+                    @click="selectPrice(product.precioventa)"
+                  >
                     $
                     {{
                       new Intl.NumberFormat("de-DE").format(product.precioventa)
                     }}
                   </ion-button>
-                  <ion-button color="mycolor" @click="selectPrice(product.precioespecial1)"
-                    v-if="product.precioespecial1 > 0">
+                  <ion-button
+                    color="mycolor"
+                    @click="selectPrice(product.precioespecial1)"
+                    v-if="product.precioespecial1 > 0"
+                  >
                     $
                     {{
                       new Intl.NumberFormat("de-DE").format(
@@ -361,8 +551,11 @@
                       )
                     }}
                   </ion-button>
-                  <ion-button color="mycolor" @click="selectPrice(product.precioespecial2)"
-                    v-if="product.precioespecial2 > 0">
+                  <ion-button
+                    color="mycolor"
+                    @click="selectPrice(product.precioespecial2)"
+                    v-if="product.precioespecial2 > 0"
+                  >
                     $
                     {{
                       new Intl.NumberFormat("de-DE").format(
@@ -371,19 +564,26 @@
                     }}
                   </ion-button>
 
-                  <ion-button color="mycolor" class="btn-edit-product" expand="full" @click="
-                    selectProduct(
-                      product.idproducto,
-                      product.descripcion,
-                      product.ultcosto,
-                      product.codiva,
-                      product.baseValue,
-                      product.taxValue,
-                      product.porcentaje,
-                      product.barcode
-                    )
-                    ">
-                    Agregar<ion-icon :icon="i.checkmarkCircleOutline"></ion-icon>
+                  <ion-button
+                    color="mycolor"
+                    class="btn-edit-product"
+                    expand="full"
+                    @click="
+                      selectProduct(
+                        product.idproducto,
+                        product.descripcion,
+                        product.ultcosto,
+                        product.codiva,
+                        product.baseValue,
+                        product.taxValue,
+                        product.porcentaje,
+                        product.barcode
+                      )
+                    "
+                  >
+                    Agregar<ion-icon
+                      :icon="i.checkmarkCircleOutline"
+                    ></ion-icon>
                   </ion-button>
                 </ion-label>
               </ion-item>
@@ -436,7 +636,10 @@ import {
   IonSelect,
   IonFab,
   IonFabList,
-  IonFabButton, IonRow, IonGrid, IonCol,
+  IonFabButton,
+  IonRow,
+  IonGrid,
+  IonCol,
 } from "@ionic/vue";
 import router from "@/router";
 import { StockManagerParamsService } from "@/services/stock_manager_params.service";
@@ -468,7 +671,10 @@ export default defineComponent({
     IonSelect,
     IonFab,
     IonFabList,
-    IonFabButton, IonRow, IonGrid, IonCol,
+    IonFabButton,
+    IonRow,
+    IonGrid,
+    IonCol,
   },
   data() {
     return {
@@ -552,6 +758,10 @@ export default defineComponent({
     },
     checkSales() {
       this.$router.push("/check-sales-by-day");
+    },
+    paginateOrders(idalmacen:number,idvendedor:number) {
+    
+        this.$router.push(`/paginate-orders/${idalmacen}/${idvendedor}`);
     },
     newOrder() {
       location.reload();
@@ -945,7 +1155,6 @@ export default defineComponent({
           }
         }
       } catch (error) {
-
         if (error.response.status === 400) {
           const alert = await alertController.create({
             cssClass: "my-custom-class",
@@ -955,9 +1164,8 @@ export default defineComponent({
             buttons: ["ACEPTAR"],
           });
           await alert.present();
-          return false
+          return false;
         } else {
-
           const alert = await alertController.create({
             cssClass: "my-custom-class",
             header: "ERROR !!!",
@@ -966,7 +1174,7 @@ export default defineComponent({
             buttons: ["ACEPTAR"],
           });
           await alert.present();
-          return false
+          return false;
         }
       }
     },
@@ -1080,7 +1288,6 @@ export default defineComponent({
           buttons: ["ACEPTAR"],
         });
         await alert.present();
-
       } catch (error) {
         console.log(error);
         const alert = await alertController.create({
@@ -1228,7 +1435,7 @@ export default defineComponent({
           this.employees = this.employees.filter((employee: any) => {
             return (
               employee.nombres.toUpperCase().indexOf(this.searchEmployees) >
-              -1 || employee.nit.indexOf(this.searchEmployees) > -1
+                -1 || employee.nit.indexOf(this.searchEmployees) > -1
             );
           });
         }
@@ -1423,8 +1630,6 @@ ion-card {
   --padding-start: 10px;
   --padding-end: 10px;
 }
-
-
 
 ion-card-title {
   font-size: 1.2rem;
