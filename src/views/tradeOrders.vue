@@ -759,9 +759,8 @@ export default defineComponent({
     checkSales() {
       this.$router.push("/check-sales-by-day");
     },
-    paginateOrders(idalmacen:number,idvendedor:number) {
-    
-        this.$router.push(`/paginate-orders/${idalmacen}/${idvendedor}`);
+    paginateOrders(idalmacen: number, idvendedor: number) {
+      this.$router.push(`/paginate-orders/${idalmacen}/${idvendedor}`);
     },
     newOrder() {
       location.reload();

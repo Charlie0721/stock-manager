@@ -1,33 +1,180 @@
 <template>
   <ion-page>
-    <h1>paginador de ordenes</h1>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>
+          <img class="edit-image1" src="../images/images_app/logo_header.png" />
+          BUSCAR PEDIDOS
+        </ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <ion-card>
+        <ion-card-content>
+          <ion-item>
+            <ion-label position="stacked" class="letter-color">Fecha</ion-label>
+            <ion-input type="date" v-model="date"></ion-input>
+            <ion-button
+              color="mycolor"
+              class="btn-edit-product"
+              @click="searchOrderByDate(date)"
+            >
+              Consultar por fecha</ion-button
+            >
+          </ion-item>
+          <ion-item>
+            <ion-label position="stacked" class="letter-color"
+              >Número de Pedido</ion-label
+            >
+            <ion-input
+              type="number"
+              v-model="orderNumber"
+              @keypress.enter="searchOrderByNumber($event)"
+            ></ion-input>
+          </ion-item>
+          <ion-button color="mycolor" @click="prevPage()" v-if="page > 1"
+            >Anterior</ion-button
+          >
+          <ion-button color="mycolor" @click="nextPage()">Siguiente</ion-button>
+        </ion-card-content>
+      </ion-card>
+      <ion-card v-for="order in orders" :key="order.numero">
+        <ion-card-header>
+          <ion-card-title class="letter-color">
+            {{ order.nombres }} {{ order.apellidos }}
+          </ion-card-title>
+          <h5 class="letter-color">Número de Pedido: {{ order.numero }}</h5>
+          <h5 class="letter-color">Fecha: {{ order.fecha }}</h5>
+          <h5 class="letter-color">Almacén: {{ order.nomalmacen }}</h5>
+        </ion-card-header>
+        <ion-card-content>
+          <h2 class="letter-color">
+            Valor Total: $
+            {{ new Intl.NumberFormat("de-DE").format(order.valortotal) }}
+          </h2>
+        </ion-card-content>
+      </ion-card>
+    </ion-content>
   </ion-page>
 </template>
 <script lang="ts" setup>
 import { onMounted, reactive, ref, watch } from "vue";
-
-import { IonPage } from "@ionic/vue";
+import {
+  IonPage,
+  IonButton,
+  IonContent,
+  IonItem,
+  IonLabel,
+  IonInput,
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCardTitle,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonSearchbar,
+  alertController,
+} from "@ionic/vue";
 import router from "@/router";
-import {OrdersService  } from "@/services/orders";
+import { OrdersService } from "@/services/orders";
 import { useRoute } from "vue-router";
+import { TOrderType } from "@/interfaces/order.type";
 const ordersService = new OrdersService();
 const route = useRoute();
 let page = ref<number>(1);
-let limit = ref<number>(10);
-let  offset= ref<number>(0) ;
-let warehouseId
-// const getOrders = async () => {
-//   try {
-//     const response = await ordersService.paginateOrders({
-//       page: page.value,
-//       limit: limit.value,
-    
-//     });
-//     console.log("Orders:", response);
-//   } catch (error) {
-//     console.error("Error fetching orders:", error);
-//   }
-// };
+let limit = ref<number>(5);
+let offset = ref<number>(0);
+let warehouseId = ref<number>(0);
+let sellerId = ref<number>(0);
+let date = ref<string>("");
+let orderNumber = ref<number>(0);
+let orders = ref<Array<TOrderType>>([]);
+warehouseId.value = +route.params.idalmacen;
+sellerId.value = +route.params.idvendedor;
 
+onMounted(async () => {
+  await getOrders();
+});
+
+const prevPage = async () => {
+  if (page.value > 1) {
+    page.value--;
+    await getOrders();
+  }
+};
+const nextPage = async () => {
+  page.value++;
+  await getOrders();
+};
+const searchOrderByDate = async (dateParam: string) => {
+  date.value = dateParam.replace(/-/gi, "");
+
+  if (dateParam) {
+    page.value = 1;
+    await getOrders(date.value);
+  }
+};
+const searchOrderByNumber = async (event: any) => {
+  orderNumber.value = event.target.value;
+  if (orderNumber.value) {
+    page.value = 1;
+    await getOrders(date.value, orderNumber.value);
+  }
+};
+
+const getOrders = async (date?: string, number?: number) => {
+  try {
+    if (!date) {
+      date = "";
+    }
+    if (!number) {
+      number = 0;
+    }
+    const response = await ordersService.paginateOrders(
+      warehouseId.value,
+      sellerId.value,
+      page.value,
+      limit.value,
+      date,
+      number
+    );
+    if (response.status === 200) {
+      orders.value = response.data.data;
+    } else {
+      const alert = await alertController.create({
+        cssClass: "my-custom-class",
+        header: "Atencion !!!",
+        subHeader: `No hay información`,
+        message: `No se encontraron pedidos`,
+        buttons: ["ACEPTAR"],
+      });
+      await alert.present();
+      orders.value = [];
+    }
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    orders.value = [];
+  }
+};
 </script>
+<style scoped>
+ion-button {
+  background-color: var(--ion-color-mycolor);
+}
+
+.edit-image1 {
+  width: 5%;
+  max-height: 5%;
+}
+
+.btn-edit-product {
+  border-radius: 30px;
+}
+
+.letter-color {
+  color: #82230d;
+  text-shadow: 1px 1px #fff;
+}
+</style>
 
