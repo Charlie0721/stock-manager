@@ -37,22 +37,28 @@
           >
           <ion-button color="mycolor" @click="nextPage()">Siguiente</ion-button>
         </ion-card-content>
-      </ion-card>
-      <ion-card v-for="order in orders" :key="order.numero">
-        <ion-card-header>
-          <ion-card-title class="letter-color">
-            {{ order.nombres }} {{ order.apellidos }}
-          </ion-card-title>
-          <h5 class="letter-color">Número de Pedido: {{ order.numero }}</h5>
-          <h5 class="letter-color">Fecha: {{ order.fecha }}</h5>
-          <h5 class="letter-color">Almacén: {{ order.nomalmacen }}</h5>
-        </ion-card-header>
-        <ion-card-content>
-          <h2 class="letter-color">
-            Valor Total: $
-            {{ new Intl.NumberFormat("de-DE").format(order.valortotal) }}
-          </h2>
-        </ion-card-content>
+        
+        <ion-list v-for="order in orders" :key="order.idpedido">
+          <ion-item>
+            <ion-label>
+              <h5 class="ion-text-wrap">
+                Cliente: {{ order.nombres }} {{ order.apellidos }}
+              </h5>
+              <ion-label>Número de Pedido: {{ order.numero }}</ion-label>
+              <ion-label>Fecha: {{ order.fecha }}</ion-label>
+              <ion-label>Almacén: {{ order.nomalmacen }}</ion-label>
+              <ion-label
+              >Valor:$
+              {{
+                new Intl.NumberFormat("de-DE").format(order.valortotal)
+              }}</ion-label
+              >
+              <ion-button color="mycolor" 
+                >Editar</ion-button
+              >
+            </ion-label>
+          </ion-item>
+        </ion-list>
       </ion-card>
     </ion-content>
   </ion-page>
@@ -75,6 +81,7 @@ import {
   IonTitle,
   IonSearchbar,
   alertController,
+  IonList,
 } from "@ionic/vue";
 import router from "@/router";
 import { OrdersService } from "@/services/orders";
