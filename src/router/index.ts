@@ -128,6 +128,11 @@ const routes: Array<RouteRecordRaw> = [
     name: "PaginateOrders",
     component: () => import("@/views/PaginateOrders.vue"),
   },
+  {
+    path: "/edit-order/:idpedido",
+    name: "EditOrder",
+    component: () => import("@/views/EditOrder.vue"),
+  },
 ];
 
 const router = createRouter({

@@ -9,6 +9,9 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
+      <ion-button color="mycolor" expand="full" @click="returnToOrders()"
+        ><ion-icon :icon="icons.arrowBackSharp"></ion-icon>Volver</ion-button
+      >
       <ion-card>
         <ion-card-content>
           <ion-item>
@@ -37,7 +40,7 @@
           >
           <ion-button color="mycolor" @click="nextPage()">Siguiente</ion-button>
         </ion-card-content>
-        
+
         <ion-list v-for="order in orders" :key="order.idpedido">
           <ion-item>
             <ion-label>
@@ -48,12 +51,15 @@
               <ion-label>Fecha: {{ order.fecha }}</ion-label>
               <ion-label>Almacén: {{ order.nomalmacen }}</ion-label>
               <ion-label
-              >Valor:$
-              {{
-                new Intl.NumberFormat("de-DE").format(order.valortotal)
-              }}</ion-label
+                >Valor:$
+                {{
+                  new Intl.NumberFormat("de-DE").format(order.valortotal)
+                }}</ion-label
               >
-              <ion-button color="mycolor" 
+              <ion-button
+                color="mycolor"
+                expand="block"
+                @click="goToEditOrder(order.idpedido)"
                 >Editar</ion-button
               >
             </ion-label>
@@ -82,8 +88,10 @@ import {
   IonSearchbar,
   alertController,
   IonList,
+  IonIcon,
 } from "@ionic/vue";
 import router from "@/router";
+import * as icons from "ionicons/icons";
 import { OrdersService } from "@/services/orders";
 import { useRoute } from "vue-router";
 import { TOrderType } from "@/interfaces/order.type";
@@ -122,6 +130,11 @@ const searchOrderByDate = async (dateParam: string) => {
     await getOrders(date.value);
   }
 };
+
+const goToEditOrder = (orderId:number) => {
+  router.push(`/edit-order/${orderId}`);
+};
+
 const searchOrderByNumber = async (event: any) => {
   orderNumber.value = event.target.value;
   if (orderNumber.value) {
@@ -163,6 +176,9 @@ const getOrders = async (date?: string, number?: number) => {
     console.error("Error fetching orders:", error);
     orders.value = [];
   }
+};
+const returnToOrders = () => {
+  router.push("/trade-orders");
 };
 </script>
 <style scoped>

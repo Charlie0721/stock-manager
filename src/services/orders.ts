@@ -12,4 +12,8 @@ export class OrdersService {
       `trade-order/paginate-orders/${warehouseId}/${sellerId}?page=${page}&limit=${limit}&date=${date}&number=${number}`
     );
   }
+
+  public async findOneOrder(orderId:number){
+    return await axios.get(`trade-order/${orderId}`);
+  }
 }
