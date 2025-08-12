@@ -10,6 +10,33 @@
     </ion-header>
 
     <ion-content>
+      <ion-button color="mycolor" expand="full" @click="router.back()"
+        ><ion-icon :icon="icons.arrowBackSharp"></ion-icon>Volver</ion-button
+      >
+      <ion-list>
+        <ion-card>
+          <ion-card-content>
+            <ion-item>
+              <ion-label>
+                <h5 class="ion-text-wrap">
+                  Cliente: {{ orders.nombres }} {{ orders.apellidos }}
+                </h5>
+                <ion-label>Nit cliente: : {{ orders.nit }}</ion-label>
+                <ion-label>Número de Pedido: {{ orders.numero }}</ion-label>
+                <ion-label>Fecha: {{ orders.fecha }}</ion-label>
+                <ion-label>Almacén: {{ orders.nomalmacen }}</ion-label>
+                <ion-label
+                  >Valor:$
+                  {{
+                    new Intl.NumberFormat("de-DE").format(orders.valortotal)
+                  }}</ion-label
+                >
+              </ion-label>
+            </ion-item>
+          </ion-card-content>
+        </ion-card>
+      </ion-list>
+
       <ion-card v-for="(prod, index) in products" :key="index">
         <ion-card-header>
           <ion-card-title>{{ prod.descripcion }}</ion-card-title>
@@ -38,7 +65,8 @@
           </ion-item>
 
           <ion-button
-           color="mycolor" expand="full"
+            color="mycolor"
+            expand="full"
             @click="removeProduct(index)"
           >
             Eliminar producto
@@ -46,6 +74,13 @@
         </ion-card-content>
       </ion-card>
     </ion-content>
+    <ion-footer>
+      <ion-toolbar>
+        <ion-button color="mycolor" expand="block" @click="saveChanges">
+          Guardar cambios
+        </ion-button>
+      </ion-toolbar>
+    </ion-footer>
   </ion-page>
 </template>
 <script lang="ts" setup>
@@ -56,7 +91,7 @@ import {
   IonToolbar,
   IonTitle,
   IonContent,
-    IonItem,
+  IonItem,
   IonLabel,
   IonInput,
   //   alertController,
@@ -65,7 +100,11 @@ import {
   IonCardTitle,
   IonCardContent,
   IonButton,
+  IonIcon,
+  IonFooter,
+  IonList,
 } from "@ionic/vue";
+import * as icons from "ionicons/icons";
 import router from "@/router";
 import { useRoute } from "vue-router";
 import { OrdersService } from "@/services/orders";
@@ -78,7 +117,7 @@ const ordersService = new OrdersService();
 const route = useRoute();
 let orderId = ref<number>(0);
 orderId.value = +route.params.idpedido;
-let order = reactive<Partial<ItradeOrderHeader>>({});
+let orders = ref([]);
 let products = reactive([]);
 
 onMounted(async () => {
@@ -87,8 +126,8 @@ onMounted(async () => {
 
 const findOne = async (orderId: number) => {
   const response = await ordersService.findOneOrder(orderId);
-  order = response.data;
-  console.log("Pedido:", order);
+  orders.value = response.data.data[1];
+
   products.splice(
     0,
     products.length,
@@ -108,7 +147,16 @@ const findOne = async (orderId: number) => {
       ivaprod: 0,
     }))
   );
-  console.log("Productos:", products);
+};
+const removeProduct = (index: number) => {
+  products.splice(index, 1);
+};
+
+const saveChanges = async () => {
+  await ordersService.updateOrder(orderId.value, {
+    detpedidos: products,
+  });
+  router.push("/pedidos");
 };
 </script>
 <style scoped>

@@ -1,5 +1,6 @@
 import axios from "./axios";
 export class OrdersService {
+  
   public async paginateOrders(
     warehouseId: number,
     sellerId: number,
@@ -15,5 +16,9 @@ export class OrdersService {
 
   public async findOneOrder(orderId:number){
     return await axios.get(`trade-order/${orderId}`);
+  }
+
+  public async updateOrder(orderId: number, orderData: any) {
+    return await axios.put(`trade-order/${orderId}`, orderData);
   }
 }
