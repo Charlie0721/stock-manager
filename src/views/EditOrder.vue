@@ -13,13 +13,16 @@
       <ion-button color="mycolor" expand="full" @click="router.back()"
         ><ion-icon :icon="icons.arrowBackSharp"></ion-icon>Volver</ion-button
       >
+      <ion-button color="mycolor" expand="block" @click="getProducts()">
+        <ion-icon :icon="icons.searchCircleSharp"></ion-icon>buscar producto
+      </ion-button>
       <ion-list>
         <ion-card>
           <ion-card-content>
             <ion-item>
               <ion-label>
                 <h5 class="ion-text-wrap">
-                  Cliente: {{ orders.nombres }} {{ orders.apellidos }}
+                  Cliente: {{ orders?.nombres }} {{ orders?.apellidos }}
                 </h5>
                 <ion-label>Nit cliente: : {{ orders.nit }}</ion-label>
                 <ion-label>Número de Pedido: {{ orders.numero }}</ion-label>
@@ -94,7 +97,7 @@ import {
   IonItem,
   IonLabel,
   IonInput,
-  //   alertController,
+  alertController,
   IonCard,
   IonCardHeader,
   IonCardTitle,
@@ -108,25 +111,80 @@ import * as icons from "ionicons/icons";
 import router from "@/router";
 import { useRoute } from "vue-router";
 import { OrdersService } from "@/services/orders";
-import {
-  ItradeOrderDetail,
-  ItradeOrderHeader,
-} from "@/interfaces/traderOrder.interface";
+import { StockManagerParamsService } from "@/services/stock_manager_params.service";
+import { TradeOrders } from "@/services/tradeOrder";
+const stockManagerParamsService = new StockManagerParamsService();
 const ordersService = new OrdersService();
 
 const route = useRoute();
 let orderId = ref<number>(0);
 orderId.value = +route.params.idpedido;
-let orders = ref([]);
+let orders = ref<Array<any>>([]);
 let products = reactive([]);
-
+let productArray = reactive([]);
+let uuid = ref<string>(localStorage.getItem("uuid"));
+let page = ref<number>(1);
+let limit = ref<number>(1);
+let productDescription = ref<string>("");
+let barcode = ref<string>("");
 onMounted(async () => {
   await findOne(orderId.value);
+  await loadParams();
 });
+const loadParams = async () => {
+  const responseParams = await stockManagerParamsService.findOne(uuid.value);
+};
+const getProducts = async () => {
+  try {
+    const responseParams = await stockManagerParamsService.findOne(uuid.value);
+    let warehouseId = responseParams.data.Id_Almacen;
+
+    const response = await TradeOrders.getProducts(
+      warehouseId,
+      limit.value,
+      page.value,
+      productDescription.value,
+      barcode.value
+    );
+    products=response.data.newProducts;
+    console.log("Products fetched:", products);
+    
+    if (products.length === 0) {
+      const alert = await alertController.create({
+        cssClass: "my-custom-class",
+        header: "ATENCIÓN !!!",
+        subHeader: `NO SE ENCONTRARON PRODUCTOS`,
+        message: `NO SE ENCONTRARON PRODUCTOS CON LOS CRITERIOS DE BÚSQUEDA`,
+        buttons: ["ACEPTAR"],
+      });
+      await alert.present();
+    }
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    const alert = await alertController.create({
+      cssClass: "my-custom-class",
+      header: "ATENCIÓN !!!",
+      subHeader: `${error} `,
+      message: `Error ${error.message}`,
+      buttons: ["ACEPTAR"],
+    });
+    await alert.present();
+  }
+};
 
 const findOne = async (orderId: number) => {
   const response = await ordersService.findOneOrder(orderId);
-  orders.value = response.data.data[1];
+
+  orders.value = {
+    nombres: response.data.data[0]?.nombres || "",
+    apellidos: response.data.data[0]?.apellidos || "",
+    nit: response.data.data[0]?.nit || "",
+    numero: response.data.data[0]?.numero || 0,
+    fecha: response.data.data[0]?.fecha || "",
+    nomalmacen: response.data.data[0]?.nomalmacen || "",
+    valortotal: response.data.data[0]?.valortotal || 0,
+    idalmacen: response.data.data[0]?.idalmacen || 0,
+  } as any;
 
   products.splice(
     0,
@@ -156,7 +214,31 @@ const saveChanges = async () => {
   await ordersService.updateOrder(orderId.value, {
     detpedidos: products,
   });
-  router.push("/pedidos");
+  const alert = await alertController.create({
+    cssClass: "my-custom-class",
+    header: "ATENCION !!!",
+    subHeader: `PEDIDO ACTUALIZADO`,
+    message: `SE HAN GUARDADO LOS CAMBIOS`,
+    buttons: ["ACEPTAR"],
+  });
+  await alert.present();
+  await viewOrder(orders.value[0]?.idalmacen, orders.value[0]?.numero);
+};
+
+const viewOrder = async (idalmacen: number, number: number) => {
+  if (idalmacen == 0 || number == 0) {
+    const alert = await alertController.create({
+      cssClass: "my-custom-class",
+      header: "ATENCION !!!",
+      subHeader: `NO SE ENCUENTRA INFORMACION `,
+      message: `DEBE CARGAR PEDIDO`,
+      buttons: ["ACEPTAR"],
+    });
+    await alert.present();
+    return false;
+  } else {
+    router.push(`/view-order/${number}/${idalmacen}`);
+  }
 };
 </script>
 <style scoped>
