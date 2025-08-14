@@ -46,60 +46,60 @@
                 <ion-label> Cantidad:{{ product.cantidad }} </ion-label>
                 <ion-label>Cod.Barras:{{ product.barcode }} </ion-label>
                 <ion-button
-                    color="mycolor"
-                    @click="selectPrice(product.precioventa)"
-                  >
-                    $
-                    {{
-                      new Intl.NumberFormat("de-DE").format(product.precioventa)
-                    }}
-                  </ion-button>
+                  color="mycolor"
+                  @click="selectPrice(product.precioventa)"
+                >
+                  $
+                  {{
+                    new Intl.NumberFormat("de-DE").format(product.precioventa)
+                  }}
+                </ion-button>
                 <ion-button
-                    color="mycolor"
-                    @click="selectPrice(product.precioespecial1)"
-                    v-if="product.precioespecial1 > 0"
-                  >
-                    $
-                    {{
-                      new Intl.NumberFormat("de-DE").format(
-                        product.precioespecial1
-                      )
-                    }}
-                  </ion-button> 
+                  color="mycolor"
+                  @click="selectPrice(product.precioespecial1)"
+                  v-if="product.precioespecial1 > 0"
+                >
+                  $
+                  {{
+                    new Intl.NumberFormat("de-DE").format(
+                      product.precioespecial1
+                    )
+                  }}
+                </ion-button>
                 <ion-button
-                    color="mycolor"
-                    @click="selectPrice(product.precioespecial2)"
-                    v-if="product.precioespecial2 > 0"
-                  >
-                    $
-                    {{
-                      new Intl.NumberFormat("de-DE").format(
-                        product.precioespecial2
-                      )
-                    }}
-                  </ion-button>
+                  color="mycolor"
+                  @click="selectPrice(product.precioespecial2)"
+                  v-if="product.precioespecial2 > 0"
+                >
+                  $
+                  {{
+                    new Intl.NumberFormat("de-DE").format(
+                      product.precioespecial2
+                    )
+                  }}
+                </ion-button>
 
                 <ion-button
-                    color="mycolor"
-                    class="btn-edit-product"
-                    expand="full"
-                    @click="
-                      selectProduct(
-                        product.idproducto,
-                        product.descripcion,
-                        product.ultcosto,
-                        product.codiva,
-                        product.baseValue,
-                        product.taxValue,
-                        product.porcentaje,
-                        product.barcode
-                      )
-                    "
-                  >
-                    Agregar<ion-icon
-                      :icon="icons.checkmarkCircleOutline"
-                    ></ion-icon>
-                  </ion-button>
+                  color="mycolor"
+                  class="btn-edit-product"
+                  expand="full"
+                  @click="
+                    selectProduct(
+                      product.idproducto,
+                      product.descripcion,
+                      product.ultcosto,
+                      product.codiva,
+                      product.baseValue,
+                      product.taxValue,
+                      product.porcentaje,
+                      product.barcode
+                    )
+                  "
+                >
+                  Agregar<ion-icon
+                    :icon="icons.checkmarkCircleOutline"
+                  ></ion-icon>
+                </ion-button>
               </ion-label>
             </ion-item>
           </ion-list>
@@ -342,6 +342,27 @@ const dismiss = () => {
 const canDismiss = async (data?: any, role?: string) => {
   return role !== "gesture";
 };
+const selectProduct = async (
+  idproducto: number,
+  descripcion: string,
+  costoprod: number,
+  codiva: string,
+  baseValue: number,
+  taxValue: number,
+  porcentaje: number,
+  barcode: string
+) => {
+  console.log(
+    idproducto,
+    descripcion,
+    costoprod,
+    codiva,
+    baseValue,
+    taxValue,
+    porcentaje,
+    barcode
+  );
+};
 </script>
 <style scoped>
 ion-button {
@@ -360,5 +381,4 @@ ion-button {
 .btn-edit-product {
   border-radius: 30px;
 }
-
 </style>
