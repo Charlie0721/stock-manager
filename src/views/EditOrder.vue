@@ -16,6 +16,95 @@
       <ion-button color="mycolor" expand="block" @click="getProducts()">
         <ion-icon :icon="icons.searchCircleSharp"></ion-icon>buscar producto
       </ion-button>
+      <ion-button
+        color="mycolor"
+        id="open-modal"
+        expand="block"
+        @click="getProducts()"
+        >Open Products</ion-button
+      >
+      <ion-modal
+        ref="modal"
+        trigger="open-modal"
+        :can-dismiss="canDismiss"
+        :presenting-element="presentingElement"
+      >
+        <ion-header>
+          <ion-toolbar>
+            <ion-title>Productos</ion-title>
+            <ion-buttons slot="end">
+              <ion-button @click="dismiss()">Cerrar</ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-header>
+        <ion-content class="ion-padding">
+          <ion-list v-for="product in products" :key="product.idproducto">
+            <ion-item>
+              <ion-label>
+                <h5 class="ion-text-wrap">{{ product.descripcion }}</h5>
+                <ion-label>Cod. Interno: {{ product.codigo }} </ion-label>
+                <ion-label> Cantidad:{{ product.cantidad }} </ion-label>
+                <ion-label>Cod.Barras:{{ product.barcode }} </ion-label>
+                <ion-button
+                    color="mycolor"
+                    @click="selectPrice(product.precioventa)"
+                  >
+                    $
+                    {{
+                      new Intl.NumberFormat("de-DE").format(product.precioventa)
+                    }}
+                  </ion-button>
+                <ion-button
+                    color="mycolor"
+                    @click="selectPrice(product.precioespecial1)"
+                    v-if="product.precioespecial1 > 0"
+                  >
+                    $
+                    {{
+                      new Intl.NumberFormat("de-DE").format(
+                        product.precioespecial1
+                      )
+                    }}
+                  </ion-button> 
+                <ion-button
+                    color="mycolor"
+                    @click="selectPrice(product.precioespecial2)"
+                    v-if="product.precioespecial2 > 0"
+                  >
+                    $
+                    {{
+                      new Intl.NumberFormat("de-DE").format(
+                        product.precioespecial2
+                      )
+                    }}
+                  </ion-button>
+
+                <ion-button
+                    color="mycolor"
+                    class="btn-edit-product"
+                    expand="full"
+                    @click="
+                      selectProduct(
+                        product.idproducto,
+                        product.descripcion,
+                        product.ultcosto,
+                        product.codiva,
+                        product.baseValue,
+                        product.taxValue,
+                        product.porcentaje,
+                        product.barcode
+                      )
+                    "
+                  >
+                    Agregar<ion-icon
+                      :icon="icons.checkmarkCircleOutline"
+                    ></ion-icon>
+                  </ion-button>
+              </ion-label>
+            </ion-item>
+          </ion-list>
+        </ion-content>
+      </ion-modal>
       <ion-list>
         <ion-card>
           <ion-card-content>
@@ -40,7 +129,7 @@
         </ion-card>
       </ion-list>
 
-      <ion-card v-for="(prod, index) in products" :key="index">
+      <ion-card v-for="(prod, index) in _products" :key="index">
         <ion-card-header>
           <ion-card-title>{{ prod.descripcion }}</ion-card-title>
         </ion-card-header>
@@ -77,6 +166,7 @@
         </ion-card-content>
       </ion-card>
     </ion-content>
+
     <ion-footer>
       <ion-toolbar>
         <ion-button color="mycolor" expand="block" @click="saveChanges">
@@ -106,6 +196,8 @@ import {
   IonIcon,
   IonFooter,
   IonList,
+  IonModal,
+  IonButtons,
 } from "@ionic/vue";
 import * as icons from "ionicons/icons";
 import router from "@/router";
@@ -115,18 +207,21 @@ import { StockManagerParamsService } from "@/services/stock_manager_params.servi
 import { TradeOrders } from "@/services/tradeOrder";
 const stockManagerParamsService = new StockManagerParamsService();
 const ordersService = new OrdersService();
-
+let presentingElement = ref(undefined);
 const route = useRoute();
 let orderId = ref<number>(0);
 orderId.value = +route.params.idpedido;
 let orders = ref<Array<any>>([]);
-let products = reactive([]);
+let products = ref<Array<any>>([]);
+let _products = reactive([]);
 let productArray = reactive([]);
 let uuid = ref<string>(localStorage.getItem("uuid"));
 let page = ref<number>(1);
-let limit = ref<number>(1);
+let limit = ref<number>(2);
 let productDescription = ref<string>("");
 let barcode = ref<string>("");
+const modal = ref(null);
+let finalPrice = ref<number>(0);
 onMounted(async () => {
   await findOne(orderId.value);
   await loadParams();
@@ -146,10 +241,9 @@ const getProducts = async () => {
       productDescription.value,
       barcode.value
     );
-    products=response.data.newProducts;
-    console.log("Products fetched:", products);
-    
-    if (products.length === 0) {
+    products.value = response.data.newProducts;
+
+    if (products.value.length === 0) {
       const alert = await alertController.create({
         cssClass: "my-custom-class",
         header: "ATENCIÓN !!!",
@@ -171,6 +265,9 @@ const getProducts = async () => {
     await alert.present();
   }
 };
+const selectPrice = (price: number) => {
+  finalPrice.value = price;
+};
 
 const findOne = async (orderId: number) => {
   const response = await ordersService.findOneOrder(orderId);
@@ -185,10 +282,9 @@ const findOne = async (orderId: number) => {
     valortotal: response.data.data[0]?.valortotal || 0,
     idalmacen: response.data.data[0]?.idalmacen || 0,
   } as any;
-
-  products.splice(
+  _products.splice(
     0,
-    products.length,
+    _products.length,
     ...response.data.data.map((p: any) => ({
       idpedido: p.idpedido.toString(),
       idproducto: p.idproducto,
@@ -207,12 +303,12 @@ const findOne = async (orderId: number) => {
   );
 };
 const removeProduct = (index: number) => {
-  products.splice(index, 1);
+  _products.splice(index, 1);
 };
 
 const saveChanges = async () => {
   await ordersService.updateOrder(orderId.value, {
-    detpedidos: products,
+    detpedidos: _products,
   });
   const alert = await alertController.create({
     cssClass: "my-custom-class",
@@ -240,6 +336,12 @@ const viewOrder = async (idalmacen: number, number: number) => {
     router.push(`/view-order/${number}/${idalmacen}`);
   }
 };
+const dismiss = () => {
+  modal.value.$el.dismiss();
+};
+const canDismiss = async (data?: any, role?: string) => {
+  return role !== "gesture";
+};
 </script>
 <style scoped>
 ion-button {
@@ -249,4 +351,14 @@ ion-button {
   width: 5%;
   max-height: 5%;
 }
+
+.custom-modal-content {
+  --overflow: auto;
+  --overflow-scroll-behavior: smooth;
+}
+
+.btn-edit-product {
+  border-radius: 30px;
+}
+
 </style>
