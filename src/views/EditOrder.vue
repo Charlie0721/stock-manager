@@ -13,15 +13,14 @@
       <ion-button color="mycolor" expand="full" @click="router.back()"
         ><ion-icon :icon="icons.arrowBackSharp"></ion-icon>Volver</ion-button
       >
-      <ion-button color="mycolor" expand="block" @click="getProducts()">
-        <ion-icon :icon="icons.searchCircleSharp"></ion-icon>buscar producto
-      </ion-button>
       <ion-button
         color="mycolor"
         id="open-modal"
         expand="block"
         @click="getProducts()"
-        >Open Products</ion-button
+      >
+        <ion-icon :icon="icons.searchCircleSharp"></ion-icon>buscar
+        producto</ion-button
       >
       <ion-modal
         ref="modal"
@@ -133,21 +132,25 @@
         <ion-card>
           <ion-card-content>
             <ion-item>
-              <ion-label>
+              <div v-if="orders">
                 <h5 class="ion-text-wrap">
-                  Cliente: {{ orders?.nombres }} {{ orders?.apellidos }}
+                  Cliente: {{ orders.nombres }} {{ orders.apellidos }}
                 </h5>
-                <ion-label>Nit cliente: : {{ orders.nit }}</ion-label>
+                <ion-label>Nit cliente: {{ orders.nit }}</ion-label>
                 <ion-label>Número de Pedido: {{ orders.numero }}</ion-label>
                 <ion-label>Fecha: {{ orders.fecha }}</ion-label>
                 <ion-label>Almacén: {{ orders.nomalmacen }}</ion-label>
-                <ion-label
-                  >Valor:$
-                  {{
+                <ion-label>
+                  Valor: ${{
                     new Intl.NumberFormat("de-DE").format(orders.valortotal)
-                  }}</ion-label
+                  }}
+                </ion-label>
+              </div>
+              <div v-else>
+                <ion-text color="warning"
+                  >No se encontraron datos del pedido</ion-text
                 >
-              </ion-label>
+              </div>
             </ion-item>
           </ion-card-content>
         </ion-card>
@@ -223,6 +226,7 @@ import {
   IonModal,
   IonButtons,
   IonSearchbar,
+  IonText,
 } from "@ionic/vue";
 import * as icons from "ionicons/icons";
 import router from "@/router";
@@ -230,13 +234,24 @@ import { useRoute } from "vue-router";
 import { OrdersService } from "@/services/orders";
 import { StockManagerParamsService } from "@/services/stock_manager_params.service";
 import { TradeOrders } from "@/services/tradeOrder";
+interface IOrder {
+  nombres: string;
+  apellidos: string;
+  nit: string;
+  numero: number;
+  fecha: string;
+  nomalmacen: string;
+  valortotal: number;
+  idalmacen: number;
+}
+
 const stockManagerParamsService = new StockManagerParamsService();
 const ordersService = new OrdersService();
 let presentingElement = ref(undefined);
 const route = useRoute();
 let orderId = ref<number>(0);
 orderId.value = +route.params.idpedido;
-let orders = ref<Array<any>>([]);
+let orders = ref<IOrder | null>(null);
 let products = ref<Array<any>>([]);
 let _products = reactive([]);
 let productsArray = reactive([]);
@@ -298,38 +313,56 @@ const selectPrice = (price: number) => {
 
 const findOne = async (orderId: number) => {
   const response = await ordersService.findOneOrder(orderId);
+  if (response.data.data && response.data.data.length > 0) {
+    const firstItem = response.data.data[0];
 
-  orders.value = {
-    nombres: response.data.data[0]?.nombres || "",
-    apellidos: response.data.data[0]?.apellidos || "",
-    nit: response.data.data[0]?.nit || "",
-    numero: response.data.data[0]?.numero || 0,
-    fecha: response.data.data[0]?.fecha || "",
-    nomalmacen: response.data.data[0]?.nomalmacen || "",
-    valortotal: response.data.data[0]?.valortotal || 0,
-    idalmacen: response.data.data[0]?.idalmacen || 0,
-  } as any;
-  _products.splice(
-    0,
-    _products.length,
-    ...response.data.data.map((p: any) => ({
-      idpedido: p.idpedido.toString(),
-      idproducto: p.idproducto,
-      descripcion: p.descripcion,
-      cantidad: p.cantidad,
-      valorprod: p.valorprod,
-      descuento: p.descuento,
-      porcdesc: p.porcdesc,
-      codiva: "",
-      porciva: 0,
-      costoprod: 0,
-      despachado: 0,
-      base: 0,
-      ivaprod: 0,
-    }))
-  );
+    orders.value = {
+      nombres: firstItem?.nombres || "",
+      apellidos: firstItem?.apellidos || "",
+      nit: firstItem?.nit || "",
+      numero: firstItem?.numero || 0,
+      fecha: firstItem?.fecha || "",
+      nomalmacen: firstItem?.nomalmacen || "",
+      valortotal: firstItem?.valortotal || 0,
+      idalmacen: firstItem?.idalmacen || 0,
+    };
+    _products.splice(
+      0,
+      _products.length,
+      ...response.data.data.map((p: any) => ({
+        idpedido: p.idpedido.toString(),
+        idproducto: p.idproducto,
+        descripcion: p.descripcion,
+        cantidad: p.cantidad,
+        valorprod: p.valorprod,
+        descuento: p.descuento,
+        porcdesc: p.porcdesc,
+        codiva: p.codiva || "",
+        porciva: p.porciva || 0,
+        costoprod: p.costoprod || 0,
+        despachado: p.despachado || 0,
+        base: p.base || 0,
+        ivaprod: p.ivaprod || 0,
+      }))
+    );
+  } else {
+    console.warn("No se encontraron datos para el pedido");
+    orders.value = null;
+    _products.splice(0, _products.length);
+  }
 };
-const removeProduct = (index: number) => {
+
+const removeProduct = async (index: number) => {
+  if (_products.length <= 1) {
+    const alert = await alertController.create({
+      header: "Advertencia",
+      message: "El pedido debe contener al menos un producto",
+      buttons: ["Entendido"],
+    });
+    await alert.present();
+    return;
+  }
+
   _products.splice(index, 1);
 };
 
@@ -345,9 +378,9 @@ const saveChanges = async () => {
     buttons: ["ACEPTAR"],
   });
   await alert.present();
-      const responseParams = await stockManagerParamsService.findOne(uuid.value);
-    let warehouseId = responseParams.data.Id_Almacen;
-  await viewOrder(warehouseId, orders.value?.numero);
+  const responseParams = await stockManagerParamsService.findOne(uuid.value);
+  let warehouseId = responseParams.data.Id_Almacen;
+  await viewOrder(warehouseId, orders.value.numero);
 };
 
 const viewOrder = async (idalmacen: number, number: number) => {
@@ -393,7 +426,6 @@ const selectProduct = async (
   barcode: string
 ) => {
   selectPrice(finalPrice.value);
-  console.log(finalPrice.value);
 
   if (finalPrice.value <= 0) {
     const alert = await alertController.create({
@@ -449,7 +481,7 @@ const searchByBarcodeItem = async () => {
     await getProducts(productDescription.value, barcode.value);
     setTimeout(async () => {
       barcode.value = "";
-      await getProducts(productDescription.value, barcode.value);
+      await getProducts();
     }, 13000);
   }
 };
