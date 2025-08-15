@@ -31,13 +31,37 @@
       >
         <ion-header>
           <ion-toolbar>
-            <ion-title>Productos</ion-title>
+            <ion-title>Productos </ion-title>
             <ion-buttons slot="end">
               <ion-button @click="dismiss()">Cerrar</ion-button>
             </ion-buttons>
           </ion-toolbar>
+          <ion-item>
+            <ion-label position="stacked">Código de barras</ion-label>
+            <ion-input
+              type="search"
+              :value="searchByBarcode"
+              @input="searchByBarcode = $event.target.value"
+              placeholder="Código de barras"
+              @keypress.enter="searchByBarcodeItem()"
+            ></ion-input>
+          </ion-item>
+
+          <ion-searchbar
+            @click="$refs.modal.$el.setCurrentBreakpoint(0.75)"
+            placeholder="Buscar Producto"
+            @ionChange="searchOneProduct($event)"
+            @keypress.enter="searchItem()"
+          ></ion-searchbar>
+          <ion-button color="mycolor" @click="prevPage()" v-if="page > 1"
+            >Anterior</ion-button
+          >
+          <ion-button color="mycolor" @click="nextPage()">Siguiente</ion-button>
         </ion-header>
         <ion-content class="ion-padding">
+          <ion-list>
+            <ion-label>página {{ page }} </ion-label>
+          </ion-list>
           <ion-list v-for="product in products" :key="product.idproducto">
             <ion-item>
               <ion-label>
@@ -198,6 +222,7 @@ import {
   IonList,
   IonModal,
   IonButtons,
+  IonSearchbar,
 } from "@ionic/vue";
 import * as icons from "ionicons/icons";
 import router from "@/router";
@@ -214,12 +239,13 @@ orderId.value = +route.params.idpedido;
 let orders = ref<Array<any>>([]);
 let products = ref<Array<any>>([]);
 let _products = reactive([]);
-let productArray = reactive([]);
+let productsArray = reactive([]);
 let uuid = ref<string>(localStorage.getItem("uuid"));
 let page = ref<number>(1);
 let limit = ref<number>(2);
 let productDescription = ref<string>("");
 let barcode = ref<string>("");
+let searchByBarcode = ref<string>("");
 const modal = ref(null);
 let finalPrice = ref<number>(0);
 onMounted(async () => {
@@ -229,11 +255,12 @@ onMounted(async () => {
 const loadParams = async () => {
   const responseParams = await stockManagerParamsService.findOne(uuid.value);
 };
-const getProducts = async () => {
+const getProducts = async (description?: string, bacode?: string) => {
   try {
     const responseParams = await stockManagerParamsService.findOne(uuid.value);
     let warehouseId = responseParams.data.Id_Almacen;
-
+    productDescription.value = description || productDescription.value;
+    barcode.value = bacode || barcode.value;
     const response = await TradeOrders.getProducts(
       warehouseId,
       limit.value,
@@ -318,7 +345,9 @@ const saveChanges = async () => {
     buttons: ["ACEPTAR"],
   });
   await alert.present();
-  await viewOrder(orders.value[0]?.idalmacen, orders.value[0]?.numero);
+      const responseParams = await stockManagerParamsService.findOne(uuid.value);
+    let warehouseId = responseParams.data.Id_Almacen;
+  await viewOrder(warehouseId, orders.value?.numero);
 };
 
 const viewOrder = async (idalmacen: number, number: number) => {
@@ -342,6 +371,17 @@ const dismiss = () => {
 const canDismiss = async (data?: any, role?: string) => {
   return role !== "gesture";
 };
+
+const prevPage = async () => {
+  if (page.value > 1) {
+    page.value--;
+    await getProducts();
+  }
+};
+const nextPage = async () => {
+  page.value++;
+  await getProducts();
+};
 const selectProduct = async (
   idproducto: number,
   descripcion: string,
@@ -352,16 +392,66 @@ const selectProduct = async (
   porcentaje: number,
   barcode: string
 ) => {
-  console.log(
-    idproducto,
-    descripcion,
-    costoprod,
-    codiva,
-    baseValue,
-    taxValue,
-    porcentaje,
-    barcode
-  );
+  selectPrice(finalPrice.value);
+  console.log(finalPrice.value);
+
+  if (finalPrice.value <= 0) {
+    const alert = await alertController.create({
+      cssClass: "my-custom-class",
+      header: "ATENCIÓN !!!",
+      subHeader: `NO PASA VALIDACIÓN `,
+      message: `DEBE SELECCIONAR PRECIO`,
+      buttons: ["ACEPTAR"],
+    });
+    await alert.present();
+    return;
+  }
+
+  const product = {
+    idproducto: idproducto,
+    descripcion: descripcion,
+    valorprod: finalPrice.value,
+    costoprod: costoprod,
+    codiva: codiva,
+    cantidad: 1,
+    despachado: 0,
+    descuento: 0,
+    porcdesc: 0,
+    base: baseValue,
+    ivaprod: taxValue,
+    porciva: porcentaje,
+    barcode,
+  };
+
+  productsArray.push(product);
+  _products.push(product);
+
+  finalPrice.value = 0;
+};
+
+const searchOneProduct = async (event: any) => {
+  let searchProduct = event.target.value;
+  productDescription.value = searchProduct.toUpperCase();
+  if (searchProduct === "") {
+    page.value = 1;
+    await getProducts();
+  }
+};
+const searchItem = async () => {
+  await getProducts(productDescription.value);
+};
+const searchByBarcodeItem = async () => {
+  barcode.value = searchByBarcode.value;
+  if (barcode.value === "") {
+    page.value = 1;
+    await getProducts();
+  } else {
+    await getProducts(productDescription.value, barcode.value);
+    setTimeout(async () => {
+      barcode.value = "";
+      await getProducts(productDescription.value, barcode.value);
+    }, 13000);
+  }
 };
 </script>
 <style scoped>

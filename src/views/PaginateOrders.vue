@@ -39,6 +39,7 @@
             >Anterior</ion-button
           >
           <ion-button color="mycolor" @click="nextPage()">Siguiente</ion-button>
+          <span> página {{ page }} </span>
         </ion-card-content>
 
         <ion-list v-for="order in orders" :key="order.idpedido">
@@ -131,7 +132,7 @@ const searchOrderByDate = async (dateParam: string) => {
   }
 };
 
-const goToEditOrder = (orderId:number) => {
+const goToEditOrder = (orderId: number) => {
   router.push(`/edit-order/${orderId}`);
 };
 
