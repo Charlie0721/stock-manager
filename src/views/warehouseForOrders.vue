@@ -119,15 +119,17 @@
           </ion-list>
         </ion-content>
       </ion-popover>
-        <ion-card class="login-card">
+      <ion-card class="login-card">
         <ion-card>
           <p v-if="customerName !== ''">CLIENTE: {{ customerName }}</p>
           <p v-if="employeeName !== ''">VENDEDOR: {{ employeeName }}</p>
           <ion-card-header>Seleccionar Parámetros</ion-card-header>
           <ion-card-content>
-            <ion-item>
-              <ion-label>Almacén</ion-label>
+            <ion-item style="--min-height: 40px">
+              <ion-label position="stacked">Almacén</ion-label>
               <ion-select
+                interface="popover"
+                style="max-width: 100%"
                 :value="SelectIdalmacen"
                 @ionChange="SelectIdalmacen = $event.target.value"
               >
@@ -140,9 +142,11 @@
                 </ion-select-option>
               </ion-select>
             </ion-item>
-            <ion-item>
-              <ion-label>Editar Precios</ion-label>
+            <ion-item style="--min-height: 40px">
+              <ion-label position="stacked">Editar Precios</ion-label>
               <ion-select
+                interface="popover"
+                style="max-width: 100%"
                 :value="editPrice"
                 @ionChange="editPrice = $event.target.value === 'true'"
               >
@@ -150,9 +154,11 @@
                 <ion-select-option :value="false">NO</ion-select-option>
               </ion-select>
             </ion-item>
-            <ion-item>
-              <ion-label>Editar Descuentos</ion-label>
+            <ion-item style="--min-height: 40px">
+              <ion-label position="stacked">Editar Descuentos</ion-label>
               <ion-select
+                interface="popover"
+                style="max-width: 100%"
                 :value="editDiscount"
                 @ionChange="editDiscount = $event.target.value === 'true'"
               >
@@ -165,9 +171,7 @@
       </ion-card>
     </ion-content>
     <ion-content>
-      <ion-card class="login-card">
-     
-      </ion-card>
+      <ion-card class="login-card"> </ion-card>
       <ion-button
         color="mycolor"
         class="btn-edit-product"

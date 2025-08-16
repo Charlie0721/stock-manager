@@ -197,7 +197,8 @@
     <ion-footer>
       <ion-toolbar>
         <ion-button color="mycolor" expand="block" @click="saveChanges">
-          Guardar cambios
+           <ion-icon :icon="icons.saveSharp"></ion-icon>
+           GUARDAR CAMBIOS
         </ion-button>
       </ion-toolbar>
     </ion-footer>
