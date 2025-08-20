@@ -274,8 +274,6 @@ onMounted(async () => {
 });
 const loadParams = async () => {
   const responseParams = await stockManagerParamsService.findOne(uuid.value);
-  console.log("responseParams", responseParams.data);
-
   editPrice.value = responseParams.data.Edita_Precio;
   editDiscount.value = responseParams.data.Edita_Descuento;
 };
