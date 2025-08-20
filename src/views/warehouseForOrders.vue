@@ -16,6 +16,12 @@
           <ion-item>
             <ion-label>Datos predeterminados para pedidos</ion-label>
           </ion-item>
+          <ion-button
+            color="mycolor"
+            class="btn-edit-product"
+            @click="reloadPage()"
+            ><ion-icon :icon="i.refreshCircleSharp"></ion-icon> Recargar Pagina
+          </ion-button>
         </ion-card-content>
       </ion-card>
       <ion-button
@@ -462,6 +468,9 @@ export default defineComponent({
         await alert.present();
       }
     },
+  },
+  reloadPage() {
+    location.reload();
   },
 });
 </script>

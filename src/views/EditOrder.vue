@@ -172,6 +172,7 @@
             <ion-input
               type="number"
               v-model.number="prod.valorprod"
+              :readonly="!editPrice"
             ></ion-input>
           </ion-item>
 
@@ -180,6 +181,7 @@
             <ion-input
               type="number"
               v-model.number="prod.descuento"
+              :readonly="!editDiscount"
             ></ion-input>
           </ion-item>
 
@@ -197,8 +199,8 @@
     <ion-footer>
       <ion-toolbar>
         <ion-button color="mycolor" expand="block" @click="saveChanges">
-           <ion-icon :icon="icons.saveSharp"></ion-icon>
-           GUARDAR CAMBIOS
+          <ion-icon :icon="icons.saveSharp"></ion-icon>
+          GUARDAR CAMBIOS
         </ion-button>
       </ion-toolbar>
     </ion-footer>
@@ -264,12 +266,18 @@ let barcode = ref<string>("");
 let searchByBarcode = ref<string>("");
 const modal = ref(null);
 let finalPrice = ref<number>(0);
+let editPrice = ref<number>(0);
+let editDiscount = ref<number>(0);
 onMounted(async () => {
   await findOne(orderId.value);
   await loadParams();
 });
 const loadParams = async () => {
   const responseParams = await stockManagerParamsService.findOne(uuid.value);
+  console.log("responseParams", responseParams.data);
+
+  editPrice.value = responseParams.data.Edita_Precio;
+  editDiscount.value = responseParams.data.Edita_Descuento;
 };
 const getProducts = async (description?: string, bacode?: string) => {
   try {
