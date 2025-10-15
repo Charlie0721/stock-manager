@@ -133,6 +133,11 @@ const routes: Array<RouteRecordRaw> = [
     name: "EditOrder",
     component: () => import("@/views/EditOrder.vue"),
   },
+  {
+    path: "/set-quantities-by-warehouse",
+    name: "ProductsInventory",
+    component: () => import("@/views/ProductsInventory.vue"),
+  },
 ];
 
 const router = createRouter({
