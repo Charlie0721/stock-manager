@@ -247,7 +247,6 @@ interface IOrder {
   valortotal: number;
   idalmacen: number;
 }
-
 const stockManagerParamsService = new StockManagerParamsService();
 const ordersService = new OrdersService();
 let presentingElement = ref(undefined);
