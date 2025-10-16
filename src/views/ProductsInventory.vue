@@ -7,57 +7,67 @@
       </ion-title>
     </ion-toolbar>
     <ion-content>
-      <ion-item style="--min-height: 40px">
-        <ion-label position="stacked">Almacén</ion-label>
-        <ion-select
-          interface="popover"
-          style="max-width: 100%"
-          v-model="warehouseId"
-        >
-          <ion-select-option
-            :value="warehouse.idalmacen"
-            v-for="warehouse in allWarehouses"
-            :key="warehouse.idalmacen"
+      <ion-card>
+        <ion-item style="--min-height: 40px">
+          <ion-label position="stacked">Almacén</ion-label>
+          <ion-select
+            interface="popover"
+            style="max-width: 100%"
+            v-model="warehouseId"
           >
-            {{ warehouse.nomalmacen }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
-      <ion-button
-        color="mycolor"
-        expand="block"
-        @click="getProductsInventory()"
-      >
-        <ion-icon :icon="icons.searchCircleSharp"></ion-icon>buscar
-        producto</ion-button
-      >
-      <ion-button
-        expand="full"
-        color="mycolor"
-        class="btn-edit-product"
-        @click="goToInventory()"
-        ><ion-icon :icon="icons.arrowForwardSharp"></ion-icon>Volver
-      </ion-button>
-      <ion-item>
-        <ion-input
-          type="search"
-          :value="searchByBarcode"
-          @input="searchByBarcode = $event.target.value"
-          placeholder="Buscar Código de barras"
-          @keypress.enter="searchByBarcodeItem()"
-        ></ion-input>
-      </ion-item>
-      <ion-searchbar
-        placeholder="Buscar Producto por descripción"
-        @ionChange="searchOneProduct($event)"
-        @keypress.enter="searchItem()"
-      ></ion-searchbar>
-      <ion-button color="mycolor" @click="prevPage()" v-if="page > 1"
-        >Anterior</ion-button
-      >
-      <ion-label>página {{ page }} </ion-label>
+            <ion-select-option
+              :value="warehouse.idalmacen"
+              v-for="warehouse in allWarehouses"
+              :key="warehouse.idalmacen"
+            >
+              {{ warehouse.nomalmacen }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-card>
+      <ion-card>
+        <ion-button
+          color="mycolor"
+          class="btn-edit-product"
+          @click="getProductsInventory()"
+        >
+          <ion-icon :icon="icons.searchCircleSharp"></ion-icon>Cargar items
+        </ion-button>
+        <ion-button
+          color="mycolor"
+          class="btn-edit-product"
+          @click="goToInventory()"
+          ><ion-icon :icon="icons.arrowForwardSharp"></ion-icon>Volver
+        </ion-button>
+        <ion-button
+          color="mycolor"
+          class="btn-edit-product"
+          @click="reloadView()"
+          ><ion-icon :icon="icons.refreshCircleSharp"></ion-icon> Recargar
+        </ion-button>
+      </ion-card>
+      <ion-card>
+        <ion-item>
+          <ion-input
+            type="search"
+            :value="searchByBarcode"
+            @input="searchByBarcode = $event.target.value"
+            placeholder="Buscar Código de barras"
+            @keypress.enter="searchByBarcodeItem()"
+          ></ion-input>
+        </ion-item>
+        <ion-searchbar
+          placeholder="Buscar Producto por descripción"
+          @ionChange="searchOneProduct($event)"
+          @keypress.enter="searchItem()"
+        ></ion-searchbar>
+        <ion-button color="mycolor" @click="prevPage()" v-if="page > 1"
+          >Anterior</ion-button
+        >
+        <ion-label>página {{ page }} </ion-label>
 
-      <ion-button color="mycolor" @click="nextPage()">Siguiente</ion-button>
+        <ion-button color="mycolor" @click="nextPage()">Siguiente</ion-button>
+      </ion-card>
 
       <ion-card v-for="prod in products" :key="prod.idproducto">
         <ion-card-header>
@@ -79,8 +89,34 @@
           </ion-item>
           <ion-item>
             <ion-label position="stacked">Nueva Cantidad</ion-label>
-            <ion-input type="number" v-model.number="newQuantity"></ion-input>
+            <ion-input
+              type="number"
+              v-model.number="newQuantities[prod.idproducto]"
+              placeholder="Nueva cantidad"
+            ></ion-input>
           </ion-item>
+          <ion-button
+            color="mycolor"
+            class="btn-edit-product"
+            @click="addAmount(prod.idproducto, prod.cantidad)"
+          >
+            sum. cant
+          </ion-button>
+          <!-- Botón de restar -->
+          <ion-button
+            color="mycolor"
+            class="btn-edit-product"
+            @click="subtractAmount(prod.idproducto, prod.cantidad)"
+          >
+            rest. cant
+          </ion-button>
+          <ion-button
+            color="mycolor"
+            class="btn-edit-product"
+            @click="sendZeroFunct(prod.idproducto, prod.cantidad)"
+          >
+            reset 0
+          </ion-button>
         </ion-card-content>
       </ion-card>
     </ion-content>
@@ -117,21 +153,137 @@ import router from "@/router";
 const route = useRoute();
 import { ProductsInventoryService } from "@/services/products-inventory.service";
 import { TradeOrders } from "@/services/tradeOrder";
-
+import { TUpdateProductsInventory } from "@/interfaces/update-products-inventory.type";
 const productsInventoryService = new ProductsInventoryService();
 let allWarehouses = ref<Array<any>>([]);
 let warehouseId = ref<number>(0);
 let page = ref<number>(1);
-let limit = ref<number>(2);
+let limit = ref<number>(1);
 let productDescription = ref<string>("");
 let barcode = ref<string>("");
 let searchByBarcode = ref<string>("");
 let products = ref<Array<any>>([]);
-let newQuantity = ref<number>(0);
+let newQuantities = reactive<Record<number, number>>({});
+let add = ref<number>(1);
+let subtract = ref<number>(2);
+let sendZero = ref<number>(3);
+
+let updateProductsInventory = reactive<TUpdateProductsInventory>({
+  idproducto: 0,
+  cantidad: 0,
+  cantidadActual: 0,
+  operacion: 0,
+});
 
 onMounted(async () => {
   await getWarehouses();
 });
+
+const addAmount = async (
+  idproducto: number,
+  quantity: number
+): Promise<void> => {
+  let newQuantity = newQuantities[idproducto] || 0;
+  updateProductsInventory.idproducto = idproducto;
+  updateProductsInventory.cantidad = newQuantity;
+  updateProductsInventory.cantidadActual = quantity;
+  updateProductsInventory.operacion = add.value;
+  const response = await productsInventoryService.updateProductsInventory(
+    warehouseId.value,
+    updateProductsInventory
+  );
+  if (response.data.status === 200) {
+    const alert = await alertController.create({
+      header: "Éxito",
+      message: "Cantidad actualizada correctamente",
+      buttons: ["OK"],
+    });
+    await alert.present();
+  } else {
+    const alert = await alertController.create({
+      header: "Error",
+      message: "No se pudo actualizar la cantidad",
+      buttons: ["OK"],
+    });
+    await alert.present();
+  }
+  await getProductsInventory();
+  newQuantities[idproducto] = 0;
+};
+
+const subtractAmount = async (
+  idproducto: number,
+  quantity: number
+): Promise<void> => {
+  let newQuantity = newQuantities[idproducto] || 0;
+  if (quantity < newQuantities[idproducto]) {
+    const alert = await alertController.create({
+      header: "Error",
+      message: "La cantidad a restar no puede ser mayor a la actual",
+      buttons: ["OK"],
+    });
+    await alert.present();
+    return;
+  }
+  updateProductsInventory.idproducto = idproducto;
+  updateProductsInventory.cantidad = newQuantity;
+  updateProductsInventory.cantidadActual = quantity;
+  updateProductsInventory.operacion = subtract.value;
+  const response = await productsInventoryService.updateProductsInventory(
+    warehouseId.value,
+    updateProductsInventory
+  );
+  if (response.data.status === 200) {
+    const alert = await alertController.create({
+      header: "Éxito",
+      message: "Cantidad actualizada correctamente",
+      buttons: ["OK"],
+    });
+    await alert.present();
+  } else {
+    const alert = await alertController.create({
+      header: "Error",
+      message: "No se pudo actualizar la cantidad",
+      buttons: ["OK"],
+    });
+    await alert.present();
+  }
+  await getProductsInventory();
+  newQuantities[idproducto] = 0;
+};
+
+const sendZeroFunct = async (
+  idproducto: number,
+  quantity: number
+): Promise<void> => {
+  const newQuantity = newQuantities[idproducto] || 0;
+  updateProductsInventory.idproducto = idproducto;
+  updateProductsInventory.cantidad = newQuantity;
+  updateProductsInventory.cantidadActual = quantity;
+  updateProductsInventory.operacion = sendZero.value;
+
+  const response = await productsInventoryService.updateProductsInventory(
+    warehouseId.value,
+    updateProductsInventory
+  );
+  if (response.data.status === 200) {
+    const alert = await alertController.create({
+      header: "Éxito",
+      message: "Cantidad reseteada a 0 correctamente",
+      buttons: ["OK"],
+    });
+    await alert.present();
+  } else {
+    const alert = await alertController.create({
+      header: "Error",
+      message: "No se pudo actualizar la cantidad",
+      buttons: ["OK"],
+    });
+    await alert.present();
+  }
+  await getProductsInventory();
+};
+
 const goToInventory = () => {
   router.push("/tabs/tab3");
 };
@@ -196,6 +348,9 @@ const nextPage = async () => {
   page.value++;
   await getProductsInventory();
 };
+const reloadView = () => {
+  location.reload();
+};
 </script>
 
 <style scoped>
@@ -205,5 +360,8 @@ ion-button {
 .edit-image1 {
   width: 5%;
   max-height: 5%;
+}
+.btn-edit-product {
+  border-radius: 30px;
 }
 </style>
