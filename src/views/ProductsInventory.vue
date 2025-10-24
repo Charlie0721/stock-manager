@@ -6,7 +6,7 @@
         Editar Inventario
       </ion-title>
     </ion-toolbar>
-    <ion-content>
+    <ion-content :fullscreen="true">
       <ion-fab
         id="remote_controller"
         vertical="start"
@@ -21,9 +21,8 @@
             <ion-card-header>Seleccionar Almacén</ion-card-header>
             <ion-card-content>
               <ion-item>
-
                 <ion-select
-                  interface="popover"
+                  interface="alert"
                   style="max-width: 100%"
                   v-model="warehouseId"
                 >
