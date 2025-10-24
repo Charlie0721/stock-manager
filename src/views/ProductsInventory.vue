@@ -7,7 +7,40 @@
       </ion-title>
     </ion-toolbar>
     <ion-content>
-      <ion-card>
+      <ion-fab
+        id="remote_controller"
+        vertical="start"
+        horizontal="start"
+        slot="fixed"
+      >
+        <ion-fab-button color="danger">
+          <ion-icon :icon="icons.add"></ion-icon>
+        </ion-fab-button>
+        <ion-fab-list side="bottom" @click="fabToggled($event)">
+          <ion-card>
+            <ion-card-header>Seleccionar Almacén</ion-card-header>
+            <ion-card-content>
+              <ion-item>
+
+                <ion-select
+                  interface="popover"
+                  style="max-width: 100%"
+                  v-model="warehouseId"
+                >
+                  <ion-select-option
+                    :value="warehouse.idalmacen"
+                    v-for="warehouse in allWarehouses"
+                    :key="warehouse.idalmacen"
+                  >
+                    {{ warehouse.nomalmacen }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+            </ion-card-content>
+          </ion-card>
+        </ion-fab-list>
+      </ion-fab>
+      <!-- <ion-card>
         <ion-item style="--min-height: 40px">
           <ion-label position="stacked">Almacén</ion-label>
           <ion-select
@@ -24,7 +57,7 @@
             </ion-select-option>
           </ion-select>
         </ion-item>
-      </ion-card>
+      </ion-card> -->
       <ion-card>
         <ion-button
           color="mycolor"
@@ -145,6 +178,9 @@ import {
   IonText,
   IonSelect,
   IonSelectOption,
+  IonFab,
+  IonFabButton,
+  IonFabList,
 } from "@ionic/vue";
 import * as icons from "ionicons/icons";
 import { onMounted, reactive, ref, watch } from "vue";
@@ -350,6 +386,9 @@ const nextPage = async () => {
 };
 const reloadView = () => {
   location.reload();
+};
+const fabToggled = (e: any) => {
+  e.stopPropagation();
 };
 </script>
 
